@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Control.h"
 #include <iostream>
+//#define DEBUGGING
 
 using namespace sf;
 
@@ -17,6 +18,15 @@ int main()
 
     int stateCounter=0;
     int frameCounter=0;
+
+    #ifdef DEBUGGING
+    Font font;
+    font.loadFromFile("assets/fonts/Roboto-Light.ttf");
+    Text text;
+    text.setColor(Color::White);
+    text.setFont(font);
+    text.setCharacterSize(20);
+    #endif // DEBUGGING
 
     while (window.isOpen())
     {
@@ -41,6 +51,10 @@ int main()
 
         window.clear(Color(100,100,100));
         controls.draw();
+        #ifdef DEBUGGING
+        text.setString(std::to_string(stateCounter));
+        window.draw(text);
+        #endif // DEBUGGING
         window.display();
     }
 

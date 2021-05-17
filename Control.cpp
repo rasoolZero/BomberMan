@@ -48,7 +48,7 @@ void Control::update(int * stateCounter=0){
     for(int i=0;i<4;i++){
         if(buttons[i].getGlobalBounds().contains(mousePosition)){
             if(i==0){
-                if(!stateCounter)
+                if(stateCounter)
                     *stateCounter=0;
             }
             if(i==1){
