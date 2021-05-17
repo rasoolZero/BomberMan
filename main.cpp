@@ -1,6 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include "Control.h"
 
 using namespace sf;
+
+int control_height=200;
 
 int main()
 {
@@ -9,7 +12,7 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(30);
-
+    Control controls(window,window.getSize().x,control_height);
 
     while (window.isOpen())
     {
