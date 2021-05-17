@@ -20,10 +20,13 @@ int main()
     int frameCounter=0;
 
     #ifdef DEBUGGING
+    Clock timer;
+    timer.restart();
+
     Font font;
     font.loadFromFile("assets/fonts/Roboto-Light.ttf");
     Text text;
-    text.setColor(Color::White);
+    text.setColor(Color::Red);
     text.setFont(font);
     text.setCharacterSize(20);
     #endif // DEBUGGING
@@ -52,7 +55,8 @@ int main()
         window.clear(Color(100,100,100));
         controls.draw();
         #ifdef DEBUGGING
-        text.setString(std::to_string(stateCounter));
+        Time t = timer.restart();
+        text.setString("state counter: "+std::to_string(stateCounter)+"\nFPS: "+std::to_string(1/t.asSeconds()));
         window.draw(text);
         #endif // DEBUGGING
         window.display();
