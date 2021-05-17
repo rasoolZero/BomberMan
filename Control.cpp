@@ -41,3 +41,33 @@ void Control::draw(){
     for(int i=0;i<4;i++)
         window.draw(buttons[i]);
 }
+
+void Control::update(int * stateCounter=0){
+    Vector2i mousePositioni = Mouse::getPosition();
+    Vector2f mousePosition = Vector2f(mousePositioni.x,mousePositioni.y);
+    for(int i=0;i<4;i++){
+        if(buttons[i].getGlobalBounds().contains(mousePosition)){
+            if(i==0){
+                if(!stateCounter)
+                    *stateCounter=0;
+            }
+            if(i==1){
+                playing=false;
+            }
+            if(i==2){
+                playing=true;
+            }
+            if(i==3){
+                speed=speed%3+1;
+                buttons[3].setTexture(speedButtons+speed-1);
+                if(speed==1)
+                    frameThreshold=15;
+                if(speed==2)
+                    frameThreshold=10;
+                if(speed==3)
+                    frameThreshold=5;
+            }
+            break;
+        }
+    }
+}

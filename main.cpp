@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Control.h"
+#include <iostream>
 
 using namespace sf;
 
@@ -14,6 +15,9 @@ int main()
     window.setFramerateLimit(30);
     Control controls(window,window.getSize().x,control_height);
 
+    int stateCounter=0;
+    int frameCounter=0;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -21,6 +25,18 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::MouseButtonPressed)
+                if(event.mouseButton.button == sf::Mouse::Left)
+                    controls.update();
+
+
+        }
+        if(controls.isPlaying()){
+            frameCounter++;
+            if(frameCounter>=controls.getFrameThreshold()){
+                frameCounter=0;
+                stateCounter++;
+            }
         }
 
         window.clear(Color(100,100,100));

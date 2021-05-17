@@ -9,6 +9,9 @@ class Control
     public:
         Control(RenderWindow & _window, int _width, int _height);
         void draw();
+        void update();
+        int getFrameThreshold(){return frameThreshold;}
+        bool isPlaying(){return playing;}
 
     protected:
 
@@ -22,6 +25,9 @@ class Control
         RenderWindow &window;
         int width;
         int height;
+        int speed=1;
+        int frameThreshold=15;
+        bool playing=true;
 
 };
 
