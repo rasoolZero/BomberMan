@@ -27,7 +27,7 @@ int main()
                 window.close();
             if (event.type == sf::Event::MouseButtonPressed)
                 if(event.mouseButton.button == sf::Mouse::Left)
-                    controls.update();
+                    controls.update(&stateCounter);
 
 
         }

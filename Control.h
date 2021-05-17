@@ -9,7 +9,7 @@ class Control
     public:
         Control(RenderWindow & _window, int _width, int _height);
         void draw();
-        void update();
+        void update(int *);
         int getFrameThreshold(){return frameThreshold;}
         bool isPlaying(){return playing;}
 
