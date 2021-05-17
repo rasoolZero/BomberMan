@@ -24,14 +24,20 @@ Control::Control(RenderWindow & _window, int _width, int _height) : window(_wind
     float scale = std::min((height-20)/2.0,(width-300)/4.0);
     float top_offset = (height - scale)/2.0;
     float const side_margin = 30;
-    float side_offset = (width/2.0)-side_margin-(side_margin/2);
+    float side_offset = (width/2.0)-side_margin-(side_margin/2)-2*scale;
     for(int i=0;i<4;i++){
         buttons[i].setSize(Vector2f(scale,scale));
-        buttons[i].setPosition(side_offset+i*side_margin,top_offset);
+        buttons[i].setPosition(side_offset+i*side_margin+i*scale,top_offset);
     }
     buttons[0].setTexture(&rewindButton);
     buttons[1].setTexture(&pauseButton);
     buttons[2].setTexture(&playButton);
     buttons[3].setTexture(speedButtons);
 
+}
+
+void Control::draw(){
+    window.draw(background);
+    for(int i=0;i<4;i++)
+        window.draw(buttons[i]);
 }

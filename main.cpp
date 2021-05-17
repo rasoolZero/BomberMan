@@ -24,7 +24,7 @@ int main()
         }
 
         window.clear(Color(100,100,100));
-
+        controls.draw();
         window.display();
     }
 

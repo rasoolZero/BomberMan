@@ -8,6 +8,7 @@ class Control
 {
     public:
         Control(RenderWindow & _window, int _width, int _height);
+        void draw();
 
     protected:
 
