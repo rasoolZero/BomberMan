@@ -20,8 +20,8 @@ int main()
                 window.close();
         }
 
-        window.clear(Color::White);
-        window.draw(quad,&texture);
+        window.clear(Color(100,100,100));
+
         window.display();
     }
 
