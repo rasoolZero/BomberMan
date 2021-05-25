@@ -13,53 +13,59 @@ Control::Control(RenderWindow & _window, int _width, int _height) : window(_wind
     rewindButton.loadFromFile("assets/buttons/rewind_button.png");
     playButton.loadFromFile("assets/buttons/play_button.png");
     pauseButton.loadFromFile("assets/buttons/paused_button.png");
+    forwardButton.loadFromFile("assets/buttons/forward_button.png");
+    backwardButton.loadFromFile("assets/buttons/backward_button.png");
     rewindButton.setSmooth(true);
     playButton.setSmooth(true);
     pauseButton.setSmooth(true);
+    forwardButton.setSmooth(true);
+    backwardButton.setSmooth(true);
 
     background.setPosition(0,0);
     background.setSize(Vector2f(width,height));
     background.setFillColor(Color(50,50,50));
 
-    float scale = std::min((height-20)/2.0,(width-300)/4.0);
+    float scale = std::min((height-20)/2.0,(width-300)/double(BUTTONS));
     float top_offset = (height - scale)/2.0;
     float const side_margin = 30;
-    float side_offset = (width/2.0)-side_margin-(side_margin/2)-2*scale;
-    for(int i=0;i<4;i++){
+    float side_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
+    for(int i=0;i<BUTTONS;i++){
         buttons[i].setSize(Vector2f(scale,scale));
         buttons[i].setPosition(side_offset+i*side_margin+i*scale,top_offset);
     }
     buttons[0].setTexture(&rewindButton);
-    buttons[1].setTexture(&pauseButton);
-    buttons[2].setTexture(&playButton);
-    buttons[3].setTexture(speedButtons);
+    buttons[1].setTexture(&backwardButton);
+    buttons[2].setTexture(&pauseButton);
+    buttons[3].setTexture(&playButton);
+    buttons[4].setTexture(&forwardButton);
+    buttons[5].setTexture(speedButtons);
 
 }
 
 void Control::draw(){
     window.draw(background);
-    for(int i=0;i<4;i++)
+    for(int i=0;i<BUTTONS;i++)
         window.draw(buttons[i]);
 }
 
 void Control::update(int * stateCounter=0){
     Vector2i mousePositioni = Mouse::getPosition();
     Vector2f mousePosition = Vector2f(mousePositioni.x,mousePositioni.y);
-    for(int i=0;i<4;i++){
+    for(int i=0;i<BUTTONS;i++){
         if(buttons[i].getGlobalBounds().contains(mousePosition)){
-            if(i==0){
+            if(i==0){ //rewind
                 if(stateCounter)
                     *stateCounter=0;
             }
-            if(i==1){
+            if(i==2){ //stop
                 playing=false;
             }
-            if(i==2){
+            if(i==3){ //play
                 playing=true;
             }
-            if(i==3){
+            if(i==5){ //change speed
                 speed=speed%3+1;
-                buttons[3].setTexture(speedButtons+speed-1);
+                buttons[5].setTexture(speedButtons+speed-1);
                 if(speed==1)
                     frameThreshold=15;
                 if(speed==2)
@@ -67,6 +73,14 @@ void Control::update(int * stateCounter=0){
                 if(speed==3)
                     frameThreshold=5;
             }
+            if(i==1) //backward
+                if(playing==false){
+                    (*stateCounter)--;
+                }
+            if(i==4) //forward
+                if(playing==false){
+                    (*stateCounter)++;
+                }
             break;
         }
     }

@@ -1,6 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 #include <SFML/Graphics.hpp>
+#define BUTTONS 6
 
 using namespace sf;
 
@@ -16,12 +17,14 @@ class Control
     protected:
 
     private:
-        RectangleShape buttons[4];
+        RectangleShape buttons[BUTTONS];
         RectangleShape background;
         Texture speedButtons[3];
         Texture rewindButton;
         Texture playButton;
         Texture pauseButton;
+        Texture backwardButton;
+        Texture forwardButton;
         RenderWindow &window;
         int width;
         int height;
