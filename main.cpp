@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include "Control.h"
+#include "Audio.h"
 #include <iostream>
 //#define DEBUGGING
 #define CONTROL_WIDTH 150
-
 using namespace sf;
 
 int main()
@@ -13,7 +13,8 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(30);
-    Control controls(window,CONTROL_WIDTH,window.getSize().y);
+    Audio audio;
+    Control controls(window,audio,CONTROL_WIDTH,window.getSize().y);
 
     int stateCounter=0;
     int frameCounter=0;
@@ -40,9 +41,11 @@ int main()
             if (event.type == sf::Event::MouseButtonPressed)
                 if(event.mouseButton.button == sf::Mouse::Left)
                     controls.update(&stateCounter);
-
-
+            if (event.type == sf::Event::KeyPressed)
+                if (event.key.code == sf::Keyboard::Escape)
+                    window.close();
         }
+
         if(controls.isPlaying()){
             frameCounter++;
             if(frameCounter>=controls.getFrameThreshold()){
