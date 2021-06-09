@@ -2,10 +2,9 @@
 #include "Control.h"
 #include <iostream>
 //#define DEBUGGING
+#define CONTROL_WIDTH 150
 
 using namespace sf;
-
-int control_height=200;
 
 int main()
 {
@@ -14,7 +13,7 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(30);
-    Control controls(window,window.getSize().x,control_height);
+    Control controls(window,CONTROL_WIDTH,window.getSize().y);
 
     int stateCounter=0;
     int frameCounter=0;

@@ -25,13 +25,13 @@ Control::Control(RenderWindow & _window, int _width, int _height) : window(_wind
     background.setSize(Vector2f(width,height));
     background.setFillColor(Color(50,50,50));
 
-    float scale = std::min((height-20)/2.0,(width-300)/double(BUTTONS));
-    float top_offset = (height - scale)/2.0;
+    float const scale = std::min((width-20)/2.0,(height-300)/double(BUTTONS));
+    float const left_offset = (width - scale)/2.0;
     float const side_margin = 30;
-    float side_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
+    float const side_offset = (height/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
     for(int i=0;i<BUTTONS;i++){
         buttons[i].setSize(Vector2f(scale,scale));
-        buttons[i].setPosition(side_offset+i*side_margin+i*scale,top_offset);
+        buttons[i].setPosition(left_offset,side_offset+i*side_margin+i*scale);
     }
     buttons[0].setTexture(&rewindButton);
     buttons[1].setTexture(&backwardButton);
@@ -75,6 +75,7 @@ void Control::update(int * stateCounter=0){
             }
             if(i==1) //backward
                 if(playing==false){
+                    if(*stateCounter>0)
                     (*stateCounter)--;
                 }
             if(i==4) //forward
