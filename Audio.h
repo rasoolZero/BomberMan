@@ -2,6 +2,7 @@
 #define AUDIO_H
 #include <vector>
 #include <SFML/Audio.hpp>
+#include <Thor/Resources.hpp>
 #define SOUNDS 6
 
 using namespace sf;
@@ -10,7 +11,7 @@ class Audio
 {
     public:
         enum Sounds{Pause,Play,Rewind,Click,Failed,Music};
-        Audio();
+        Audio( thor::ResourceHolder<SoundBuffer,int> & soundBuffers);
         void play(Sounds _sound);
         void stop(Sounds _sound);
         void setSound(bool _sound){this->sound=_sound;}
@@ -19,7 +20,7 @@ class Audio
 
     private:
     std::vector<Sound> sounds;
-    std::vector<SoundBuffer> buffers;
+    thor::ResourceHolder<SoundBuffer,int> & buffers;
     bool sound=true;
 };
 

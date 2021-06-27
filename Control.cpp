@@ -1,33 +1,13 @@
 #include "Control.h"
-#include <string.h>
+#include <string>
 #include <iostream>
 
 using namespace sf;
 
-Control::Control(RenderWindow & _window,Audio & _audio, int _width, int _height) : window(_window),audio(_audio),width(_width),height(_height)
+Control::Control(RenderWindow & _window,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures) :
+                window(_window),audio(_audio),width(_width),height(_height),textures(_textures)
 {
-    for(int i=0;i<3;i++){
-        speedButtons[i].loadFromFile("assets/buttons/speed_button_"+std::to_string(i+1)+".png");
-        speedButtons[i].setSmooth(true);
-    }
-    rewindButton.loadFromFile("assets/buttons/rewind_button.png");
-    playButton.loadFromFile("assets/buttons/play_button.png");
-    pauseButton.loadFromFile("assets/buttons/paused_button.png");
-    forwardButton.loadFromFile("assets/buttons/forward_button.png");
-    backwardButton.loadFromFile("assets/buttons/backward_button.png");
-    soundOn.loadFromFile("assets/buttons/sound_on.png");
-    soundOff.loadFromFile("assets/buttons/sound_off.png");
-    musicOn.loadFromFile("assets/buttons/music_on.png");
-    musicOff.loadFromFile("assets/buttons/music_off.png");
-    rewindButton.setSmooth(true);
-    playButton.setSmooth(true);
-    pauseButton.setSmooth(true);
-    forwardButton.setSmooth(true);
-    backwardButton.setSmooth(true);
-    soundOn.setSmooth(true);
-    soundOff.setSmooth(true);
-    musicOn.setSmooth(true);
-    musicOff.setSmooth(true);
+
 
     background.setPosition(0,0);
     background.setSize(Vector2f(width,height));
@@ -41,12 +21,12 @@ Control::Control(RenderWindow & _window,Audio & _audio, int _width, int _height)
         buttons[i].setSize(Vector2f(scale,scale));
         buttons[i].setPosition(left_offset,side_offset+i*side_margin+i*scale);
     }
-    buttons[0].setTexture(&rewindButton);
-    buttons[1].setTexture(&backwardButton);
-    buttons[2].setTexture(&pauseButton);
-    buttons[3].setTexture(&playButton);
-    buttons[4].setTexture(&forwardButton);
-    buttons[5].setTexture(speedButtons);
+    buttons[0].setTexture(&textures["rewind_button"]);
+    buttons[1].setTexture(&textures["backward_button"]);
+    buttons[2].setTexture(&textures["pause_button"]);
+    buttons[3].setTexture(&textures["play_button"]);
+    buttons[4].setTexture(&textures["forward_button"]);
+    buttons[5].setTexture(&textures["speed_button_1"]);
 
     float const _scale=30.0;
     float const offset = (width-2*_scale)/4.0;
@@ -54,8 +34,8 @@ Control::Control(RenderWindow & _window,Audio & _audio, int _width, int _height)
         soundButtons[i].setSize(Vector2f(_scale,_scale));
         soundButtons[i].setPosition((2*i+1)*offset+(i)*_scale,height-_scale-5);
     }
-    soundButtons[0].setTexture(&musicOff);
-    soundButtons[1].setTexture(&soundOn);
+    soundButtons[0].setTexture(&textures["music_off"]);
+    soundButtons[1].setTexture(&textures["sound_on"]);
 
 }
 
@@ -86,7 +66,7 @@ void Control::update(int * stateCounter=0){
             }
             if(i==5){ //change speed
                 speed=speed%3+1;
-                buttons[5].setTexture(speedButtons+speed-1);
+                buttons[5].setTexture(&textures["speed_button_"+std::to_string(speed)]);
                 if(speed==1)
                     frameThreshold=15;
                 if(speed==2)
@@ -120,7 +100,7 @@ void Control::update(int * stateCounter=0){
         if(soundButtons[i].getGlobalBounds().contains(mousePosition)){
             if(i==0){
                 music=!music;
-                soundButtons[i].setTexture(music?&musicOn:&musicOff);
+                soundButtons[i].setTexture(music?&textures["music_on"]:&textures["music_off"]);
                 if(music)
                     audio.play(Audio::Music);
                 else
@@ -128,7 +108,7 @@ void Control::update(int * stateCounter=0){
             }
             if(i==1){
                 sound=!sound;
-                soundButtons[i].setTexture(sound?&soundOn:&soundOff);
+                soundButtons[i].setTexture(sound?&textures["sound_on"]:&textures["sound_off"]);
                 audio.setSound(sound);
                 audio.play(Audio::Click);
             }

@@ -1,6 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
 #include "Audio.h"
 #define BUTTONS 6
 
@@ -9,7 +10,7 @@ using namespace sf;
 class Control
 {
     public:
-        Control(RenderWindow & _window,Audio & _audio, int _width, int _height);
+        Control(RenderWindow & _window,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures);
         void draw();
         void update(int *);
         int getFrameThreshold(){return frameThreshold;}
@@ -18,21 +19,10 @@ class Control
     protected:
 
     private:
+        thor::ResourceHolder<Texture,std::string> & textures;
         RectangleShape buttons[BUTTONS];
         RectangleShape background;
-        Texture speedButtons[3];
-        Texture rewindButton;
-        Texture playButton;
-        Texture pauseButton;
-        Texture backwardButton;
-        Texture forwardButton;
-
-        Texture soundOn;
-        Texture soundOff;
-        Texture musicOn;
-        Texture musicOff;
         RectangleShape soundButtons[2];
-
 
         RenderWindow &window;
         Audio &audio;
