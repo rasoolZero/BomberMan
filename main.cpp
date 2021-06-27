@@ -2,10 +2,13 @@
 #include "Control.h"
 #include "Audio.h"
 #include <iostream>
+#include <fstream>
 #include <Thor/Resources.hpp>
+#include <json.hpp>
 //#define DEBUGGING
 #define CONTROL_WIDTH 150
 using namespace sf;
+using json = nlohmann::json;
 Time DeltaTime;
 
 int main()
@@ -36,6 +39,11 @@ int main()
         std::cout << e.what() << std::endl;
         return 1;
     }
+    std::ifstream i("log.json");
+    json j;
+    i >> j;
+    i.close();
+    std::cout << j << std::endl;
     Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;

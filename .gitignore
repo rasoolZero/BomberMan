@@ -4,3 +4,4 @@ obj
 BomberMan.*
 /debug
 todo.txt
+*.json
