@@ -1,11 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include "Control.h"
 #include "Audio.h"
+#include "Game.h"
 #include <iostream>
 #include <fstream>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
-//#define DEBUGGING
+#define DEBUGGING
 #define CONTROL_WIDTH 150
 using namespace sf;
 using json = nlohmann::json;
@@ -28,6 +29,8 @@ int main()
         textures.acquire("music_on",thor::Resources::fromFile<Texture>("assets/buttons/music_on.png")).setSmooth(true);
         textures.acquire("music_off",thor::Resources::fromFile<Texture>("assets/buttons/music_off.png")).setSmooth(true);
 
+        textures.acquire("floor",thor::Resources::fromFile<Texture>("assets/sprites/floor.png")).setSmooth(true);
+
         soundBuffers.acquire(0,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Pause.wav"));
         soundBuffers.acquire(1,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Play.wav"));
         soundBuffers.acquire(2,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Rewind.wav"));
@@ -43,11 +46,11 @@ int main()
     json j;
     i >> j;
     i.close();
-    std::cout << j << std::endl;
     Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
+    Game game(window,j,textures,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,audio,CONTROL_WIDTH,window.getSize().y,textures);
 
@@ -92,6 +95,7 @@ int main()
 
         window.clear(Color(100,100,100));
         controls.draw();
+        game.update();
         #ifdef DEBUGGING
         Time t = timer.restart();
         text.setString("state: "+std::to_string(stateCounter)+"\nFPS: "+std::to_string((int)(1/t.asSeconds())));
