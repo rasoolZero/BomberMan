@@ -1,5 +1,6 @@
 #include "Game.h"
-
+#include "Control.h"
+#include "Tile_State.h"
 using namespace sf;
 using json = nlohmann::json;
 
@@ -10,6 +11,7 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     rows = _json["initial_game_data"]["map_height"];
     totalTurns = _json["initial_game_data"]["last_turn"];
     initialHealth = _json["initial_game_data"]["initial_health"];
+    turn = 0;
 
 
     float widthRatio=(_window.getSize().x-offset)/(float)columns;
@@ -34,12 +36,61 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
             quad[3].texCoords = Vector2f(0,textureSize.y);
         }
     }
+
+
+
+    obstacle.setTexture(&textures["obstacle"]);
+    obstacle.setSize(Vector2f(scale,scale));
+    box.setTexture(&textures["box"]);
+    box.setSize(Vector2f(scale,scale));
 }
 
 void Game::update(){
+    timePassed+=DeltaTime.asSeconds();
+    if(!playing || turn==totalTurns-1)
+        timePassed=0.0;
+    if(timePassed>=timeThreshold){
+        timePassed=0.0;
+        turn++;
+        if(turn==totalTurns)
+            turn--;
+    }
     draw();
 }
 
 void Game::draw(){
     window.draw(vertices,&textures["floor"]);
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<columns;j++){
+            int mask = json_["turns"][turn]["map_data"][i][j];
+            if(has_state(mask,Tile_State::wall)){
+                obstacle.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(obstacle);
+            }
+            if(has_state(mask,Tile_State::box)){
+                box.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(box);
+            }
+        }
+    }
 }
+
+void Game::changeSpeed(int speed){
+    if(speed==1)
+        timeThreshold=0.5;
+    if(speed==2)
+        timeThreshold=0.25;
+    if(speed==3)
+        timeThreshold=0.15;
+}
+
+bool Game::setTurn(unsigned _turn){
+    if(_turn >= totalTurns)
+        return false;
+    if(_turn < 0)
+        return false;
+    turn = _turn;
+    timePassed=0;
+    return true;
+}
+

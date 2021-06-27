@@ -7,13 +7,14 @@
 
 using namespace sf;
 
+class Game;
+
 class Control
 {
     public:
-        Control(RenderWindow & _window,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures);
+        Control(RenderWindow & _window,Game & _game,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures);
         void draw();
-        void update(int *);
-        float getTimeThreshold(){return timeThreshold;}
+        void update();
         bool isPlaying(){return playing;}
 
     protected:
@@ -25,11 +26,11 @@ class Control
         RectangleShape soundButtons[2];
 
         RenderWindow &window;
-        Audio &audio;
+        Audio & audio;
+        Game & game;
         int width;
         int height;
         int speed=1;
-        float timeThreshold=0.5;
         bool playing=true;
         bool sound=true;
         bool music=false;

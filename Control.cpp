@@ -1,11 +1,14 @@
 #include "Control.h"
+#include "Game.h"
 #include <string>
 #include <iostream>
 
 using namespace sf;
 
-Control::Control(RenderWindow & _window,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures) :
-                window(_window),audio(_audio),width(_width),height(_height),textures(_textures)
+
+
+Control::Control(RenderWindow & _window,Game & _game,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures) :
+                window(_window),game(_game),audio(_audio),width(_width),height(_height),textures(_textures)
 {
 
 
@@ -47,38 +50,34 @@ void Control::draw(){
         window.draw(soundButtons[i]);
 }
 
-void Control::update(int * stateCounter=0){
+void Control::update(){
     Vector2i mousePositioni = Mouse::getPosition();
     Vector2f mousePosition = Vector2f(mousePositioni.x,mousePositioni.y);
     for(int i=0;i<BUTTONS;i++){
         if(buttons[i].getGlobalBounds().contains(mousePosition)){
             if(i==0){ //rewind
-                *stateCounter=0;
+                game.setTurn(0);
                 audio.play(Audio::Rewind);
             }
             if(i==2){ //stop
                 playing=false;
+                game.setPlaying(playing);
                 audio.play(Audio::Pause);
             }
             if(i==3){ //play
                 playing=true;
+                game.setPlaying(playing);
                 audio.play(Audio::Play);
             }
             if(i==5){ //change speed
                 speed=speed%3+1;
                 buttons[5].setTexture(&textures["speed_button_"+std::to_string(speed)]);
-                if(speed==1)
-                    timeThreshold=0.5;
-                if(speed==2)
-                    timeThreshold=0.25;
-                if(speed==3)
-                    timeThreshold=0.15;
+                game.changeSpeed(speed);
                 audio.play(Audio::Click);
             }
             if(i==1) //backward
                 if(playing==false){
-                    if(*stateCounter>0){
-                        (*stateCounter)--;
+                    if(game.setTurn(game.getTurn()-1)){
                         audio.play(Audio::Click);
                     }
                     else
@@ -88,8 +87,11 @@ void Control::update(int * stateCounter=0){
                     audio.play(Audio::Failed);
             if(i==4) //forward
                 if(playing==false){
-                    (*stateCounter)++;
-                    audio.play(Audio::Click);
+                    if(game.setTurn(game.getTurn()+1)){
+                        audio.play(Audio::Click);
+                    }
+                    else
+                        audio.play(Audio::Failed);
                 }
                 else
                     audio.play(Audio::Failed);

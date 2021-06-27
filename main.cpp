@@ -30,6 +30,8 @@ int main()
         textures.acquire("music_off",thor::Resources::fromFile<Texture>("assets/buttons/music_off.png")).setSmooth(true);
 
         textures.acquire("floor",thor::Resources::fromFile<Texture>("assets/sprites/floor.png")).setSmooth(true);
+        textures.acquire("box",thor::Resources::fromFile<Texture>("assets/sprites/box.png")).setSmooth(true);
+        textures.acquire("obstacle",thor::Resources::fromFile<Texture>("assets/sprites/obstacle.png")).setSmooth(true);
 
         soundBuffers.acquire(0,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Pause.wav"));
         soundBuffers.acquire(1,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Play.wav"));
@@ -52,10 +54,7 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
     Game game(window,j,textures,CONTROL_WIDTH);
     Audio audio(soundBuffers);
-    Control controls(window,audio,CONTROL_WIDTH,window.getSize().y,textures);
-
-    int stateCounter=0;
-    float timePassed=0;
+    Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
 
     #ifdef DEBUGGING
     Clock timer;
@@ -79,18 +78,10 @@ int main()
                 window.close();
             if (event.type == sf::Event::MouseButtonPressed)
                 if(event.mouseButton.button == sf::Mouse::Left)
-                    controls.update(&stateCounter);
+                    controls.update();
             if (event.type == sf::Event::KeyPressed)
                 if (event.key.code == sf::Keyboard::Escape)
                     window.close();
-        }
-
-        if(controls.isPlaying()){
-            timePassed+=DeltaTime.asSeconds();
-            if(timePassed>=controls.getTimeThreshold()){
-                timePassed=0.0;
-                stateCounter++;
-            }
         }
 
         window.clear(Color(100,100,100));
@@ -98,7 +89,7 @@ int main()
         game.update();
         #ifdef DEBUGGING
         Time t = timer.restart();
-        text.setString("state: "+std::to_string(stateCounter)+"\nFPS: "+std::to_string((int)(1/t.asSeconds())));
+        text.setString("state: "+std::to_string(game.getTurn())+"\nFPS: "+std::to_string((int)(1/t.asSeconds())));
         window.draw(text);
         #endif // DEBUGGING
         window.display();
