@@ -29,7 +29,7 @@ class Game
         RenderWindow &window;
         json & json_;
         thor::ResourceHolder<Texture,std::string> & textures;
-        RectangleShape obstacle,box;
+        RectangleShape obstacle,box,deadzone;
         int rows;
         int columns;
         int totalTurns;

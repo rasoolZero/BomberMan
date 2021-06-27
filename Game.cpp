@@ -43,6 +43,8 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     obstacle.setSize(Vector2f(scale,scale));
     box.setTexture(&textures["box"]);
     box.setSize(Vector2f(scale,scale));
+    deadzone.setFillColor(Color(250,0,0,100));
+    deadzone.setSize(Vector2f(scale,scale));
 }
 
 void Game::update(){
@@ -71,17 +73,29 @@ void Game::draw(){
                 box.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(box);
             }
+
+
+
+
+
+
+
+
+            if(has_state(mask,Tile_State::deadzone)){
+                deadzone.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(deadzone);
+            }
         }
     }
 }
 
 void Game::changeSpeed(int speed){
     if(speed==1)
-        timeThreshold=0.5;
+        timeThreshold=0.6;
     if(speed==2)
-        timeThreshold=0.25;
+        timeThreshold=0.3;
     if(speed==3)
-        timeThreshold=0.15;
+        timeThreshold=0.2;
 }
 
 bool Game::setTurn(unsigned _turn){
