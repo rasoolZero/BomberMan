@@ -68,11 +68,11 @@ void Control::update(int * stateCounter=0){
                 speed=speed%3+1;
                 buttons[5].setTexture(&textures["speed_button_"+std::to_string(speed)]);
                 if(speed==1)
-                    frameThreshold=15;
+                    timeThreshold=0.5;
                 if(speed==2)
-                    frameThreshold=10;
+                    timeThreshold=0.25;
                 if(speed==3)
-                    frameThreshold=5;
+                    timeThreshold=0.15;
                 audio.play(Audio::Click);
             }
             if(i==1) //backward

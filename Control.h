@@ -13,7 +13,7 @@ class Control
         Control(RenderWindow & _window,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures);
         void draw();
         void update(int *);
-        int getFrameThreshold(){return frameThreshold;}
+        float getTimeThreshold(){return timeThreshold;}
         bool isPlaying(){return playing;}
 
     protected:
@@ -29,7 +29,7 @@ class Control
         int width;
         int height;
         int speed=1;
-        int frameThreshold=15;
+        float timeThreshold=0.5;
         bool playing=true;
         bool sound=true;
         bool music=false;

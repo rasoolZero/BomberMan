@@ -6,7 +6,7 @@
 //#define DEBUGGING
 #define CONTROL_WIDTH 150
 using namespace sf;
-
+Time DeltaTime;
 
 int main()
 {
@@ -36,16 +36,15 @@ int main()
         std::cout << e.what() << std::endl;
         return 1;
     }
+    Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(30);
     Audio audio(soundBuffers);
     Control controls(window,audio,CONTROL_WIDTH,window.getSize().y,textures);
 
     int stateCounter=0;
-    int frameCounter=0;
+    float timePassed=0;
 
     #ifdef DEBUGGING
     Clock timer;
@@ -61,6 +60,7 @@ int main()
 
     while (window.isOpen())
     {
+        DeltaTime = clk.restart();
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -75,9 +75,9 @@ int main()
         }
 
         if(controls.isPlaying()){
-            frameCounter++;
-            if(frameCounter>=controls.getFrameThreshold()){
-                frameCounter=0;
+            timePassed+=DeltaTime.asSeconds();
+            if(timePassed>=controls.getTimeThreshold()){
+                timePassed=0.0;
                 stateCounter++;
             }
         }
@@ -86,7 +86,7 @@ int main()
         controls.draw();
         #ifdef DEBUGGING
         Time t = timer.restart();
-        text.setString("state counter: "+std::to_string(stateCounter)+"\nFPS: "+std::to_string(1/t.asSeconds()));
+        text.setString("state: "+std::to_string(stateCounter)+"\nFPS: "+std::to_string((int)(1/t.asSeconds())));
         window.draw(text);
         #endif // DEBUGGING
         window.display();
