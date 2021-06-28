@@ -47,9 +47,11 @@ class Game
 
         RectangleShape powerup1;
         RectangleShape powerup2;
+        RectangleShape fire;
         thor::FrameAnimation powerupAnimation;
-        thor::FrameAnimation powerupStopAnimation;
+        thor::FrameAnimation fireAnimation;
         thor::Animator<sf::RectangleShape, std::string> powerupAnimator;
+        thor::Animator<sf::RectangleShape, std::string> fireAnimator;
 
         float timeThresholds[4]={0,0.6,0.3,0.2};
 

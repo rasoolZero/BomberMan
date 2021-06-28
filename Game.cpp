@@ -50,18 +50,30 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     powerup2.setTexture(&textures["powerup2"]);
     powerup1.setSize(Vector2f(scale,scale));
     powerup2.setSize(Vector2f(scale,scale));
+    fire.setTexture(&textures["fire"]);
+    fire.setSize(Vector2f(scale,scale));
+
+
 
     int textureEdge=textures["powerup1"].getSize().y;
     int parts=textures["powerup1"].getSize().x/textureEdge;
-    std::cout << parts << std::endl;
     for(int i=0;i<parts;i++)
-        powerupAnimation.addFrame(1.f,IntRect(i*132,0,132,132));
-    powerupStopAnimation.addFrame(1.f,IntRect(0,0,132,132));
+        powerupAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
+
+    textureEdge=textures["fire"].getSize().y;
+    parts=textures["fire"].getSize().x/textureEdge;
+    for(int i=0;i<parts;i++)
+        fireAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
+
     powerupAnimator.addAnimation("powerup1",powerupAnimation,seconds(timeThresholds[1]));
     powerupAnimator.addAnimation("powerup2",powerupAnimation,seconds(timeThresholds[2]));
     powerupAnimator.addAnimation("powerup3",powerupAnimation,seconds(timeThresholds[3]));
-    powerupAnimator.addAnimation("powerupStop",powerupStopAnimation,seconds(timeThresholds[1]));
     powerupAnimator.playAnimation("powerup1",true);
+
+    fireAnimator.addAnimation("fire1",fireAnimation,seconds(timeThresholds[1]));
+    fireAnimator.addAnimation("fire2",fireAnimation,seconds(timeThresholds[2]));
+    fireAnimator.addAnimation("fire3",fireAnimation,seconds(timeThresholds[3]));
+    fireAnimator.playAnimation("fire1",true);
 }
 
 void Game::update(){
@@ -71,12 +83,15 @@ void Game::update(){
     if(timePassed>=timeThreshold){
         timePassed=0.0;
         turn++;
-        if(turn==totalTurns)
+        if(turn==totalTurns){
             turn--;
+        }
     }
-    powerupAnimator.update(DeltaTime);
+    powerupAnimator.update(playing?DeltaTime:seconds(0));
     powerupAnimator.animate(powerup1);
     powerupAnimator.animate(powerup2);
+    fireAnimator.update(playing?DeltaTime:seconds(0));
+    fireAnimator.animate(fire);
     draw();
 }
 
@@ -103,6 +118,10 @@ void Game::draw(){
                 powerup2.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(powerup2);
             }
+            if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
+                fire.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(fire);
+            }
 
 
 
@@ -121,17 +140,13 @@ void Game::draw(){
 void Game::changeSpeed(int _speed){
     this->speed=_speed;
     timeThreshold = timeThresholds[this->speed];
-    if(playing)
+    if(playing){
         powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
+        fireAnimator.playAnimation("fire"+std::to_string(speed),true);
+    }
 }
 void Game::setPlaying(bool _playing){
     playing=_playing;
-    if(playing){
-        powerupAnimator.playAnimation("powerup"+std::to_string(this->speed),true);
-    }
-    else{
-        powerupAnimator.playAnimation("powerupStop");
-    }
 }
 
 bool Game::setTurn(unsigned _turn){

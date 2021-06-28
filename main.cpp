@@ -34,6 +34,7 @@ int main()
         textures.acquire("obstacle",thor::Resources::fromFile<Texture>("assets/sprites/obstacle.png")).setSmooth(true);
         textures.acquire("powerup1",thor::Resources::fromFile<Texture>("assets/sprites/powerup1.png")).setSmooth(true);
         textures.acquire("powerup2",thor::Resources::fromFile<Texture>("assets/sprites/powerup2.png")).setSmooth(true);
+        textures.acquire("fire",thor::Resources::fromFile<Texture>("assets/sprites/fire.png")).setSmooth(true);
 
         soundBuffers.acquire(0,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Pause.flac"));
         soundBuffers.acquire(1,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Play.flac"));
