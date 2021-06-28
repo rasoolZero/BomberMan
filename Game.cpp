@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Control.h"
 #include "Tile_State.h"
+#include <iostream>
 using namespace sf;
 using json = nlohmann::json;
 
@@ -45,15 +46,17 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     box.setSize(Vector2f(scale,scale));
     deadzone.setFillColor(Color(250,0,0,100));
     deadzone.setSize(Vector2f(scale,scale));
-    powerup1.setTexture(textures["powerup1"]);
-    powerup2.setTexture(textures["powerup2"]);
+    powerup1.setTexture(&textures["powerup1"]);
+    powerup2.setTexture(&textures["powerup2"]);
+    powerup1.setSize(Vector2f(scale,scale));
+    powerup2.setSize(Vector2f(scale,scale));
 
     int textureEdge=textures["powerup1"].getSize().y;
     int parts=textures["powerup1"].getSize().x/textureEdge;
+    std::cout << parts << std::endl;
     for(int i=0;i<parts;i++)
-        powerupAnimation.addFrame(1.f,IntRect(i*132,0,(i+1)*132,132));
+        powerupAnimation.addFrame(1.f,IntRect(i*132,0,132,132));
     powerupStopAnimation.addFrame(1.f,IntRect(0,0,132,132));
-
     powerupAnimator.addAnimation("powerup1",powerupAnimation,seconds(timeThresholds[1]));
     powerupAnimator.addAnimation("powerup2",powerupAnimation,seconds(timeThresholds[2]));
     powerupAnimator.addAnimation("powerup3",powerupAnimation,seconds(timeThresholds[3]));
@@ -82,6 +85,7 @@ void Game::draw(){
     for(int i=0;i<rows;i++){
         for(int j=0;j<columns;j++){
             int mask = json_["turns"][turn]["map_data"][i][j];
+            bool isBox=false;
             if(has_state(mask,Tile_State::wall)){
                 obstacle.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(obstacle);
@@ -89,8 +93,16 @@ void Game::draw(){
             if(has_state(mask,Tile_State::box)){
                 box.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(box);
+                isBox=true;
             }
-            window.draw(powerup1);
+            if(!isBox && has_state(mask,Tile_State::upgrade_health)){
+                powerup1.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(powerup1);
+            }
+            if(!isBox && has_state(mask,Tile_State::upgrade_power)){
+                powerup2.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(powerup2);
+            }
 
 
 
@@ -107,15 +119,15 @@ void Game::draw(){
 }
 
 void Game::changeSpeed(int _speed){
-    speed=_speed;
-    timeThreshold = timeThresholds[speed];
+    this->speed=_speed;
+    timeThreshold = timeThresholds[this->speed];
     if(playing)
         powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
 }
 void Game::setPlaying(bool _playing){
     playing=_playing;
     if(playing){
-        powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
+        powerupAnimator.playAnimation("powerup"+std::to_string(this->speed),true);
     }
     else{
         powerupAnimator.playAnimation("powerupStop");

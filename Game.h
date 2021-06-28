@@ -16,7 +16,7 @@ class Game
     public:
         Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures , unsigned offset);
         void update();
-        void changeSpeed(int speed);
+        void changeSpeed(int _speed);
 
         bool setTurn(unsigned _turn);
         unsigned getTurn(){return turn;}
@@ -43,13 +43,13 @@ class Game
         float timePassed=0;
         float timeThreshold=0.5;
         bool playing=true;
-        int speed;
+        int speed=1;
 
-        Sprite powerup1;
-        Sprite powerup2;
+        RectangleShape powerup1;
+        RectangleShape powerup2;
         thor::FrameAnimation powerupAnimation;
         thor::FrameAnimation powerupStopAnimation;
-        thor::Animator<sf::Sprite, std::string> powerupAnimator;
+        thor::Animator<sf::RectangleShape, std::string> powerupAnimator;
 
         float timeThresholds[4]={0,0.6,0.3,0.2};
 

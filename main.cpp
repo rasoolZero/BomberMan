@@ -35,11 +35,11 @@ int main()
         textures.acquire("powerup1",thor::Resources::fromFile<Texture>("assets/sprites/powerup1.png")).setSmooth(true);
         textures.acquire("powerup2",thor::Resources::fromFile<Texture>("assets/sprites/powerup2.png")).setSmooth(true);
 
-        soundBuffers.acquire(0,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Pause.wav"));
-        soundBuffers.acquire(1,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Play.wav"));
-        soundBuffers.acquire(2,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Rewind.wav"));
-        soundBuffers.acquire(3,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Click.wav"));
-        soundBuffers.acquire(4,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Failed.wav"));
+        soundBuffers.acquire(0,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Pause.flac"));
+        soundBuffers.acquire(1,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Play.flac"));
+        soundBuffers.acquire(2,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Rewind.flac"));
+        soundBuffers.acquire(3,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Click.flac"));
+        soundBuffers.acquire(4,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Failed.flac"));
         soundBuffers.acquire(5,thor::Resources::fromFile<SoundBuffer>("assets/sounds/Music.wav"));
     }
     catch(thor::ResourceLoadingException& e){
@@ -54,6 +54,7 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
+//    window.setVerticalSyncEnabled(true);
     Game game(window,j,textures,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
