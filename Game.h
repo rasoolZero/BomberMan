@@ -2,6 +2,7 @@
 #define GAME_H
 #include <json.hpp>
 #include <Thor/Resources.hpp>
+#include <Thor/Animations.hpp>
 #include <SFML/Graphics.hpp>
 #include <Player_Action.h>
 using namespace sf;
@@ -20,7 +21,7 @@ class Game
         bool setTurn(unsigned _turn);
         unsigned getTurn(){return turn;}
 
-        void setPlaying(bool _playing){playing=_playing;}
+        void setPlaying(bool _playing);
         bool getPlaying(){return playing;}
 
     protected:
@@ -42,6 +43,15 @@ class Game
         float timePassed=0;
         float timeThreshold=0.5;
         bool playing=true;
+        int speed;
+
+        Sprite powerup1;
+        Sprite powerup2;
+        thor::FrameAnimation powerupAnimation;
+        thor::FrameAnimation powerupStopAnimation;
+        thor::Animator<sf::Sprite, std::string> powerupAnimator;
+
+        float timeThresholds[4]={0,0.6,0.3,0.2};
 
         void draw();
 };

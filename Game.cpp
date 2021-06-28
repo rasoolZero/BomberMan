@@ -45,6 +45,20 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     box.setSize(Vector2f(scale,scale));
     deadzone.setFillColor(Color(250,0,0,100));
     deadzone.setSize(Vector2f(scale,scale));
+    powerup1.setTexture(textures["powerup1"]);
+    powerup2.setTexture(textures["powerup2"]);
+
+    int textureEdge=textures["powerup1"].getSize().y;
+    int parts=textures["powerup1"].getSize().x/textureEdge;
+    for(int i=0;i<parts;i++)
+        powerupAnimation.addFrame(1.f,IntRect(i*132,0,(i+1)*132,132));
+    powerupStopAnimation.addFrame(1.f,IntRect(0,0,132,132));
+
+    powerupAnimator.addAnimation("powerup1",powerupAnimation,seconds(timeThresholds[1]));
+    powerupAnimator.addAnimation("powerup2",powerupAnimation,seconds(timeThresholds[2]));
+    powerupAnimator.addAnimation("powerup3",powerupAnimation,seconds(timeThresholds[3]));
+    powerupAnimator.addAnimation("powerupStop",powerupStopAnimation,seconds(timeThresholds[1]));
+    powerupAnimator.playAnimation("powerup1",true);
 }
 
 void Game::update(){
@@ -57,6 +71,9 @@ void Game::update(){
         if(turn==totalTurns)
             turn--;
     }
+    powerupAnimator.update(DeltaTime);
+    powerupAnimator.animate(powerup1);
+    powerupAnimator.animate(powerup2);
     draw();
 }
 
@@ -73,7 +90,7 @@ void Game::draw(){
                 box.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(box);
             }
-
+            window.draw(powerup1);
 
 
 
@@ -89,13 +106,20 @@ void Game::draw(){
     }
 }
 
-void Game::changeSpeed(int speed){
-    if(speed==1)
-        timeThreshold=0.6;
-    if(speed==2)
-        timeThreshold=0.3;
-    if(speed==3)
-        timeThreshold=0.2;
+void Game::changeSpeed(int _speed){
+    speed=_speed;
+    timeThreshold = timeThresholds[speed];
+    if(playing)
+        powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
+}
+void Game::setPlaying(bool _playing){
+    playing=_playing;
+    if(playing){
+        powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
+    }
+    else{
+        powerupAnimator.playAnimation("powerupStop");
+    }
 }
 
 bool Game::setTurn(unsigned _turn){
