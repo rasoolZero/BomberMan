@@ -45,13 +45,9 @@ class Game
         bool playing=true;
         int speed=1;
 
-        RectangleShape powerup1;
-        RectangleShape powerup2;
-        RectangleShape fire;
-        thor::FrameAnimation powerupAnimation;
-        thor::FrameAnimation fireAnimation;
-        thor::Animator<sf::RectangleShape, std::string> powerupAnimator;
-        thor::Animator<sf::RectangleShape, std::string> fireAnimator;
+        RectangleShape powerup1,powerup2,fire,bomb,mine;
+        thor::FrameAnimation powerupAnimation,fireAnimation,bombAnimation,mineAnimation;
+        thor::Animator<sf::RectangleShape, std::string> powerupAnimator,fireAnimator,bombAnimator,mineAnimator;
 
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
