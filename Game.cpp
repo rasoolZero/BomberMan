@@ -52,7 +52,7 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         int parts=textures[name].getSize().x/textureEdge;
         for(int j=0;j<parts;j++)
             animations[name].addFrame(1.f,IntRect(j*textureEdge,0,textureEdge,textureEdge));
-        animators.insert(std::pair<std::string,thor::Animator<sf::RectangleShape, std::string>>(name,thor::Animator<sf::RectangleShape, std::string>()));
+        animators.insert(std::pair<std::string,ANIMATOR>(name,ANIMATOR()));
         for(int j=1;j<=3;j++)
             animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
 
