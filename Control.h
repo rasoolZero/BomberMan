@@ -31,7 +31,7 @@ class Control
         int width;
         int height;
         int speed=1;
-        bool playing=true;
+        bool playing=false;
         bool sound=true;
         bool music=false;
 

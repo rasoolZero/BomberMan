@@ -42,7 +42,7 @@ class Game
         unsigned turn;
         float timePassed=0;
         float timeThreshold=0.5;
-        bool playing=true;
+        bool playing=false;
         int speed=1;
 
         RectangleShape powerup1,powerup2,fire,bomb,mine;
