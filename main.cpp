@@ -18,14 +18,14 @@ int main()
     thor::ResourceHolder<Texture,std::string> textures;
     thor::ResourceHolder<SoundBuffer,int> soundBuffers;
     try{
-        for(int i=0;i<Resources::texturesCount;i++)
-            textures.acquire(Resources::textures[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources::textures[i]+".png")).setSmooth(true);
+        for(int i=0;i<Resources_n::texturesCount;i++)
+            textures.acquire(Resources_n::textures[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::textures[i]+".png")).setSmooth(true);
 
-        for(int i=0;i<Resources::spritesCount;i++)
-            textures.acquire(Resources::sprites[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources::sprites[i]+".png")).setSmooth(true);
+        for(int i=0;i<Resources_n::spritesCount;i++)
+            textures.acquire(Resources_n::sprites[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::sprites[i]+".png")).setSmooth(true);
 
-        for(int i=0;i<Resources::soundsCount;i++)
-            soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources::sounds[i]+".flac"));
+        for(int i=0;i<Resources_n::soundsCount;i++)
+            soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources_n::sounds[i]+".flac"));
 
     }
     catch(thor::ResourceLoadingException& e){

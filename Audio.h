@@ -3,7 +3,7 @@
 #include <vector>
 #include <SFML/Audio.hpp>
 #include <Thor/Resources.hpp>
-#define SOUNDS 6
+#include <Resources_n.h>
 
 using namespace sf;
 
@@ -22,6 +22,7 @@ class Audio
     std::vector<Sound> sounds;
     thor::ResourceHolder<SoundBuffer,int> & buffers;
     bool sound=true;
+    int const SOUNDS = Resources_n::soundsCount;
 };
 
 #endif // AUDIO_H

@@ -37,67 +37,30 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
             quad[3].texCoords = Vector2f(0,textureSize.y);
         }
     }
-
-
-
-    obstacle.setTexture(&textures["obstacle"]);
     obstacle.setSize(Vector2f(scale,scale));
-    box.setTexture(&textures["box"]);
+    obstacle.setTexture(&textures["obstacle"]);
     box.setSize(Vector2f(scale,scale));
-    deadzone.setFillColor(Color(250,0,0,100));
+    box.setTexture(&textures["box"]);
+
+    for(int i=0;i<Resources_n::spritesCount;i++){
+        std::string & name=Resources_n::sprites[i];
+
+        shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape(Vector2f(scale,scale))));
+        shapes[name].setTexture(&textures[name]);
+        animations.insert(std::pair<std::string,thor::FrameAnimation>(name,thor::FrameAnimation()));
+        int textureEdge=textures[name].getSize().y;
+        int parts=textures[name].getSize().x/textureEdge;
+        for(int j=0;j<parts;j++)
+            animations[name].addFrame(1.f,IntRect(j*textureEdge,0,textureEdge,textureEdge));
+        animators.insert(std::pair<std::string,thor::Animator<sf::RectangleShape, std::string>>(name,thor::Animator<sf::RectangleShape, std::string>()));
+        for(int j=1;j<=3;j++)
+            animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
+
+        animators[name].playAnimation(name+std::to_string(1),true);
+    }
+
+    deadzone.setFillColor(Color(250,0,0,80));
     deadzone.setSize(Vector2f(scale,scale));
-    powerup1.setTexture(&textures["powerup1"]);
-    powerup2.setTexture(&textures["powerup2"]);
-    powerup1.setSize(Vector2f(scale,scale));
-    powerup2.setSize(Vector2f(scale,scale));
-    fire.setTexture(&textures["fire"]);
-    fire.setSize(Vector2f(scale,scale));
-    bomb.setTexture(&textures["bomb"]);
-    bomb.setSize(Vector2f(scale,scale));
-    mine.setTexture(&textures["mine"]);
-    mine.setSize(Vector2f(scale,scale));
-
-
-
-    int textureEdge=textures["powerup1"].getSize().y;
-    int parts=textures["powerup1"].getSize().x/textureEdge;
-    for(int i=0;i<parts;i++)
-        powerupAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
-
-    textureEdge=textures["fire"].getSize().y;
-    parts=textures["fire"].getSize().x/textureEdge;
-    for(int i=0;i<parts;i++)
-        fireAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
-
-    textureEdge=textures["bomb"].getSize().y;
-    parts=textures["bomb"].getSize().x/textureEdge;
-    for(int i=0;i<parts;i++)
-        bombAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
-
-    textureEdge=textures["mine"].getSize().y;
-    parts=textures["mine"].getSize().x/textureEdge;
-    for(int i=0;i<parts;i++)
-        mineAnimation.addFrame(1.f,IntRect(i*textureEdge,0,textureEdge,textureEdge));
-
-    powerupAnimator.addAnimation("powerup1",powerupAnimation,seconds(timeThresholds[1]));
-    powerupAnimator.addAnimation("powerup2",powerupAnimation,seconds(timeThresholds[2]));
-    powerupAnimator.addAnimation("powerup3",powerupAnimation,seconds(timeThresholds[3]));
-    powerupAnimator.playAnimation("powerup1",true);
-
-    fireAnimator.addAnimation("fire1",fireAnimation,seconds(timeThresholds[1]));
-    fireAnimator.addAnimation("fire2",fireAnimation,seconds(timeThresholds[2]));
-    fireAnimator.addAnimation("fire3",fireAnimation,seconds(timeThresholds[3]));
-    fireAnimator.playAnimation("fire1",true);
-
-    bombAnimator.addAnimation("bomb1",bombAnimation,seconds(timeThresholds[1]));
-    bombAnimator.addAnimation("bomb2",bombAnimation,seconds(timeThresholds[2]));
-    bombAnimator.addAnimation("bomb3",bombAnimation,seconds(timeThresholds[3]));
-    bombAnimator.playAnimation("bomb1",true);
-
-    mineAnimator.addAnimation("mine1",mineAnimation,seconds(timeThresholds[1]));
-    mineAnimator.addAnimation("mine2",mineAnimation,seconds(timeThresholds[2]));
-    mineAnimator.addAnimation("mine3",mineAnimation,seconds(timeThresholds[3]));
-    mineAnimator.playAnimation("mine1",true);
 }
 
 void Game::update(){
@@ -111,15 +74,11 @@ void Game::update(){
             turn--;
         }
     }
-    powerupAnimator.update(playing?DeltaTime:seconds(0));
-    powerupAnimator.animate(powerup1);
-    powerupAnimator.animate(powerup2);
-    fireAnimator.update(playing?DeltaTime:seconds(0));
-    fireAnimator.animate(fire);
-    bombAnimator.update(playing?DeltaTime:seconds(0));
-    bombAnimator.animate(bomb);
-    mineAnimator.update(playing?DeltaTime:seconds(0));
-    mineAnimator.animate(mine);
+    for(int i=0;i<Resources_n::spritesCount;i++){
+        std::string & name=Resources_n::sprites[i];
+        animators[name].update(playing?DeltaTime:seconds(0));
+        animators[name].animate(shapes[name]);
+    }
     draw();
 }
 
@@ -139,24 +98,24 @@ void Game::draw(){
                 isBox=true;
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_health)){
-                powerup1.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(powerup1);
+                shapes["powerup1"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["powerup1"]);
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_power)){
-                powerup2.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(powerup2);
+                shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["powerup2"]);
             }
             if(has_state(mask,Tile_State::mine)){
-                mine.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(mine);
+                shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["mine"]);
             }
             if(has_state(mask,Tile_State::bomb)){
-                bomb.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(bomb);
+                shapes["bomb"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["bomb"]);
             }
             if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
-                fire.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(fire);
+                shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["fire"]);
             }
 
 
@@ -172,13 +131,12 @@ void Game::draw(){
 }
 
 void Game::changeSpeed(int _speed){
-    this->speed=_speed;
-    timeThreshold = timeThresholds[this->speed];
-    if(playing){
-        powerupAnimator.playAnimation("powerup"+std::to_string(speed),true);
-        fireAnimator.playAnimation("fire"+std::to_string(speed),true);
-        bombAnimator.playAnimation("bomb"+std::to_string(speed),true);
-        mineAnimator.playAnimation("mine"+std::to_string(speed),true);
+    speed=_speed;
+    timeThreshold = timeThresholds[speed];
+    std::cout << "test " << speed << std::endl;
+    for(int i=0;i<Resources_n::spritesCount;i++){
+        std::string & name = Resources_n::sprites[i];
+        animators[name].playAnimation(name+std::to_string(speed),true);
     }
 }
 void Game::setPlaying(bool _playing){

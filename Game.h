@@ -5,6 +5,7 @@
 #include <Thor/Animations.hpp>
 #include <SFML/Graphics.hpp>
 #include <Player_Action.h>
+#include <unordered_map>
 using namespace sf;
 using json = nlohmann::json;
 extern Time DeltaTime;
@@ -45,9 +46,10 @@ class Game
         bool playing=false;
         int speed=1;
 
-        RectangleShape powerup1,powerup2,fire,bomb,mine;
-        thor::FrameAnimation powerupAnimation,fireAnimation,bombAnimation,mineAnimation;
-        thor::Animator<sf::RectangleShape, std::string> powerupAnimator,fireAnimator,bombAnimator,mineAnimator;
+        std::unordered_map<std::string,RectangleShape> shapes;
+        std::unordered_map<std::string,thor::FrameAnimation> animations;
+        std::unordered_map<std::string,thor::Animator<sf::RectangleShape, std::string>> animators;
+
 
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
