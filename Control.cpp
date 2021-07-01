@@ -76,26 +76,16 @@ void Control::update(){
                 audio.play(Audio::Click);
             }
             if(i==1) //backward
-                if(playing==false){
-                    if(game.setTurn(game.getTurn()-1)){
-                        audio.play(Audio::Click);
-                    }
-                    else
-                        audio.play(Audio::Failed);
+                if(game.setTurn(game.getTurn()-1)){
+                    audio.play(Audio::Click);
                 }
                 else
                     audio.play(Audio::Failed);
             if(i==4) //forward
-                if(playing==false){
-                    if(game.setTurn(game.getTurn()+1)){
-                        audio.play(Audio::Click);
-                    }
-                    else
-                        audio.play(Audio::Failed);
-                }
+                if(game.setTurn(game.getTurn()+1))
+                    audio.play(Audio::Click);
                 else
                     audio.play(Audio::Failed);
-            break;
         }
     }
     for(int i=0;i<2;i++){
