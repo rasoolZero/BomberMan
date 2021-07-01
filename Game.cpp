@@ -133,7 +133,6 @@ void Game::draw(){
 void Game::changeSpeed(int _speed){
     speed=_speed;
     timeThreshold = timeThresholds[speed];
-    std::cout << "test " << speed << std::endl;
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name = Resources_n::sprites[i];
         animators[name].playAnimation(name+std::to_string(speed),true);
