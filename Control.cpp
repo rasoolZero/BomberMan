@@ -51,7 +51,7 @@ void Control::draw(){
 }
 
 void Control::update(){
-    Vector2i mousePositioni = Mouse::getPosition();
+    Vector2i mousePositioni = Mouse::getPosition(window);
     Vector2f mousePosition = Vector2f(mousePositioni.x,mousePositioni.y);
     for(int i=0;i<BUTTONS;i++){
         if(buttons[i].getGlobalBounds().contains(mousePosition)){

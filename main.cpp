@@ -73,7 +73,7 @@ int main()
                     window.close();
         }
 
-        window.clear(Color(100,100,100));
+        window.clear();
         controls.draw();
         game.update();
         #ifdef DEBUGGING
