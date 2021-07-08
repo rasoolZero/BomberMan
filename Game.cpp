@@ -164,6 +164,8 @@ bool Game::setTurn(unsigned _turn){
         return false;
     turn = _turn;
     timePassed=0;
+    updatePlayerPosition(turn);
+    updatePlayerPosition(turn+1);
     return true;
 }
 
