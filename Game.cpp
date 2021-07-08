@@ -12,6 +12,7 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     rows = _json["initial_game_data"]["map_height"];
     totalTurns = _json["initial_game_data"]["last_turn"];
     initialHealth = _json["initial_game_data"]["initial_health"];
+    timeThreshold=timeThresholds[speed];
     turn = 0;
 
 
@@ -61,6 +62,14 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
 
     deadzone.setFillColor(Color(250,0,0,80));
     deadzone.setSize(Vector2f(scale,scale));
+
+
+    player[0].setFillColor(Color::Red);
+    player[0].setSize(Vector2f(scale,scale));
+    player[1].setFillColor(Color::Green);
+    player[1].setSize(Vector2f(scale,scale));
+    updatePlayerPosition(0);
+    updatePlayerPosition(1);
 }
 
 void Game::update(){
@@ -79,6 +88,7 @@ void Game::update(){
         animators[name].update(playing?DeltaTime:seconds(0));
         animators[name].animate(shapes[name]);
     }
+    updatePlayerPosition(turn);
     draw();
 }
 
@@ -113,10 +123,15 @@ void Game::draw(){
                 shapes["bomb"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["bomb"]);
             }
+
+            for(int i=0;i<2;i++)
+                window.draw(player[i]);
+
             if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
                 shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["fire"]);
             }
+
 
 
 
@@ -150,5 +165,47 @@ bool Game::setTurn(unsigned _turn){
     turn = _turn;
     timePassed=0;
     return true;
+}
+
+Vector2f Game::getPlayerPosition(int index){
+    if(index<0)
+        index=0;
+    if(index>=totalTurns)
+        if(index%2==0)
+            if(totalTurns%2==1)
+                index=totalTurns-1;
+            else
+                index=totalTurns-2;
+        else
+            if(totalTurns%2==1)
+                index=totalTurns-2;
+            else
+                index=totalTurns-1;
+
+    int x = json_["turns"][index]["players_data"][0]["x_position"];
+    int y = json_["turns"][index]["players_data"][0]["y_position"];
+    return Vector2f(x*scale+startPoint.x,y*scale+startPoint.y);
+}
+
+void Game::updatePlayerPosition(int index){
+    if(index<0)
+        index=0;
+    if(index>=totalTurns)
+        if(index%2==0)
+            if(totalTurns%2==1)
+                index=totalTurns-1;
+            else
+                index=totalTurns-2;
+        else
+            if(totalTurns%2==1)
+                index=totalTurns-2;
+            else
+                index=totalTurns-1;
+    int playerIndex=index%2;
+    Vector2f currentPosition = Game::getPlayerPosition(index);
+    Vector2f nextPosition = Game::getPlayerPosition(index+2);
+    Vector2f position = nextPosition-currentPosition;
+    position = currentPosition + (position*timePassed/timeThreshold);
+    player[playerIndex].setPosition(position);
 }
 

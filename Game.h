@@ -33,7 +33,7 @@ class Game
         RenderWindow &window;
         json & json_;
         thor::ResourceHolder<Texture,std::string> & textures;
-        RectangleShape obstacle,box,deadzone;
+        RectangleShape obstacle,box,deadzone, player[2];
         int rows;
         int columns;
         int totalTurns;
@@ -44,7 +44,7 @@ class Game
 
         unsigned turn;
         float timePassed=0;
-        float timeThreshold=0.5;
+        float timeThreshold;
         bool playing=false;
         int speed=1;
 
@@ -56,6 +56,8 @@ class Game
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
         void draw();
+        Vector2f getPlayerPosition(int index);
+        void updatePlayerPosition(int index);
 };
 
 #endif // GAME_H
