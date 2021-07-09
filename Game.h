@@ -57,7 +57,8 @@ class Game
 
         void draw();
         Vector2f getPlayerPosition(int index);
-        void updatePlayerPosition(int index);
+        void updatePlayer(int index);
+        void initPlayerAnimation();
 };
 
 #endif // GAME_H

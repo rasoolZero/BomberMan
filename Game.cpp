@@ -50,26 +50,28 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         shapes[name].setTexture(&textures[name]);
         animations.insert(std::pair<std::string,thor::FrameAnimation>(name,thor::FrameAnimation()));
         int textureEdge=textures[name].getSize().y;
-        int parts=textures[name].getSize().x/textureEdge;
-        for(int j=0;j<parts;j++)
+        int frames=textures[name].getSize().x/textureEdge;
+        for(int j=0;j<frames;j++)
             animations[name].addFrame(1.f,IntRect(j*textureEdge,0,textureEdge,textureEdge));
         animators.insert(std::pair<std::string,ANIMATOR>(name,ANIMATOR()));
         for(int j=1;j<=3;j++)
             animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
 
-        animators[name].playAnimation(name+std::to_string(1),true);
+        animators[name].playAnimation(name+std::to_string(speed),true);
     }
+    player[0].setTexture(&textures["player1"]);
+    player[1].setTexture(&textures["player2"]);
+
 
     deadzone.setFillColor(Color(250,0,0,80));
     deadzone.setSize(Vector2f(scale,scale));
 
 
-    player[0].setFillColor(Color::Red);
     player[0].setSize(Vector2f(scale,scale));
-    player[1].setFillColor(Color::Green);
     player[1].setSize(Vector2f(scale,scale));
-    updatePlayerPosition(0);
-    updatePlayerPosition(1);
+    initPlayerAnimation();
+    updatePlayer(0);
+    updatePlayer(1);
 }
 
 void Game::update(){
@@ -88,7 +90,12 @@ void Game::update(){
         animators[name].update(playing?DeltaTime:seconds(0));
         animators[name].animate(shapes[name]);
     }
-    updatePlayerPosition(turn);
+    for(int i=0;i<2;i++){
+        std::string name = "player"+std::to_string(i+1);
+        animators[name].update(playing?DeltaTime:seconds(0));
+        animators[name].animate(player[i]);
+    }
+    updatePlayer(turn);
     draw();
 }
 
@@ -152,6 +159,15 @@ void Game::changeSpeed(int _speed){
         std::string & name = Resources_n::sprites[i];
         animators[name].playAnimation(name+std::to_string(speed),true);
     }
+    for(int i=0;i<2;i++){
+        std::string name = "player"+std::to_string(i+1);
+        if(animators[name].isPlayingAnimation()){
+            std::string animation = animators[name].getPlayingAnimation();
+            animation.pop_back();
+            animation+=std::to_string(speed);
+            animators[name].playAnimation(animation,true);
+        }
+    }
 }
 void Game::setPlaying(bool _playing){
     playing=_playing;
@@ -164,8 +180,8 @@ bool Game::setTurn(unsigned _turn){
         return false;
     turn = _turn;
     timePassed=0;
-    updatePlayerPosition(turn);
-    updatePlayerPosition(turn+1);
+    updatePlayer(turn);
+    updatePlayer(turn+1);
     return true;
 }
 
@@ -189,7 +205,7 @@ Vector2f Game::getPlayerPosition(int index){
     return Vector2f(x*scale+startPoint.x,y*scale+startPoint.y);
 }
 
-void Game::updatePlayerPosition(int index){
+void Game::updatePlayer(int index){
     if(index<0)
         index=0;
     if(index>=totalTurns)
@@ -206,8 +222,110 @@ void Game::updatePlayerPosition(int index){
     int playerIndex=index%2;
     Vector2f currentPosition = Game::getPlayerPosition(index);
     Vector2f nextPosition = Game::getPlayerPosition(index+2);
-    Vector2f position = nextPosition-currentPosition;
-    position = currentPosition + (position*timePassed/timeThreshold);
+    Vector2f path = nextPosition-currentPosition;
+    Vector2f position = currentPosition + (path*timePassed/timeThreshold);
+
+    std::string nextAnimation,name="player"+std::to_string(playerIndex+1);
+
+    if(path.x<0)
+        nextAnimation = "walk_left";
+    else if(path.x>0)
+        nextAnimation = "walk_right";
+    else if(path.y<0)
+        nextAnimation = "walk_up";
+    else if(path.y>0)
+        nextAnimation = "walk_down";
+    else{
+        int actionTaken = json_["turns"][index]["players_data"][0]["action_taken"];
+        Player_Action action = static_cast<Player_Action>(actionTaken);
+
+        if(static_cast<int>(action) < 4){
+            if(action==Player_Action::go_down)
+                nextAnimation = "stand_down";
+            if(action==Player_Action::go_left)
+                nextAnimation = "stand_left";
+            if(action==Player_Action::go_up)
+                nextAnimation = "stand_up";
+            if(action==Player_Action::go_right)
+                nextAnimation = "stand_right";
+        }
+        else{
+            if(animators[name].isPlayingAnimation()){
+                std::string currentAnimation = animators[name].getPlayingAnimation();
+                if(currentAnimation.find("left")!=std::string::npos)
+                    nextAnimation = "stand_left";
+                if(currentAnimation.find("right")!=std::string::npos)
+                    nextAnimation = "stand_right";
+                if(currentAnimation.find("down")!=std::string::npos)
+                    nextAnimation = "stand_down";
+                if(currentAnimation.find("up")!=std::string::npos)
+                    nextAnimation = "stand_up";
+            }
+            else{
+                nextAnimation = "stand_right";
+            }
+        }
+    }
+    nextAnimation+=std::to_string(speed);
+    if(animators[name].isPlayingAnimation()){
+        if(animators[name].getPlayingAnimation()!=nextAnimation)
+            animators[name].playAnimation(nextAnimation,true);
+    }
+    else
+        animators[name].playAnimation(nextAnimation,true);
+
     player[playerIndex].setPosition(position);
+
+
+    //make the other player stand
+    if(index!=0)
+        index--;
+    else
+        index++;
+    playerIndex=index%2;
+    name="player"+std::to_string(playerIndex+1);
+    if(animators[name].isPlayingAnimation()){
+        std::string currentAnimation = animators[name].getPlayingAnimation();
+        if(currentAnimation.find("left")!=std::string::npos)
+            nextAnimation = "stand_left";
+        if(currentAnimation.find("right")!=std::string::npos)
+            nextAnimation = "stand_right";
+        if(currentAnimation.find("down")!=std::string::npos)
+            nextAnimation = "stand_down";
+        if(currentAnimation.find("up")!=std::string::npos)
+            nextAnimation = "stand_up";
+        nextAnimation+=std::to_string(speed);
+        animators[name].playAnimation(nextAnimation,true);
+    }
+
 }
 
+
+
+void Game::initPlayerAnimation(){
+    const std::string playerAnimations[8] =  {"walk_down","walk_left","walk_right","walk_up",
+                                        "stand_down","stand_left","stand_right","stand_up"};
+    for(int i=0;i<8;i++){
+        std::string name = playerAnimations[i];
+        animations.insert(std::pair<std::string,thor::FrameAnimation>(name,thor::FrameAnimation()));
+    }
+    int edge = textures["player1"].getSize().y/4;
+    int frames = textures["player1"].getSize().x/edge;
+    for(int j=0;j<4;j++){
+        for(int k=0;k<frames;k++){
+            animations[playerAnimations[j]].addFrame(1.f,IntRect(k*edge,j*edge,edge,edge));
+        }
+        animations[playerAnimations[j+4]].addFrame(1.f,IntRect((frames/2)*edge,j*edge,edge,edge));
+    }
+    for(int i=0;i<2;i++)
+        animators.insert(std::pair<std::string,ANIMATOR>("player"+std::to_string(i+1),ANIMATOR()));
+
+    for(int i=0;i<8;i++)
+        for(int j=1;j<=3;j++){
+            animators["player1"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
+            animators["player2"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
+        }
+
+
+
+}

@@ -10,6 +10,9 @@ namespace Resources_n{
 
     extern int const soundsCount;
     extern std::string sounds[];
+
+    extern int const playersCount;
+    extern std::string players[];
 }
 
 

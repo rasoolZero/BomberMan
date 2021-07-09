@@ -20,7 +20,8 @@ int main()
     try{
         for(int i=0;i<Resources_n::texturesCount;i++)
             textures.acquire(Resources_n::textures[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::textures[i]+".png")).setSmooth(true);
-
+        textures["player1"].setSmooth(false);
+        textures["player2"].setSmooth(false);
         for(int i=0;i<Resources_n::spritesCount;i++)
             textures.acquire(Resources_n::sprites[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::sprites[i]+".png")).setSmooth(true);
 
