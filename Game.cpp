@@ -4,6 +4,9 @@
 #include <iostream>
 using namespace sf;
 using json = nlohmann::json;
+float map(float value, float istart, float istop, float ostart, float ostop) {
+    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+}
 
 Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures , unsigned offset):
                 window(_window),json_(_json),textures(_textures)
@@ -16,11 +19,12 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     turn = 0;
 
 
+
     float widthRatio=(_window.getSize().x-offset)/(float)columns;
-    float heightRatio=_window.getSize().y/(float)rows;
+    float heightRatio=(_window.getSize().y-playerInfoBoxHeight)/(float)rows;
     scale = widthRatio<heightRatio ? widthRatio : heightRatio;
     startPoint.x=(_window.getSize().x-offset-scale*columns)/2.0+offset;
-    startPoint.y=(_window.getSize().y-scale*rows)/2.0;
+    startPoint.y=(_window.getSize().y-playerInfoBoxHeight-scale*rows)/2.0;
     Vector2u textureSize = textures["floor"].getSize();
     vertices.setPrimitiveType(Quads);
     vertices.resize(columns * rows * 4);
@@ -72,6 +76,19 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     initPlayerAnimation();
     updatePlayer(0);
     updatePlayer(1);
+
+    int playerInfoBoxWidth = window.getSize().x - offset;
+    int playerInfoBoxY = _window.getSize().y-playerInfoBoxHeight;
+    playerInfo.setSize(Vector2f(playerInfoBoxWidth,playerInfoBoxHeight));
+    playerInfo.setPosition(offset,playerInfoBoxY);
+    playerInfo.setFillColor(Color(10,10,10));
+
+    for(int i=0;i<2;i++){
+        heart[i].setSize(Vector2f(playerInfoBoxHeight,playerInfoBoxHeight));
+        heart[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 , playerInfoBoxY);
+        heart[i].setTexture(&textures["heart"]);
+    }
+    heartTextureSize = textures["heart"].getSize().y;
 }
 
 void Game::update(){
@@ -150,6 +167,9 @@ void Game::draw(){
             }
         }
     }
+    window.draw(playerInfo);
+    for(int i=0;i<2;i++)
+        window.draw(heart[i]);
 }
 
 void Game::changeSpeed(int _speed){
@@ -220,6 +240,9 @@ void Game::updatePlayer(int index){
             else
                 index=totalTurns-1;
     int playerIndex=index%2;
+    health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
+
+
     Vector2f currentPosition = Game::getPlayerPosition(index);
     Vector2f nextPosition = Game::getPlayerPosition(index+2);
     Vector2f path = nextPosition-currentPosition;
@@ -297,7 +320,12 @@ void Game::updatePlayer(int index){
         nextAnimation+=std::to_string(speed);
         animators[name].playAnimation(nextAnimation,true);
     }
+    health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
 
+    for(int i=0;i<2;i++){
+        int part = int(map(health[i],0,initialHealth,3,0));
+        heart[i].setTextureRect(IntRect(part*heartTextureSize,0,heartTextureSize,heartTextureSize));
+    }
 }
 
 

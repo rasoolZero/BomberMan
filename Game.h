@@ -33,7 +33,7 @@ class Game
         RenderWindow &window;
         json & json_;
         thor::ResourceHolder<Texture,std::string> & textures;
-        RectangleShape obstacle,box,deadzone, player[2];
+        RectangleShape obstacle,box,deadzone, player[2], heart[2], playerInfo;
         int rows;
         int columns;
         int totalTurns;
@@ -41,6 +41,10 @@ class Game
         Vector2f startPoint;
         int initialHealth;
         VertexArray vertices;
+
+        int playerInfoBoxHeight = 50;
+        int health[2];
+        int heartTextureSize;
 
         unsigned turn;
         float timePassed=0;
