@@ -17,6 +17,7 @@ int main()
 {
     thor::ResourceHolder<Texture,std::string> textures;
     thor::ResourceHolder<SoundBuffer,int> soundBuffers;
+    thor::ResourceHolder<Font,int> fonts;
     try{
         for(int i=0;i<Resources_n::texturesCount;i++)
             textures.acquire(Resources_n::textures[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::textures[i]+".png")).setSmooth(true);
@@ -27,7 +28,7 @@ int main()
 
         for(int i=0;i<Resources_n::soundsCount;i++)
             soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources_n::sounds[i]+".flac"));
-
+        fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Roboto-Light.ttf"));
     }
     catch(thor::ResourceLoadingException& e){
         std::cout << e.what() << std::endl;
@@ -42,7 +43,7 @@ int main()
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
 //    window.setVerticalSyncEnabled(true);
-    Game game(window,j,textures,CONTROL_WIDTH);
+    Game game(window,j,textures,fonts,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
 
@@ -50,11 +51,9 @@ int main()
     Clock timer;
     timer.restart();
 
-    Font font;
-    font.loadFromFile("assets/fonts/Roboto-Light.ttf");
     Text text;
     text.setColor(Color::Red);
-    text.setFont(font);
+    text.setFont(fonts[0]);
     text.setCharacterSize(20);
     #endif // DEBUGGING
 

@@ -8,8 +8,8 @@ float map(float value, float istart, float istop, float ostart, float ostop) {
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 }
 
-Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures , unsigned offset):
-                window(_window),json_(_json),textures(_textures)
+Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures,
+           thor::ResourceHolder<Font,int> & _fonts , unsigned offset): window(_window),json_(_json),textures(_textures)
 {
     columns = _json["initial_game_data"]["map_width"];
     rows = _json["initial_game_data"]["map_height"];
@@ -83,12 +83,19 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     playerInfo.setPosition(offset,playerInfoBoxY);
     playerInfo.setFillColor(Color(10,10,10));
 
+
     for(int i=0;i<2;i++){
         heart[i].setSize(Vector2f(playerInfoBoxHeight,playerInfoBoxHeight));
         heart[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 , playerInfoBoxY);
         heart[i].setTexture(&textures["heart"]);
+        upgrades[i].setFont(_fonts[0]);
+        upgrades[i].setCharacterSize(fontSize);
+        upgrades[i].setStyle(Text::Bold);
+        upgrades[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 + heart[i].getSize().y + fontSize,playerInfoBoxY+(playerInfoBoxHeight-fontSize)/2);
     }
     heartTextureSize = textures["heart"].getSize().y;
+    upgrades[0].setColor(Color(156,0,0));
+    upgrades[1].setColor(Color(0,0,156));
 }
 
 void Game::update(){
@@ -168,8 +175,10 @@ void Game::draw(){
         }
     }
     window.draw(playerInfo);
-    for(int i=0;i<2;i++)
+    for(int i=0;i<2;i++){
         window.draw(heart[i]);
+        window.draw(upgrades[i]);
+    }
 }
 
 void Game::changeSpeed(int _speed){
@@ -241,7 +250,12 @@ void Game::updatePlayer(int index){
                 index=totalTurns-1;
     int playerIndex=index%2;
     health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
-
+    {
+        std::string bombCount = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_count_level"]));
+        std::string bombPower = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_power_level"]));
+        std::string mineCount = std::to_string(int(json_["turns"][index]["players_data"][0]["mines_left"]));
+        upgrades[playerIndex].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
+    }
 
     Vector2f currentPosition = Game::getPlayerPosition(index);
     Vector2f nextPosition = Game::getPlayerPosition(index+2);
@@ -321,6 +335,12 @@ void Game::updatePlayer(int index){
         animators[name].playAnimation(nextAnimation,true);
     }
     health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
+    {
+        std::string bombCount = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_count_level"]));
+        std::string bombPower = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_power_level"]));
+        std::string mineCount = std::to_string(int(json_["turns"][index]["players_data"][0]["mines_left"]));
+        upgrades[playerIndex].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
+    }
 
     for(int i=0;i<2;i++){
         int part = int(map(health[i],0,initialHealth,3,0));
