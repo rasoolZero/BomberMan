@@ -18,7 +18,7 @@ class Game
 
     public:
         Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures ,
-            thor::ResourceHolder<Font,int> & _fonts, unsigned offset);
+            thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
         void update();
         void changeSpeed(int _speed);
 
@@ -47,7 +47,8 @@ class Game
         int health[2];
         int heartTextureSize;
         int const fontSize=17;
-        Text upgrades[2];
+        Text upgrades[2], names[2];
+        unsigned offset;
 
         unsigned turn;
         float timePassed=0;

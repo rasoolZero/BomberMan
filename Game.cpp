@@ -15,6 +15,9 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     rows = _json["initial_game_data"]["map_height"];
     totalTurns = _json["initial_game_data"]["last_turn"];
     initialHealth = _json["initial_game_data"]["initial_health"];
+    const std::string name1 = "test name 1"; // replace these with actual names from json
+    const std::string name2 = "test name 2";
+
     timeThreshold=timeThresholds[speed];
     turn = 0;
 
@@ -84,6 +87,8 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     playerInfo.setFillColor(Color(10,10,10));
 
 
+    names[0].setString(name1);
+    names[1].setString(name2);
     for(int i=0;i<2;i++){
         heart[i].setSize(Vector2f(playerInfoBoxHeight,playerInfoBoxHeight));
         heart[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 , playerInfoBoxY);
@@ -91,11 +96,19 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         upgrades[i].setFont(_fonts[0]);
         upgrades[i].setCharacterSize(fontSize);
         upgrades[i].setStyle(Text::Bold);
-        upgrades[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 + heart[i].getSize().y + fontSize,playerInfoBoxY+(playerInfoBoxHeight-fontSize)/2);
+        upgrades[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().x)/2 + heart[i].getSize().x + fontSize,playerInfoBoxY+(playerInfoBoxHeight)/2-upgrades[i].getLocalBounds().height);
+        names[i].setFont(_fonts[0]);
+        names[i].setCharacterSize(fontSize);
+        names[i].setStyle(Text::Bold);
+        FloatRect const bound = names[i].getLocalBounds();
+        names[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (((playerInfoBoxWidth/2-heart[i].getSize().x)/2)-bound.width)/2 ,playerInfoBoxY+(playerInfoBoxHeight)/2-bound.height);
     }
+
     heartTextureSize = textures["heart"].getSize().y;
-    upgrades[0].setColor(Color(156,0,0));
-    upgrades[1].setColor(Color(0,0,156));
+    upgrades[0].setColor(Color(156,40,40));
+    upgrades[1].setColor(Color(40,40,156));
+    names[0].setColor(Color(156,40,40));
+    names[1].setColor(Color(40,40,156));
 }
 
 void Game::update(){
@@ -178,6 +191,7 @@ void Game::draw(){
     for(int i=0;i<2;i++){
         window.draw(heart[i]);
         window.draw(upgrades[i]);
+        window.draw(names[i]);
     }
 }
 
