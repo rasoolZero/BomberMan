@@ -5,13 +5,41 @@
 #include "Game.h"
 #include <iostream>
 #include <fstream>
+#include <dirent.h>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
 #define DEBUGGING
+#define OS Windows
 #define CONTROL_WIDTH 150
 using namespace sf;
 using json = nlohmann::json;
 Time DeltaTime;
+
+void capture(sf::RenderWindow & window){
+    Image img = window.capture();
+    size_t maxFound = 0;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir ("Screenshots\\")) != NULL) {
+        while ((ent = readdir (dir)) != NULL) {
+            size_t number=0;
+            std::string s(ent->d_name);
+            size_t t = s.find_first_of("0123456789");
+            if(t!=std::string::npos){
+                number = std::stoi(ent->d_name+t);
+                if(number>maxFound)
+                    maxFound=number;
+            }
+        }
+        closedir(dir);
+    }
+    else {
+        perror ("Screenshots folder can't be opened");
+        exit(EXIT_FAILURE);
+    }
+
+    img.saveToFile(std::string("Screenshots\\Scr") + std::to_string(maxFound+1) + std::string(".png") );
+}
 
 int main()
 {
@@ -34,6 +62,14 @@ int main()
         std::cout << e.what() << std::endl;
         return 1;
     }
+    #if !defined OS
+    #error OS is not defined.
+    #endif
+    #if(OS == Windows)
+        system("mkdir Screenshots 2> nul:");
+    #else
+        system("mkdir Screenshots 2> /dev/null");
+    #endif
     std::ifstream i("log.json");
     json j;
     i >> j;
@@ -46,6 +82,7 @@ int main()
     Game game(window,j,textures,fonts,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+
 
     #ifdef DEBUGGING
     Clock timer;
@@ -68,9 +105,14 @@ int main()
             if (event.type == sf::Event::MouseButtonPressed)
                 if(event.mouseButton.button == sf::Mouse::Left)
                     controls.update();
-            if (event.type == sf::Event::KeyPressed)
+            if (event.type == sf::Event::KeyPressed){
                 if (event.key.code == sf::Keyboard::Escape)
                     window.close();
+                if (event.key.code == sf::Keyboard::F2){
+                    capture(window);
+                    audio.play(Audio::Capture);
+                }
+            }
         }
 
         window.clear();

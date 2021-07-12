@@ -10,7 +10,7 @@ using namespace sf;
 class Audio
 {
     public:
-        enum Sounds{Pause,Play,Rewind,Click,Failed,Music};
+        enum Sounds{Pause,Play,Rewind,Click,Failed,Capture,Music};
         Audio( thor::ResourceHolder<SoundBuffer,int> & soundBuffers);
         void play(Sounds _sound);
         void stop(Sounds _sound);
