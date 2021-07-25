@@ -16,7 +16,10 @@ using json = nlohmann::json;
 Time DeltaTime;
 
 void capture(sf::RenderWindow & window){
-    Image img = window.capture();
+    Texture capture;
+    capture.update(window);
+    Image img = capture.copyToImage();//window.capture();
+
     size_t maxFound = 0;
     DIR *dir;
     struct dirent *ent;
@@ -89,7 +92,7 @@ int main()
     timer.restart();
 
     Text text;
-    text.setColor(Color::Red);
+    text.setFillColor(Color::Red);
     text.setFont(fonts[0]);
     text.setCharacterSize(20);
     #endif // DEBUGGING

@@ -105,10 +105,10 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     }
 
     heartTextureSize = textures["heart"].getSize().y;
-    upgrades[0].setColor(Color(156,40,40));
-    upgrades[1].setColor(Color(40,40,156));
-    names[0].setColor(Color(156,40,40));
-    names[1].setColor(Color(40,40,156));
+    upgrades[0].setFillColor(Color(156,40,40));
+    upgrades[1].setFillColor(Color(40,40,156));
+    names[0].setFillColor(Color(156,40,40));
+    names[1].setFillColor(Color(40,40,156));
 }
 
 void Game::update(){

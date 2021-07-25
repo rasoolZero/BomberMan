@@ -1,7 +1,7 @@
 #ifndef RESOURCES_N_H_INCLUDED
 #define RESOURCES_N_H_INCLUDED
 #include <string>
-namespace Resources_n{
+namespace Resources_n {
     extern int const texturesCount;
     extern std::string textures[];
 

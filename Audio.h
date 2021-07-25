@@ -3,7 +3,7 @@
 #include <vector>
 #include <SFML/Audio.hpp>
 #include <Thor/Resources.hpp>
-#include <Resources_n.h>
+#include "Resources_n.h"
 
 using namespace sf;
 
