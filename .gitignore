@@ -3,6 +3,7 @@ bin
 obj
 BomberMan.*
 /debug
+/release
 todo.txt
 *.json
 /Screenshots
