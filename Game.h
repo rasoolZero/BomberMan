@@ -23,7 +23,7 @@ class Game
         void changeSpeed(int _speed);
 
         bool setTurn(unsigned _turn);
-        unsigned getTurn(){return turn;}
+        unsigned getTurn(){return this->turn;}
 
         void setPlaying(bool _playing);
         bool getPlaying(){return playing;}

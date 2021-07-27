@@ -1,5 +1,5 @@
 #include "MoveAnimation.h"
-
+#include <cmath>
 MoveAnimation::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
 	:destination{ relative_destination }
 	, mode{ movement_mode }
