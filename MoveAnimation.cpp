@@ -1,12 +1,15 @@
 #include "MoveAnimation.h"
 #include <cmath>
-MoveAnimation::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
+
+template <class T>
+MoveAnimation<T>::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
 	:destination{ relative_destination }
 	, mode{ movement_mode }
 {
 }
 
-void MoveAnimation::operator()(Transformable& object, double progress)
+template <class T>
+void MoveAnimation<T>::operator()(T& object, double progress)
 {
 	if (firstCall) {
 		source = object.getPosition();
@@ -32,6 +35,7 @@ void MoveAnimation::operator()(Transformable& object, double progress)
 		break;
 	case Mode::settle :
 		modifier = -1 * abs(1.25 * progress - 1.125) + 1.125;
+		break;
 	default: //uniform
 		modifier = progress;
 		break;
@@ -40,8 +44,19 @@ void MoveAnimation::operator()(Transformable& object, double progress)
 	object.setPosition(source + static_cast<float>(modifier) * destination);
 }
 
-bool MoveAnimation::is_idle()
+template <class T>
+bool MoveAnimation<T>::is_idle()
 {
 	return firstCall;
 }
 
+template<class T>
+void MoveAnimation<T>::reset(Vector2f relative_destination, Mode movement_mode)
+{
+	this->destination = relative_destination;
+	this->mode = movement_mode;
+	firstCall = true;
+}
+
+template class MoveAnimation<CharShape>;
+template class MoveAnimation<Transformable>;

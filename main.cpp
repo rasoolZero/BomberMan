@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include "Manager.h"
+#include "Intro.h"
 #include "Control.h"
 #include "Resources_n.h"
 #include "Audio.h"
@@ -81,11 +83,13 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
+    Manager manager(&window);
     window.setVerticalSyncEnabled(true);
+    Intro intro(window);
     Game game(window,j,textures,fonts,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
-
+    manager.setPointers(&intro, &controls, &game);
 
     #ifdef DEBUGGING
     Clock timer;
@@ -96,7 +100,6 @@ int main()
     text.setFont(fonts[0]);
     text.setCharacterSize(20);
     #endif // DEBUGGING
-
     while (window.isOpen())
     {
         DeltaTime = clk.restart();
@@ -119,12 +122,15 @@ int main()
         }
 
         window.clear();
-        controls.draw();
-        game.update();
+        //controls.draw();
+        //game.update();
+        manager.update();
         #ifdef DEBUGGING
-        Time t = timer.restart();
-        text.setString("state: "+std::to_string(game.getTurn())+"\nFPS: "+std::to_string((int)(1/t.asSeconds())));
-        window.draw(text);
+        //if (manager.getState() == Manager::State::game) {
+            Time t = timer.restart();
+            text.setString("state: " + std::to_string(game.getTurn()) + "\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
+            window.draw(text);
+        //}
         #endif // DEBUGGING
         window.display();
     }

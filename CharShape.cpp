@@ -6,12 +6,18 @@ CharShape::CharShape(char type, Color color, Vector2f wing_vector, float thickne
 	,thickness{ thickness }
 {
 	spline.setColor(color);
-	assign_points();
+	assign_points(true);
+	spline.setThickness(4);
+	spline.setClosed(true);
+	spline.setThickCornerType(sw::Spline::ThickCornerType::Round);
+	spline.smoothHandles();
+	spline.update();
 }
 
-void CharShape::setposition(Vector2f position)
+void CharShape::setPosition(Vector2f position)
 {
 	Vector2f move_vector = position - this->getPosition();
+	Transformable::setPosition(position);
 	this->move(move_vector);
 }
 
@@ -24,7 +30,37 @@ void CharShape::move(Vector2f move_vector)
 	spline.update();
 }
 
-void CharShape::assign_points()
+void CharShape::flip(Vector2f origin)
+{
+	this->spline.rotate(180.f, origin);
+	for (int i = 0; i < vertices.size(); i++) {
+		vertices[i] = spline.getPosition(i);
+	}
+	if (vertices[0].y > vertices[1].y) {
+		if (type == '<' || type == '>') {
+			Transformable::setPosition(vertices[0] - Vector2f(0, wing_vector.y));
+		}
+		else {
+			Transformable::setPosition(vertices[1]);
+		}
+	}
+	else {
+		if (type == '<' || type == '>') {
+			Transformable::setPosition(vertices[4]);
+		}
+		else {
+			Transformable::setPosition(vertices[0] - Vector2f(wing_vector.x, 0));
+		}
+	}
+	this->spline.update();
+}
+
+void CharShape::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	target.draw(spline, states);
+}
+
+void CharShape::assign_points(bool init = 0)
 {
 	if (type == '^') {
 		vertices.push_back({ wing_vector.x, 0 });
@@ -59,7 +95,9 @@ void CharShape::assign_points()
 	else {
 		throw std::invalid_argument("invalid character");
 	}
-	spline.removeVertices(0);
+	if (!init) {
+		spline.removeVertices(0);
+	}
 	spline.addVertices(vertices);
 	spline.update();
 }
