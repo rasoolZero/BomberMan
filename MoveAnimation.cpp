@@ -13,9 +13,10 @@ void MoveAnimation<T>::operator()(T& object, double progress)
 {
 	if (firstCall) {
 		source = object.getPosition();
+		firstCall = false;
 	}
 	//prepare "firstCall" for next animation if the current one is complete:
-	firstCall = progress == 1.0f;
+	//firstCall = progress == 1.0f; //irrelevant in thor2.0(progress is not guaranteed to be 1 on last call), pending thor2.1
 
 	double modifier;
 
