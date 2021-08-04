@@ -1,15 +1,14 @@
 #include "MoveAnimation.h"
 #include <cmath>
 
-template <class T>
-MoveAnimation<T>::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
+MoveAnimation::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
 	:destination{ relative_destination }
 	, mode{ movement_mode }
 {
 }
 
 template <class T>
-void MoveAnimation<T>::operator()(T& object, double progress)
+void MoveAnimation::operator()(T& object, double progress)
 {
 	if (firstCall) {
 		source = object.getPosition();
@@ -45,19 +44,17 @@ void MoveAnimation<T>::operator()(T& object, double progress)
 	object.setPosition(source + static_cast<float>(modifier) * destination);
 }
 
-template <class T>
-bool MoveAnimation<T>::is_idle()
+bool MoveAnimation::is_idle()
 {
 	return firstCall;
 }
 
-template<class T>
-void MoveAnimation<T>::reset(Vector2f relative_destination, Mode movement_mode)
+void MoveAnimation::reset(Vector2f relative_destination, Mode movement_mode)
 {
 	this->destination = relative_destination;
 	this->mode = movement_mode;
 	firstCall = true;
 }
 
-template class MoveAnimation<CharShape>;
-template class MoveAnimation<Transformable>;
+template void MoveAnimation::operator() < CharShape >(CharShape&, double);
+template void MoveAnimation::operator() < Transformable > (Transformable&, double);

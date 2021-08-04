@@ -19,10 +19,10 @@ private:
 	RenderWindow& window;
 	CharShape pieces[8];
 	Vector2f gap;
-	MoveAnimation<CharShape> l_move;
-	MoveAnimation<CharShape> r_move;
-	MoveAnimation<CharShape> l_parallel_move;
-	MoveAnimation<CharShape> r_parallel_move; // extra move animations for right small and left small
+	MoveAnimation l_move;
+	MoveAnimation r_move;
+	MoveAnimation l_parallel_move;
+	MoveAnimation r_parallel_move; // extra move animations for right small and left small
 	thor::Animator<CharShape, std::string> l_animator;
 	thor::Animator<CharShape, std::string> r_animator;
 	thor::Animator<CharShape, std::string> l_parallel_animator;

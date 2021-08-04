@@ -4,7 +4,6 @@
 #include "CharShape.h"
 using namespace sf;
 
-template <class T>
 class MoveAnimation {	// custom movement animation for thor::animator
 public:
 	enum Mode
@@ -12,6 +11,7 @@ public:
 		uniform, accelerate, decelerate, ac_de, de_ac, settle
 	};
 	MoveAnimation(Vector2f relative_destination, Mode movement_mode);
+	template <class T>
 	void operator()(T& object, double progress);
 	bool is_idle();
 	void reset() { firstCall = true; }

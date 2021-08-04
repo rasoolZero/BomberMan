@@ -13,10 +13,10 @@ Intro::Intro(RenderWindow& window)
 		{'>', Color(255, 167, 0), Vector2f(95, 165), 69}  //right_small
 	}
 	, gap{ 21, 19 }
-	, l_move{ {0, -(pieces[A].getWing().y + gap.y/2) }, MoveAnimation<CharShape>::Mode::ac_de }
-	,r_move{ {0, pieces[A_flipped].getWing().y + gap.y/2 }, MoveAnimation<CharShape>::Mode::ac_de }
-	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation<CharShape>::Mode::settle }
-	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation<CharShape>::Mode::settle }
+	, l_move{ {0, -(pieces[A].getWing().y + gap.y/2) }, MoveAnimation::Mode::ac_de }
+	,r_move{ {0, pieces[A_flipped].getWing().y + gap.y/2 }, MoveAnimation::Mode::ac_de }
+	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
+	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 {
 	Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
 	
@@ -85,7 +85,7 @@ void Intro::update()
 				l_animator.playAnimation("l");
 				r_animator.playAnimation("r");
 			}
-			else {}
+			//else {}
 		}
 	}
 	else {
@@ -102,18 +102,18 @@ void Intro::setNextAnimation()
 	{
 	case 0:
 		if (pieces[0].getPosition().x < window.getSize().x/2 - pieces[A].getWing().x * 2 + 1) {
-			l_move.reset({ gap.x / 2 + pieces[A].getThickness(), 0 }, MoveAnimation<CharShape>::Mode::accelerate);
-			r_move.reset({ -(gap.x / 2+ pieces[A_flipped].getThickness()), 0 }, MoveAnimation<CharShape>::Mode::accelerate);
+			l_move.reset({ gap.x / 2 + pieces[A].getThickness(), 0 }, MoveAnimation::Mode::accelerate);
+			r_move.reset({ -(gap.x / 2+ pieces[A_flipped].getThickness()), 0 }, MoveAnimation::Mode::accelerate);
 		}
 		else {
-			l_move.reset({ gap.x + pieces[I].getThickness(), 0 }, MoveAnimation<CharShape>::Mode::decelerate);
-			r_move.reset({ -(gap.x + pieces[I_flipped].getThickness()), 0 }, MoveAnimation<CharShape>::Mode::decelerate);
+			l_move.reset({ gap.x + pieces[I].getThickness(), 0 }, MoveAnimation::Mode::decelerate);
+			r_move.reset({ -(gap.x + pieces[I_flipped].getThickness()), 0 }, MoveAnimation::Mode::decelerate);
 			active_piece += 2;
 		}
 		break;
 	case 2:
-		l_move.reset({ -(gap.x + pieces[left_big].getThickness()), 0 }, MoveAnimation<CharShape>::Mode::settle);
-		r_move.reset({ gap.x + pieces[right_big].getThickness(), 0 }, MoveAnimation<CharShape>::Mode::settle);
+		l_move.reset({ -(gap.x + pieces[left_big].getThickness()), 0 }, MoveAnimation::Mode::settle);
+		r_move.reset({ gap.x + pieces[right_big].getThickness(), 0 }, MoveAnimation::Mode::settle);
 		active_piece += 2;
 		break;
 	case 4:
