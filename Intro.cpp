@@ -1,16 +1,16 @@
 #include "Intro.h"
 #include "CharShape.h"
-Intro::Intro(RenderWindow& window)
+Intro::Intro(RenderWindow& window, Color background_color)
 	:window{ window }
 	,pieces{ 
-		{'^', Color(0, 149,250), Vector2f(125, 217), 69}, //A
-		{'^', Color(0, 149,250), Vector2f(125, 217), 69}, //A_flipped
-		{'\\', Color(0, 149,250), Vector2f(125, 217), 69}, //I
-		{'\\', Color(0, 149,250), Vector2f(125, 217), 69}, //I_flipped
-		{'<', Color(245, 4, 126), Vector2f(131, 227), 69}, //left_big
-		{'>', Color(245, 4, 126), Vector2f(131, 227), 69}, //right_big
-		{'<', Color(255, 167, 0), Vector2f(95, 165), 69}, //left_small
-		{'>', Color(255, 167, 0), Vector2f(95, 165), 69}  //right_small
+		{'^', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //A
+		{'^', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //A_flipped
+		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //I
+		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //I_flipped
+		{'<', Color(245, 4, 126), Vector2f(131, 227), 69, background_color}, //left_big
+		{'>', Color(245, 4, 126), Vector2f(131, 227), 69, background_color}, //right_big
+		{'<', Color(255, 167, 0), Vector2f(95, 165), 69, background_color}, //left_small
+		{'>', Color(255, 167, 0), Vector2f(95, 165), 69, background_color}  //right_small
 	}
 	, gap{ 21, 19 }
 	, l_move{ {0, -(pieces[A].getWing().y + gap.y/2) }, MoveAnimation::Mode::ac_de }
@@ -31,28 +31,30 @@ Intro::Intro(RenderWindow& window)
 	//pieces[left_big].setPosition(pieces[A].getPosition() - pieces[left_big].getWing() + Vector2f{pieces[A].getThickness() + gap.x, 0});
 	pieces[left_big].setPosition({ middle.x - pieces[A].getWing().x + gap.x/2 + pieces[A].getThickness() - pieces[left_big].getWing().x
 		,middle.y - pieces[left_big].getWing().y });
-	pieces[right_big].flip(middle);
 	pieces[right_big].setPosition(pieces[left_big].getPosition());
-	pieces[right_big].flip(middle);
+	pieces[right_big].move( { ( middle.x - pieces[right_big].getPosition().x)*2 - (pieces[right_big].getThickness() + pieces[right_big].getWing().x), 0 });
+	/*pieces[right_big].flip(middle);
+	pieces[right_big].flip(middle);*/
 	//pieces[right_big].setPosition({ middle.x - gap.x, middle.y - pieces[right_big].getWing().y });
 
 	pieces[left_small].setPosition({ middle.x - (pieces[left_big].getThickness() * 2 + gap.x * (gap.y/gap.x) + gap.x), middle.y - pieces[left_small].getWing().y });
-	pieces[right_small].flip(middle);
 	pieces[right_small].setPosition(pieces[left_small].getPosition());
-	pieces[right_small].flip(middle);
+	pieces[right_small].move({ (middle.x - pieces[right_small].getPosition().x) * 2 - (pieces[right_small].getThickness() + pieces[right_small].getWing().x) , 0 });
+	/*pieces[right_small].flip(middle);
+	pieces[right_small].flip(middle);*/
 
 
-	l_animator.addAnimation("l", thor::refAnimation(l_move), seconds(.5));
-	r_animator.addAnimation("r", thor::refAnimation(r_move), seconds(.5));
+	l_animator.addAnimation("l", thor::refAnimation(l_move), seconds(.5f));
+	r_animator.addAnimation("r", thor::refAnimation(r_move), seconds(.5f));
 	l_animator.playAnimation("l");
 	r_animator.playAnimation("r");
 
-	l_parallel_animator.addAnimation("l", thor::refAnimation(l_parallel_move), seconds(.75));
-	r_parallel_animator.addAnimation("r", thor::refAnimation(r_parallel_move), seconds(.75));
+	l_parallel_animator.addAnimation("l", thor::refAnimation(l_parallel_move), seconds(.75f));
+	r_parallel_animator.addAnimation("r", thor::refAnimation(r_parallel_move), seconds(.75f));
 	l_parallel_animator.playAnimation("l");
 	r_parallel_animator.playAnimation("r");
 	frame_timer.restart();
-	wait(seconds(1));
+	wait(seconds(0.75f));
 }
 
 void Intro::update()
@@ -85,13 +87,12 @@ void Intro::update()
 				l_animator.playAnimation("l");
 				r_animator.playAnimation("r");
 			}
-			//else {}
 		}
 	}
 	else {
 		checkDelay();
 	}
-	for (int i = 0; i < active_piece + (active_piece == 4 ? 4 :2); i++) {
+	for (int i = active_piece + (active_piece == 4 ? 3 : 1); i >=0 ; i--) {
 		window.draw(pieces[i]);
 	}
 }

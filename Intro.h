@@ -10,7 +10,7 @@ using namespace sf;
 class Intro
 {
 public:
-	Intro(RenderWindow& window);
+	Intro(RenderWindow& window, Color background_color);
 	void update();
 private:
 	enum Piece {

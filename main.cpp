@@ -83,9 +83,11 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
+
+    Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    Intro intro(window);
+    Intro intro(window, bg);
     Game game(window,j,textures,fonts,CONTROL_WIDTH);
     Audio audio(soundBuffers);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
@@ -121,7 +123,7 @@ int main()
             }
         }
 
-        window.clear();
+        window.clear(bg);
         //controls.draw();
         //game.update();
         manager.update();

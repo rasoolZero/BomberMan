@@ -1,38 +1,52 @@
 #include "CharShape.h"
 #include <stdexcept>
-CharShape::CharShape(char type, Color color, Vector2f wing_vector, float thickness)
+CharShape::CharShape(char type, Color color, Vector2f wing_vector, float thickness, Color background_color = Color::Black)
 	:type{ type }
 	,wing_vector{ abs(wing_vector.x), abs(wing_vector.y) }
 	,thickness{ thickness }
 {
-	spline.setColor(color);
+	assign_points();
+	shape.setFillColor(background_color);
+	shape.setOutlineColor(color);
+	shape.setOutlineThickness(4);
+	/*spline.setColor(color);
 	assign_points(true);
 	spline.setThickness(4);
 	spline.setClosed(true);
 	spline.setThickCornerType(sw::Spline::ThickCornerType::Round);
 	spline.smoothHandles();
-	spline.update();
+	spline.update();*/
+	
 }
 
 void CharShape::setPosition(Vector2f position)
 {
-	Vector2f move_vector = position - this->getPosition();
+	/*Vector2f move_vector = position - this->getPosition();
 	Transformable::setPosition(position);
-	this->move(move_vector);
+	this->move(move_vector);*/
+	this->shape.setPosition(position);
 }
 
-void CharShape::move(Vector2f move_vector)
+void CharShape::move(Vector2f offset)
 {
-	for (int i = 0; i < vertices.size(); i++) {
+	this->shape.setPosition(this->shape.getPosition() + offset);
+}
+
+/*void CharShape::move(Vector2f move_vector)
+{
+	/*for (int i = 0; i < vertices.size(); i++) {
 		vertices[i] += move_vector;
 	}
 	spline.setPositions(vertices);
 	spline.update();
-}
+}*/
 
 void CharShape::flip(Vector2f origin)
 {
-	this->spline.rotate(180.f, origin);
+	shape.setOrigin(origin - shape.getPosition());
+	shape.move(origin - shape.getPosition());
+	shape.rotate(180);
+	/*this->spline.rotate(180.f, origin);
 	for (int i = 0; i < vertices.size(); i++) {
 		vertices[i] = spline.getPosition(i);
 	}
@@ -52,16 +66,18 @@ void CharShape::flip(Vector2f origin)
 			Transformable::setPosition(vertices[0] - Vector2f(wing_vector.x, 0));
 		}
 	}
-	this->spline.update();
+	this->spline.update();*/
 }
 
 void CharShape::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	target.draw(spline, states);
+	//target.draw(spline, states);
+	target.draw(shape, states);
 }
 
-void CharShape::assign_points(bool init = 0)
+void CharShape::assign_points()
 {
+	std::vector<Vector2f> vertices;
 	if (type == '^') {
 		vertices.push_back({ wing_vector.x, 0 });
 		vertices.push_back({ wing_vector.x * 2, wing_vector.y });
@@ -95,9 +111,8 @@ void CharShape::assign_points(bool init = 0)
 	else {
 		throw std::invalid_argument("invalid character");
 	}
-	if (!init) {
-		spline.removeVertices(0);
+	shape.setPointCount(vertices.size());
+	for (int i = 0; i < vertices.size(); i++) {
+		shape.setPoint(i, vertices[i]);
 	}
-	spline.addVertices(vertices);
-	spline.update();
 }
