@@ -10,10 +10,13 @@ using namespace sf;
 class CharShape : public Drawable
 {
 public:
+	CharShape() {};
 	CharShape(char type, Color color, Vector2f wing_vector, float thickness, Color background_color);
 	void setPosition(Vector2f position);
 	void move(Vector2f offset);
 	Vector2f getPosition() { return this->shape.getPosition(); }
+	Vector2f getPoint(int index) { return this->shape.getPoint(index); }
+	const Transform& getTransform() { return this->shape.getTransform(); }
 	//void move(Vector2f move_vector);
 	//sw::Spline& getSpline() { return this->spline; }
 	Vector2f getWing() { return this->wing_vector; }

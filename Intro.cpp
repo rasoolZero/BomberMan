@@ -2,15 +2,16 @@
 #include "CharShape.h"
 Intro::Intro(RenderWindow& window, Color background_color)
 	:window{ window }
+	,bg{background_color}
 	,pieces{ 
-		{'^', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //A
-		{'^', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //A_flipped
-		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //I
-		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, background_color}, //I_flipped
-		{'<', Color(245, 4, 126), Vector2f(131, 227), 69, background_color}, //left_big
-		{'>', Color(245, 4, 126), Vector2f(131, 227), 69, background_color}, //right_big
-		{'<', Color(255, 167, 0), Vector2f(95, 165), 69, background_color}, //left_small
-		{'>', Color(255, 167, 0), Vector2f(95, 165), 69, background_color}  //right_small
+		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A
+		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A_flipped
+		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //I
+		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //I_flipped
+		{'<', Color(245, 4, 126), Vector2f(131, 227), 69, bg}, //left_big
+		{'>', Color(245, 4, 126), Vector2f(131, 227), 69, bg}, //right_big
+		{'<', Color(255, 167, 0), Vector2f(95, 165), 69, bg}, //left_small
+		{'>', Color(255, 167, 0), Vector2f(95, 165), 69, bg}  //right_small
 	}
 	, gap{ 21, 19 }
 	, l_move{ {0, -(pieces[A].getWing().y + gap.y/2) }, MoveAnimation::Mode::ac_de }
@@ -18,6 +19,9 @@ Intro::Intro(RenderWindow& window, Color background_color)
 	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 {
+	top_veil.setPrimitiveType(TriangleStrip);
+	bot_veil.setPrimitiveType(TriangleStrip);
+
 	Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
 	
 	pieces[A].setPosition({ middle.x - pieces[A].getWing().x * 2, middle.y });
@@ -44,15 +48,18 @@ Intro::Intro(RenderWindow& window, Color background_color)
 	pieces[right_small].flip(middle);*/
 
 
-	l_animator.addAnimation("l", thor::refAnimation(l_move), seconds(.5f));
-	r_animator.addAnimation("r", thor::refAnimation(r_move), seconds(.5f));
+	l_animator.addAnimation("l", thor::refAnimation(l_move), seconds(.4f));
+	r_animator.addAnimation("r", thor::refAnimation(r_move), seconds(.4f));
 	l_animator.playAnimation("l");
 	r_animator.playAnimation("r");
 
-	l_parallel_animator.addAnimation("l", thor::refAnimation(l_parallel_move), seconds(.75f));
-	r_parallel_animator.addAnimation("r", thor::refAnimation(r_parallel_move), seconds(.75f));
+	l_parallel_animator.addAnimation("l", thor::refAnimation(l_parallel_move), seconds(.6f));
+	r_parallel_animator.addAnimation("r", thor::refAnimation(r_parallel_move), seconds(.6f));
 	l_parallel_animator.playAnimation("l");
 	r_parallel_animator.playAnimation("r");
+
+	setNextVeil();
+
 	frame_timer.restart();
 	wait(seconds(0.75f));
 }
@@ -79,6 +86,7 @@ void Intro::update()
 			l_move(pieces[active_piece], 1.0);
 			r_move(pieces[active_piece + 1], 1.0);
 			setNextAnimation();
+			setNextVeil();
 			/*if (1 <active_piece && active_piece < 6) {
 				pieces[active_piece].setPosition(pieces[active_piece - 2].getPosition());
 				pieces[active_piece + 1].setPosition(pieces[active_piece - 1].getPosition());
@@ -94,6 +102,84 @@ void Intro::update()
 	}
 	for (int i = active_piece + (active_piece == 4 ? 3 : 1); i >=0 ; i--) {
 		window.draw(pieces[i]);
+		if ((i == active_piece) && (active_piece != 0 || (active_piece == 0 && !A_appeared))) {
+			window.draw(top_veil);
+			window.draw(bot_veil);
+		}
+	}
+}
+
+void Intro::setNextVeil()
+{
+	Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
+	CharShape p;
+	switch (active_piece)
+	{
+	case 0:
+		top_veil.resize(6);
+		bot_veil.resize(6);
+		p = pieces[A_flipped];
+		if (!A_appeared) {
+			top_veil[0].position = p.getTransform().transformPoint(p.getPoint(1)) - Vector2f(10, 10);
+			top_veil[1].position = p.getTransform().transformPoint(p.getPoint(5)) + Vector2f(10, -10);
+			top_veil[2].position = { p.getTransform().transformPoint(p.getPoint(0)).x - (p.getWing().x + 5), middle.y + 2 };
+			top_veil[3].position = { p.getTransform().transformPoint(p.getPoint(0)).x + (p.getWing().x + 5), middle.y + 2 };
+			top_veil[4].position = top_veil[2].position + Vector2f(0, gap.y / 4);
+			top_veil[5].position = top_veil[3].position + Vector2f(0, gap.y / 4);
+
+			for (int i = 0; i < 6; i++) {
+				bot_veil[i].position = 2.f * middle - top_veil[i].position; //mirror positions based on middle
+			}
+		}
+		break;
+	case 2:
+		top_veil.resize(6);
+		bot_veil.resize(6);
+		p = pieces[A_flipped];
+
+		bot_veil[0].position = p.getTransform().transformPoint(p.getPoint(5)) - Vector2f(0,5);
+		bot_veil[1].position = bot_veil[0].position + Vector2f(0, p.getWing().y + 10);
+		bot_veil[2].position = p.getTransform().transformPoint(p.getPoint(1)) + Vector2f(-2, -5);
+		bot_veil[3].position = p.getTransform().transformPoint(p.getPoint(0)) + Vector2f(-2, 5);
+		bot_veil[4].position = bot_veil[2].position - Vector2f(gap.x / 2, 0);
+		bot_veil[5].position = bot_veil[3].position - Vector2f(gap.x / 2, 0);
+
+		for (int i = 0; i < 6; i++) {
+			top_veil[i].position = 2.f * middle - bot_veil[i].position;
+		}
+		break;
+	case 4:
+		top_veil.resize(8);
+		bot_veil.resize(8);
+		p = pieces[left_big];
+
+		top_veil[2].position = p.getTransform().transformPoint(p.getPoint(1)) - Vector2f(2, 5);
+		top_veil[3].position = p.getTransform().transformPoint(p.getPoint(0)) - Vector2f(2, 0);
+		top_veil[0].position = top_veil[2].position - Vector2f(gap.x / 2, 0);
+		top_veil[1].position = top_veil[3].position - Vector2f(gap.x / 2, 0);
+		p = pieces[right_big];
+		top_veil[4].position = p.getTransform().transformPoint(p.getPoint(5)) + Vector2f(2, -5);
+		top_veil[5].position = p.getTransform().transformPoint(p.getPoint(0)) + Vector2f(2, 0);
+		top_veil[6].position = top_veil[4].position + Vector2f(gap.x / 2, 0);
+		top_veil[7].position = top_veil[5].position + Vector2f(gap.x / 2, 0);
+		for (int i = 0; i < 8; i++) {
+			bot_veil[i].position = 2.f * middle - top_veil[i].position;
+		}
+		break;
+	default:
+		break;
+	}
+	for (int i = 0; i < top_veil.getVertexCount(); i++) {
+		top_veil[i].color = bg;
+		bot_veil[i].color = bg;
+		if ((i > top_veil.getVertexCount() - 3) || (i < 2 && top_veil.getVertexCount() == 8)) {
+			top_veil[i].color.a = 0;
+			bot_veil[i].color.a = 0;
+		}
+		else {
+			top_veil[i].color.a = 255;
+			bot_veil[i].color.a = 255;
+		}
 	}
 }
 
@@ -105,6 +191,7 @@ void Intro::setNextAnimation()
 		if (pieces[0].getPosition().x < window.getSize().x/2 - pieces[A].getWing().x * 2 + 1) {
 			l_move.reset({ gap.x / 2 + pieces[A].getThickness(), 0 }, MoveAnimation::Mode::accelerate);
 			r_move.reset({ -(gap.x / 2+ pieces[A_flipped].getThickness()), 0 }, MoveAnimation::Mode::accelerate);
+			A_appeared = true;
 		}
 		else {
 			l_move.reset({ gap.x + pieces[I].getThickness(), 0 }, MoveAnimation::Mode::decelerate);
