@@ -1,7 +1,6 @@
 #ifndef MOVEANIMATION_h
 #define MOVEANIMATION_h
 #include <SFML/Graphics.hpp>
-#include "CharShape.h"
 using namespace sf;
 
 class MoveAnimation {	// custom movement animation for thor::animator
@@ -14,7 +13,8 @@ public:
 	template <class T>
 	void operator()(T& object, double progress);
 	bool is_idle();
-	void reset() { firstCall = true; }
+	double getProgress() { return this->progress; }
+	void reset() { firstCall = true; progress = 0.0; }
 	void reset(Vector2f relative_destination, Mode movement_mode);
 	void setDestination(Vector2f relative_destination) { this->destination = relative_destination; }
 	void setMode(Mode mode) { this->mode = mode; }
@@ -23,7 +23,7 @@ private:
 	Vector2f destination;
 	Mode mode;
 	bool firstCall = true;
-
+	double progress = 0.0;
 };
 
 

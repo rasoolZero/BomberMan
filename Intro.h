@@ -5,12 +5,13 @@
 #include <Thor/Animations.hpp>
 #include "CharShape.h"
 #include "MoveAnimation.h"
+#include "Mask.h"
 using namespace sf;
 
 class Intro
 {
 public:
-	Intro(RenderWindow& window, Color background_color);
+	Intro(RenderWindow& window, Color background_color, Texture* logo_texture);
 	void update();
 private:
 	enum Piece {
@@ -20,6 +21,7 @@ private:
 	Color bg;
 	CharShape pieces[8];
 	Vector2f gap;
+	Vector2f middle;
 	MoveAnimation l_move;
 	MoveAnimation r_move;
 	MoveAnimation l_parallel_move;
@@ -28,9 +30,13 @@ private:
 	thor::Animator<CharShape, std::string> r_animator;
 	thor::Animator<CharShape, std::string> l_parallel_animator;
 	thor::Animator<CharShape, std::string> r_parallel_animator; // extra animators for right small and left small
-
+	VertexArray logo;
+	Texture* logo_texture;
+	VertexArray logo_veil;
 	VertexArray top_veil;
 	VertexArray bot_veil; //two veil "layers" to hide parts of pieces
+	Mask l_mask;
+	Mask r_mask;
 	void setNextVeil();
 	void setNextAnimation();
 	short active_piece = 0;

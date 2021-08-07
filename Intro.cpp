@@ -1,8 +1,10 @@
 #include "Intro.h"
 #include "CharShape.h"
-Intro::Intro(RenderWindow& window, Color background_color)
+#include <stdexcept>
+Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture)
 	:window{ window }
 	,bg{background_color}
+	,logo_texture{logo_texture}
 	,pieces{ 
 		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A
 		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A_flipped
@@ -14,16 +16,22 @@ Intro::Intro(RenderWindow& window, Color background_color)
 		{'>', Color(255, 167, 0), Vector2f(95, 165), 69, bg}  //right_small
 	}
 	, gap{ 21, 19 }
+	, middle{ static_cast<Vector2f>(window.getSize()) / 2.f }
 	, l_move{ {0, -(pieces[A].getWing().y + gap.y/2) }, MoveAnimation::Mode::ac_de }
 	,r_move{ {0, pieces[A_flipped].getWing().y + gap.y/2 }, MoveAnimation::Mode::ac_de }
 	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
+	, l_mask{ middle, middle - Vector2f{400, 0}, seconds(2), Vector2f(pieces[left_big].getWing().x, -pieces[left_big].getWing().y) * 1.1f, Color::White, bg }
+	, r_mask{ middle, middle + Vector2f{400, 0}, seconds(2), Vector2f(pieces[right_big].getWing().x, -pieces[right_big].getWing().y) * 1.1f, Color::White, bg }
 {
 	top_veil.setPrimitiveType(TriangleStrip);
 	bot_veil.setPrimitiveType(TriangleStrip);
 
-	Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
-	
+	logo.resize(6);
+	logo.setPrimitiveType(TriangleStrip);
+	logo_veil.resize(6);
+	logo_veil.setPrimitiveType(TriangleStrip);
+		
 	pieces[A].setPosition({ middle.x - pieces[A].getWing().x * 2, middle.y });
 	pieces[A_flipped].setPosition(pieces[A].getPosition());
 	pieces[A_flipped].flip(middle);
@@ -55,10 +63,15 @@ Intro::Intro(RenderWindow& window, Color background_color)
 
 	l_parallel_animator.addAnimation("l", thor::refAnimation(l_parallel_move), seconds(.6f));
 	r_parallel_animator.addAnimation("r", thor::refAnimation(r_parallel_move), seconds(.6f));
-	l_parallel_animator.playAnimation("l");
-	r_parallel_animator.playAnimation("r");
+	//l_parallel_animator.playAnimation("l");
+	//r_parallel_animator.playAnimation("r");
 
 	setNextVeil();
+
+	/*if (!logo_texture.loadFromFile("./assets/sprites/logo.png")) {
+		throw std::runtime_error("couldnt load logo");
+	}
+	logo_texture.setSmooth(true);*/
 
 	frame_timer.restart();
 	wait(seconds(0.75f));
@@ -66,36 +79,59 @@ Intro::Intro(RenderWindow& window, Color background_color)
 
 void Intro::update()
 {
-	if (active_piece == 6)/* &&
-		(!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()))*/
-		ready = false;
+	/*if (active_piece <= 6)/* &&
+		(!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()))
+	{
+		//ready = false;
+		l_mask.update(frame_timer.getElapsedTime());
+		r_mask.update(frame_timer.restart());
+		
+	}*/
 	if (ready) {
-		l_animator.update(frame_timer.getElapsedTime());
-		l_animator.animate(pieces[active_piece]);
-		if (active_piece == 4) {
-			l_parallel_animator.update(frame_timer.getElapsedTime());
-			l_parallel_animator.animate(pieces[active_piece+2]);
-			r_parallel_animator.update(frame_timer.getElapsedTime());
-			r_parallel_animator.animate(pieces[active_piece + 3]);
+		if (active_piece >= 6)/* &&
+		(!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()))*/
+		{
+			//ready = false;
+			l_mask.update(frame_timer.getElapsedTime());
+			r_mask.update(frame_timer.restart());
+
 		}
-		r_animator.update(frame_timer.restart());
-		r_animator.animate(pieces[active_piece+1]);
+		else {
+			l_animator.update(frame_timer.getElapsedTime());
+			l_animator.animate(pieces[active_piece]);
+			if (active_piece == 4) {
+				l_parallel_animator.update(frame_timer.getElapsedTime());
+				l_parallel_animator.animate(pieces[active_piece + 2]);
+				r_parallel_animator.update(frame_timer.getElapsedTime());
+				r_parallel_animator.animate(pieces[active_piece + 3]);
+			}
+			r_animator.update(frame_timer.restart());
+			r_animator.animate(pieces[active_piece + 1]);
 
 
-		if (!l_animator.isPlayingAnimation() && !r_animator.isPlayingAnimation() && active_piece != 4) {
-			l_move(pieces[active_piece], 1.0);
-			r_move(pieces[active_piece + 1], 1.0);
-			setNextAnimation();
-			setNextVeil();
-			/*if (1 <active_piece && active_piece < 6) {
-				pieces[active_piece].setPosition(pieces[active_piece - 2].getPosition());
-				pieces[active_piece + 1].setPosition(pieces[active_piece - 1].getPosition());
-			}*/
-			if (active_piece != 6) {
-				l_animator.playAnimation("l");
-				r_animator.playAnimation("r");
+			if (!l_animator.isPlayingAnimation() && !r_animator.isPlayingAnimation() /*&& active_piece != 4*/) {
+				l_move(pieces[active_piece], 1.0);
+				r_move(pieces[active_piece + 1], 1.0);
+				setNextAnimation();
+				/*if (!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()) {
+					//setNextVeil();
+				}
+				/*if (1 <active_piece && active_piece < 6) {
+					pieces[active_piece].setPosition(pieces[active_piece - 2].getPosition());
+					pieces[active_piece + 1].setPosition(pieces[active_piece - 1].getPosition());
+				}*/
+				/*if (active_piece != 4) {
+					l_animator.playAnimation("l");
+					r_animator.playAnimation("r");
+				}*/
+				if (active_piece == 6) {
+					l_parallel_move(pieces[left_small], 1.0);
+					r_parallel_move(pieces[right_small], 1.0);
+					wait(seconds(.5f));
+				}
 			}
 		}
+		
 	}
 	else {
 		checkDelay();
@@ -107,11 +143,30 @@ void Intro::update()
 			window.draw(bot_veil);
 		}
 	}
+	if (active_piece == 6) {
+		for (int i = 0; i < 6; i++) {
+			if (i % 2) {
+				logo[i].position = r_mask.getPosition(6 - i);
+				
+			}
+			else {
+				logo[i].position = l_mask.getPosition(i + 1);
+			}
+			logo_veil[i].position = logo[i].position;
+			logo_veil[i].color = bg;
+			logo[i].texCoords = Vector2f((*logo_texture).getSize().x / 2.f, (*logo_texture).getSize().y / 2.f) + (logo[i].position - middle)*(11.2f/8.f);
+		}
+		window.draw(logo_veil);
+		window.draw(logo, RenderStates(logo_texture));
+		window.draw(l_mask);
+		window.draw(r_mask);
+
+	}
 }
 
 void Intro::setNextVeil()
 {
-	Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
+	//Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
 	CharShape p;
 	switch (active_piece)
 	{
@@ -167,6 +222,7 @@ void Intro::setNextVeil()
 		}
 		break;
 	default:
+		return;
 		break;
 	}
 	for (int i = 0; i < top_veil.getVertexCount(); i++) {
@@ -198,15 +254,24 @@ void Intro::setNextAnimation()
 			r_move.reset({ -(gap.x + pieces[I_flipped].getThickness()), 0 }, MoveAnimation::Mode::decelerate);
 			active_piece += 2;
 		}
+		setNextVeil();
+		l_animator.playAnimation("l");
+		r_animator.playAnimation("r");
 		break;
 	case 2:
 		l_move.reset({ -(gap.x + pieces[left_big].getThickness()), 0 }, MoveAnimation::Mode::settle);
 		r_move.reset({ gap.x + pieces[right_big].getThickness(), 0 }, MoveAnimation::Mode::settle);
 		active_piece += 2;
+		l_parallel_animator.playAnimation("l");
+		r_parallel_animator.playAnimation("r");
+		setNextVeil();
+		l_animator.playAnimation("l");
+		r_animator.playAnimation("r");
+		wait(seconds(0.2f));
 		break;
 	case 4:
 		if (!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()) {
-			active_piece += 2;
+ 			active_piece += 2;
 		}
 		break;
 	default:

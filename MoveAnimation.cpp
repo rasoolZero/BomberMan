@@ -1,5 +1,7 @@
 #include "MoveAnimation.h"
 #include <cmath>
+#include "CharShape.h"
+#include "Mask.h"
 
 MoveAnimation::MoveAnimation(Vector2f relative_destination, Mode movement_mode)
 	:destination{ relative_destination }
@@ -16,7 +18,7 @@ void MoveAnimation::operator()(T& object, double progress)
 	}
 	//prepare "firstCall" for next animation if the current one is complete:
 	//firstCall = progress == 1.0f; //irrelevant in thor2.0(progress is not guaranteed to be 1 on last call), pending thor2.1
-
+	this->progress = progress;
 	double modifier;
 
 	switch (mode)
@@ -54,7 +56,9 @@ void MoveAnimation::reset(Vector2f relative_destination, Mode movement_mode)
 	this->destination = relative_destination;
 	this->mode = movement_mode;
 	firstCall = true;
+	progress = 0.0;
 }
 
 template void MoveAnimation::operator() < CharShape >(CharShape&, double);
 template void MoveAnimation::operator() < Transformable > (Transformable&, double);
+template void MoveAnimation::operator() < Mask > (Mask&, double);
