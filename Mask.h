@@ -10,6 +10,7 @@ public:
 	Mask(Vector2f source, Vector2f destination, Time duration, Vector2f wing_vector, Color color, Color background_color);
 	void update(Time elapsed);
 	Vector2f getPosition(short index = 2);
+	float getProgress() { return this->move.getProgress(); }
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void setPosition(Vector2f position);
@@ -17,7 +18,9 @@ private:
 	Vector2f movement_vector;
 	Vector2f wing_vector;
 	VertexArray vertices;
-	VertexArray glow;
+	//VertexArray glow;
+	VertexArray front_glow;
+	VertexArray back_glow;
 	VertexArray fill;
 	Color color;
 	MoveAnimation move;

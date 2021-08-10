@@ -1,8 +1,9 @@
 #include "Intro.h"
 #include "CharShape.h"
 #include <stdexcept>
-Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture)
+Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio)
 	:window{ window }
+	,audio{ audio }
 	,bg{background_color}
 	,logo_texture{logo_texture}
 	,pieces{ 
@@ -21,8 +22,9 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	,r_move{ {0, pieces[A_flipped].getWing().y + gap.y/2 }, MoveAnimation::Mode::ac_de }
 	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
-	, l_mask{ middle, middle - Vector2f{400, 0}, seconds(2), Vector2f(pieces[left_big].getWing().x, -pieces[left_big].getWing().y) * 1.1f, Color::White, bg }
-	, r_mask{ middle, middle + Vector2f{400, 0}, seconds(2), Vector2f(pieces[right_big].getWing().x, -pieces[right_big].getWing().y) * 1.1f, Color::White, bg }
+	, logo_animation{ { 0, -middle.y }, MoveAnimation::Mode::uniform }
+	, l_mask{ middle, middle - Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[left_big].getWing().x, -pieces[left_big].getWing().y) * 1.1f, Color::White, bg }
+	, r_mask{ middle, middle + Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[right_big].getWing().x, -pieces[right_big].getWing().y) * 1.1f, Color::White, bg }
 {
 	top_veil.setPrimitiveType(TriangleStrip);
 	bot_veil.setPrimitiveType(TriangleStrip);
@@ -31,7 +33,13 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	logo.setPrimitiveType(TriangleStrip);
 	logo_veil.resize(6);
 	logo_veil.setPrimitiveType(TriangleStrip);
-		
+	for (int i = 0; i < logo_veil.getVertexCount(); i++) {
+		logo_veil[i].color = bg;
+	}
+	logo_animator.addAnimation("logo", thor::refAnimation(logo_animation), seconds(1.5f));
+	logo_transform.setOrigin(middle);
+	logo_transform.setPosition(middle);
+
 	pieces[A].setPosition({ middle.x - pieces[A].getWing().x * 2, middle.y });
 	pieces[A_flipped].setPosition(pieces[A].getPosition());
 	pieces[A_flipped].flip(middle);
@@ -67,7 +75,7 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	//r_parallel_animator.playAnimation("r");
 
 	setNextVeil();
-
+	//audio.play(Audio::Sounds::Intro);
 	/*if (!logo_texture.loadFromFile("./assets/sprites/logo.png")) {
 		throw std::runtime_error("couldnt load logo");
 	}
@@ -93,8 +101,20 @@ void Intro::update()
 		{
 			//ready = false;
 			l_mask.update(frame_timer.getElapsedTime());
+			logo_animator.update(frame_timer.getElapsedTime());
+			logo_animator.animate(logo_transform);
 			r_mask.update(frame_timer.restart());
-
+			logo_transform.setScale(Vector2f(1.f, 1.f) - Vector2f(.5f, .5f) * static_cast<float>(logo_animation.getProgress()));
+			if (l_mask.getProgress() == 1.f && r_mask.getProgress() == 1.f) {
+				if (active_piece == 6) {
+					logo_animator.playAnimation("logo");
+					wait(seconds(1.5f));
+				}
+				active_piece = 8;
+			}
+			if (active_piece == 8 && !logo_animator.isPlayingAnimation()) { //end of intro
+				logo_animation(logo_transform, 1.f);
+			}
 		}
 		else {
 			l_animator.update(frame_timer.getElapsedTime());
@@ -136,14 +156,17 @@ void Intro::update()
 	else {
 		checkDelay();
 	}
-	for (int i = active_piece + (active_piece == 4 ? 3 : 1); i >=0 ; i--) {
-		window.draw(pieces[i]);
-		if ((i == active_piece) && (active_piece != 0 || (active_piece == 0 && !A_appeared))) {
-			window.draw(top_veil);
-			window.draw(bot_veil);
+	if (active_piece <= 6) {
+		for (int i = active_piece + (active_piece == 4 ? 3 : 1); i >= 0; i--) {
+			window.draw(pieces[i]);
+			if ((i == active_piece) && (active_piece != 0 || (active_piece == 0 && !A_appeared))) {
+				window.draw(top_veil);
+				window.draw(bot_veil);
+			}
 		}
 	}
-	if (active_piece == 6) {
+	
+	if (active_piece >= 6) {
 		for (int i = 0; i < 6; i++) {
 			if (i % 2) {
 				logo[i].position = r_mask.getPosition(6 - i);
@@ -153,11 +176,10 @@ void Intro::update()
 				logo[i].position = l_mask.getPosition(i + 1);
 			}
 			logo_veil[i].position = logo[i].position;
-			logo_veil[i].color = bg;
 			logo[i].texCoords = Vector2f((*logo_texture).getSize().x / 2.f, (*logo_texture).getSize().y / 2.f) + (logo[i].position - middle)*(11.2f/8.f);
 		}
-		window.draw(logo_veil);
-		window.draw(logo, RenderStates(logo_texture));
+		window.draw(logo_veil, logo_transform.getTransform());
+		window.draw(logo, RenderStates(BlendAlpha, logo_transform.getTransform(), logo_texture, nullptr));
 		window.draw(l_mask);
 		window.draw(r_mask);
 
@@ -291,6 +313,9 @@ void Intro::checkDelay()
 	if (stall.getElapsedTime() > delay) {
 		ready = true;
 		delay = Time::Zero;
+		if (active_piece == 0) {
+			audio.play(Audio::Sounds::Intro);
+		}
 		frame_timer.restart();
 	}
 }

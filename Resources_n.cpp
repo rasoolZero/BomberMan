@@ -8,6 +8,6 @@ namespace Resources_n{
     int const spritesCount=5;
     std::string sprites[spritesCount]={"powerup1","powerup2","fire","bomb","mine"};
 
-    int const soundsCount=7;
-    std::string sounds[soundsCount] = {"Pause","Play","Rewind","Click","Failed","Capture","Music"};
+    int const soundsCount=8;
+    std::string sounds[soundsCount] = {"Pause","Play","Rewind","Click","Failed","Capture","Music", "intro"};
 }

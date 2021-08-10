@@ -6,18 +6,20 @@
 #include "CharShape.h"
 #include "MoveAnimation.h"
 #include "Mask.h"
+#include "Audio.h"
 using namespace sf;
 
 class Intro
 {
 public:
-	Intro(RenderWindow& window, Color background_color, Texture* logo_texture);
+	Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio);
 	void update();
 private:
 	enum Piece {
 		A, A_flipped, I, I_flipped, left_big, right_big, left_small, right_small
 	};
 	RenderWindow& window;
+	Audio& audio;
 	Color bg;
 	CharShape pieces[8];
 	Vector2f gap;
@@ -26,11 +28,14 @@ private:
 	MoveAnimation r_move;
 	MoveAnimation l_parallel_move;
 	MoveAnimation r_parallel_move; // extra move animations for right small and left small
+	MoveAnimation logo_animation;
 	thor::Animator<CharShape, std::string> l_animator;
 	thor::Animator<CharShape, std::string> r_animator;
 	thor::Animator<CharShape, std::string> l_parallel_animator;
 	thor::Animator<CharShape, std::string> r_parallel_animator; // extra animators for right small and left small
+	thor::Animator<Transformable, std::string> logo_animator;
 	VertexArray logo;
+	Transformable logo_transform;
 	Texture* logo_texture;
 	VertexArray logo_veil;
 	VertexArray top_veil;

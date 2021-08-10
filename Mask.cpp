@@ -21,15 +21,20 @@ Mask::Mask(Vector2f source, Vector2f destination, Time duration, Vector2f wing_v
 		this->vertices[i].position = source;
 		this->vertices[i].color = color;
 	}
-	this->glow.setPrimitiveType(TriangleStrip);
-	this->glow.resize(12);
-	for (int i = 0; i < 12; i++) {
-		this->glow[i].position = source;
+	this->front_glow.setPrimitiveType(TriangleStrip);
+	this->back_glow.setPrimitiveType(TriangleStrip);
+	this->front_glow.resize(6);
+	this->back_glow.resize(6);
+	for (int i = 0; i < front_glow.getVertexCount(); i++) {
+		this->front_glow[i].position = source;
+		this->back_glow[i].position = source;
 		if (i % 2 == 0) {
-			this->glow[i].color = color;
+			this->front_glow[i].color = color;
+			this->back_glow[i].color = color;
 		}
 		else {
-			this->glow[i].color = background_color;
+			this->front_glow[i].color = Color::Transparent;
+			this->back_glow[i].color = Color::Transparent;
 		}
 	}
 	animator.addAnimation("move",thor::refAnimation(move), duration);
@@ -54,17 +59,19 @@ void Mask::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.draw(vertices, states);
 	target.draw(fill, states);
-	//target.draw(glow, states);
+	if (move.getProgress() != 1.0) {
+		//target.draw(front_glow, states);
+		//target.draw(back_glow, states);
+	}
 }
 
 void Mask::setPosition(Vector2f position)
 {
 	if (move.getProgress() == 0.0) {
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < vertices.getVertexCount(); i++) {
 			this->vertices[i].position = position;
-		}
-		for (int i = 0; i < 12; i++) {
-			this->glow[i].position = position;
+			this->front_glow[i].position = position;
+			this->back_glow[i].position = position;
 		}
 	}
 	else {
@@ -123,7 +130,13 @@ void Mask::setPosition(Vector2f position)
 		fill[4] = vertices[5];
 		fill[5].position = { source.x , vertices[4].position.y };
 
-		glow[0].position = vertices[0].position;
+		for (int i = 0; i < 6; i += 2) {
+			front_glow[i].position = vertices[i].position;
+			back_glow[i].position = vertices[i+1].position;
+			front_glow[i+1].position = vertices[i].position + difference / 4.f;
+			back_glow[i+1].position = vertices[i+1].position - difference / 3.f;
+		}
+		/*glow[0].position = vertices[0].position;
 		glow[2].position = vertices[1].position;
 		glow[4].position = vertices[3].position;
 		glow[6].position = vertices[5].position;
@@ -133,8 +146,8 @@ void Mask::setPosition(Vector2f position)
 		glow[11].position = vertices[2].position + difference / 4.f; //head
 		glow[5].position = vertices[3].position - difference / 2.f; //tail
 		if ((rebased_r * 1.25f).x > travelled) {
-			glow[1].position = glow[5].position + rebased_r * 1.25f * (position.x - source.x) / rebased_r.x;
-			glow[9].position = glow[5].position + rebased_l * 1.25f * (position.x - source.x) / rebased_r.x;
+			glow[1].position = glow[5].position + rebased_r * 1.25f * travelled / abs(rebased_r.x);
+			glow[9].position = glow[5].position + rebased_l * 1.25f * travelled / abs(rebased_r.x);
 		}
 		else {
 			glow[1].position = glow[5].position + rebased_r * 1.25f;
@@ -142,6 +155,6 @@ void Mask::setPosition(Vector2f position)
 		}
 		//glow[1].position = glow[5].position + rebased_r * 1.25f * ((rebased_r * 1.25f).x >= abs(position.x - source.x) ? 1 : (position.x - source.x) / rebased_r.x);
 		glow[3].position = glow[1].position - difference * 1.75f;
-		glow[7].position = glow[9].position - difference * 1.75f;
+		glow[7].position = glow[9].position - difference * 1.75f;*/
 	}
 }

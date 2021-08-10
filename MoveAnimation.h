@@ -13,7 +13,7 @@ public:
 	template <class T>
 	void operator()(T& object, double progress);
 	bool is_idle();
-	double getProgress() { return this->progress; }
+	double getProgress() const { return this->progress; }
 	void reset() { firstCall = true; progress = 0.0; }
 	void reset(Vector2f relative_destination, Mode movement_mode);
 	void setDestination(Vector2f relative_destination) { this->destination = relative_destination; }

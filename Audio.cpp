@@ -10,6 +10,9 @@ Audio::Audio( thor::ResourceHolder<SoundBuffer,int> &soundBuffers) : buffers(sou
     sounds[static_cast<int>(Sounds::Music)].setLoop(true);
     sounds[static_cast<int>(Sounds::Music)].setVolume(45.0);
     sounds[static_cast<int>(Sounds::Capture)].setVolume(60.0);
+    sounds[static_cast<int>(Sounds::Intro)].setPlayingOffset(seconds(1.1f));
+    sounds[static_cast<int>(Sounds::Intro)].setVolume(70.f);
+    //sounds[static_cast<int>(Sounds::Intro)].setPitch(1.02f);
 }
 
 void Audio::play(Sounds _sound){

@@ -87,9 +87,9 @@ int main()
     Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    Intro intro(window, bg, &textures["logo"]);
     Game game(window,j,textures,fonts,CONTROL_WIDTH);
     Audio audio(soundBuffers);
+    Intro intro(window, bg, &textures["logo"], audio);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
     manager.setPointers(&intro, &controls, &game);
 
