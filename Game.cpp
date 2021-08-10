@@ -99,6 +99,10 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         names[i].setFont(_fonts[0]);
         names[i].setCharacterSize(fontSize);
         names[i].setStyle(Text::Bold);
+        extraHealth[i].setFont(_fonts[0]);
+        extraHealth[i].setCharacterSize(fontSize-3);
+        extraHealth[i].setStyle(Text::Bold);
+        extraHealth[i].setPosition(heart[i].getPosition().x+heart[i].getSize().x*3/4,window.getSize().y-fontSize);
         FloatRect const bound = names[i].getLocalBounds();
         names[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (((playerInfoBoxWidth/2-heart[i].getSize().x)/2)-bound.width)/2 ,playerInfoBoxY+(playerInfoBoxHeight)/2-bound.height);
     }
@@ -191,6 +195,7 @@ void Game::draw(){
         window.draw(heart[i]);
         window.draw(upgrades[i]);
         window.draw(names[i]);
+        window.draw(extraHealth[i]);
     }
 }
 
@@ -242,8 +247,16 @@ void Game::updatePlayer(){
         std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
         std::string mineCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["mines_left"]));
         upgrades[i].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
-        //TODO: when health is larger than initial health
-        int part = int(map(health[i],0,initialHealth,3,0));
+
+        int part;
+        if(health[i]>initialHealth){
+            part = 0;
+            extraHealth[i].setString(std::string("+")+std::to_string(health[i]-initialHealth));
+        }
+        else{
+            part = int(map(health[i],0,initialHealth,3,0));
+            extraHealth[i].setString("");
+        }
         heart[i].setTextureRect(IntRect(part*heartTextureSize,0,heartTextureSize,heartTextureSize));
 
         Vector2f currentPosition = Game::getPlayerPosition(turn-1,i);

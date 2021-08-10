@@ -47,7 +47,7 @@ class Game
         int health[2];
         int heartTextureSize;
         int const fontSize=17;
-        Text upgrades[2], names[2];
+        Text upgrades[2], names[2], extraHealth[2];
         unsigned offset;
 
         unsigned turn;
