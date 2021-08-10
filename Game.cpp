@@ -77,8 +77,7 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     player[0].setSize(Vector2f(scale,scale));
     player[1].setSize(Vector2f(scale,scale));
     initPlayerAnimation();
-    updatePlayer(0);
-    updatePlayer(1);
+    updatePlayer();
 
     int playerInfoBoxWidth = window.getSize().x - offset;
     int playerInfoBoxY = _window.getSize().y-playerInfoBoxHeight;
@@ -100,6 +99,10 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         names[i].setFont(_fonts[0]);
         names[i].setCharacterSize(fontSize);
         names[i].setStyle(Text::Bold);
+        extraHealth[i].setFont(_fonts[0]);
+        extraHealth[i].setCharacterSize(fontSize-3);
+        extraHealth[i].setStyle(Text::Bold);
+        extraHealth[i].setPosition(heart[i].getPosition().x+heart[i].getSize().x*3/4,window.getSize().y-fontSize);
         FloatRect const bound = names[i].getLocalBounds();
         names[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (((playerInfoBoxWidth/2-heart[i].getSize().x)/2)-bound.width)/2 ,playerInfoBoxY+(playerInfoBoxHeight)/2-bound.height);
     }
@@ -132,7 +135,7 @@ void Game::update(){
         animators[name].update(playing?DeltaTime:seconds(0));
         animators[name].animate(player[i]);
     }
-    updatePlayer(turn);
+    updatePlayer();
     draw();
 }
 
@@ -155,9 +158,13 @@ void Game::draw(){
                 shapes["powerup1"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["powerup1"]);
             }
-            if(!isBox && has_state(mask,Tile_State::upgrade_power)){
+            if(!isBox && has_state(mask,Tile_State::upgrade_range)){
                 shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["powerup2"]);
+            }
+            if(!isBox && has_state(mask,Tile_State::upgrade_mine)){
+                shapes["powerup3"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["powerup3"]);
             }
             if(has_state(mask,Tile_State::mine)){
                 shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
@@ -192,6 +199,7 @@ void Game::draw(){
         window.draw(heart[i]);
         window.draw(upgrades[i]);
         window.draw(names[i]);
+        window.draw(extraHealth[i]);
     }
 }
 
@@ -223,143 +231,94 @@ bool Game::setTurn(unsigned _turn){
         return false;
     turn = _turn;
     timePassed=0;
-    updatePlayer(turn);
-    updatePlayer(turn+1);
+    updatePlayer();
     return true;
 }
 
-Vector2f Game::getPlayerPosition(int index){
-    if(index<0)
-        index=0;
-    if(index>=totalTurns)
-        if(index%2==0)
-            if(totalTurns%2==1)
-                index=totalTurns-1;
-            else
-                index=totalTurns-2;
-        else
-            if(totalTurns%2==1)
-                index=totalTurns-2;
-            else
-                index=totalTurns-1;
-
-    int x = json_["turns"][index]["players_data"][0]["x_position"];
-    int y = json_["turns"][index]["players_data"][0]["y_position"];
+Vector2f Game::getPlayerPosition(int _turn,int player){
+    //TODO: if _turn is -1, use initial position
+    if(_turn == -1)
+        _turn++;
+    int x = json_["turns"][_turn]["players_data"][player]["x_position"];
+    int y = json_["turns"][_turn]["players_data"][player]["y_position"];
     return Vector2f(x*scale+startPoint.x,y*scale+startPoint.y);
 }
 
-void Game::updatePlayer(int index){
-    if(index<0)
-        index=0;
-    if(index>=totalTurns)
-        if(index%2==0)
-            if(totalTurns%2==1)
-                index=totalTurns-1;
-            else
-                index=totalTurns-2;
-        else
-            if(totalTurns%2==1)
-                index=totalTurns-2;
-            else
-                index=totalTurns-1;
-    int playerIndex=index%2;
-    health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
-    {
-        std::string bombCount = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_count_level"]));
-        std::string bombPower = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_power_level"]));
-        std::string mineCount = std::to_string(int(json_["turns"][index]["players_data"][0]["mines_left"]));
-        upgrades[playerIndex].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
-    }
+void Game::updatePlayer(){
+    for(int i=0;i<2;i++){
+        health[i] = json_["turns"][turn]["players_data"][i]["health"];
+        std::string bombCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_count_level"]));
+        std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
+        std::string mineCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["mines_left"]));
+        upgrades[i].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
 
-    Vector2f currentPosition = Game::getPlayerPosition(index);
-    Vector2f nextPosition = Game::getPlayerPosition(index+2);
-    Vector2f path = nextPosition-currentPosition;
-    Vector2f position = currentPosition + (path*timePassed/timeThreshold);
-
-    std::string nextAnimation,name="player"+std::to_string(playerIndex+1);
-
-    if(path.x<0)
-        nextAnimation = "walk_left";
-    else if(path.x>0)
-        nextAnimation = "walk_right";
-    else if(path.y<0)
-        nextAnimation = "walk_up";
-    else if(path.y>0)
-        nextAnimation = "walk_down";
-    else{
-        int actionTaken = json_["turns"][index]["players_data"][0]["action_taken"];
-        Player_Action action = static_cast<Player_Action>(actionTaken);
-
-        if(static_cast<int>(action) < 4){
-            if(action==Player_Action::go_down)
-                nextAnimation = "stand_down";
-            if(action==Player_Action::go_left)
-                nextAnimation = "stand_left";
-            if(action==Player_Action::go_up)
-                nextAnimation = "stand_up";
-            if(action==Player_Action::go_right)
-                nextAnimation = "stand_right";
+        int part;
+        if(health[i]>initialHealth){
+            part = 0;
+            extraHealth[i].setString(std::string("+")+std::to_string(health[i]-initialHealth));
         }
         else{
-            if(animators[name].isPlayingAnimation()){
-                std::string currentAnimation = animators[name].getPlayingAnimation();
-                if(currentAnimation.find("left")!=std::string::npos)
-                    nextAnimation = "stand_left";
-                if(currentAnimation.find("right")!=std::string::npos)
-                    nextAnimation = "stand_right";
-                if(currentAnimation.find("down")!=std::string::npos)
+            part = int(map(health[i],0,initialHealth,3,0));
+            extraHealth[i].setString("");
+        }
+        heart[i].setTextureRect(IntRect(part*heartTextureSize,0,heartTextureSize,heartTextureSize));
+
+        Vector2f currentPosition = Game::getPlayerPosition(turn-1,i);
+        Vector2f nextPosition = Game::getPlayerPosition(turn,i);
+        Vector2f path = nextPosition-currentPosition;
+        Vector2f position = currentPosition + (path*timePassed/timeThreshold);
+
+        std::string nextAnimation,name="player"+std::to_string(i+1);
+        if(path.x<0)
+            nextAnimation = "walk_left";
+        else if(path.x>0)
+            nextAnimation = "walk_right";
+        else if(path.y<0)
+            nextAnimation = "walk_up";
+        else if(path.y>0)
+            nextAnimation = "walk_down";
+        else{
+            int actionTaken = json_["turns"][turn]["players_data"][i]["action_taken"];
+            Player_Action action = static_cast<Player_Action>(actionTaken);
+
+            if(static_cast<int>(action) < 4){
+                if(action==Player_Action::go_down)
                     nextAnimation = "stand_down";
-                if(currentAnimation.find("up")!=std::string::npos)
+                if(action==Player_Action::go_left)
+                    nextAnimation = "stand_left";
+                if(action==Player_Action::go_up)
                     nextAnimation = "stand_up";
+                if(action==Player_Action::go_right)
+                    nextAnimation = "stand_right";
             }
             else{
-                nextAnimation = "stand_right";
+                if(animators[name].isPlayingAnimation()){
+                    std::string currentAnimation = animators[name].getPlayingAnimation();
+                    if(currentAnimation.find("left")!=std::string::npos)
+                        nextAnimation = "stand_left";
+                    if(currentAnimation.find("right")!=std::string::npos)
+                        nextAnimation = "stand_right";
+                    if(currentAnimation.find("down")!=std::string::npos)
+                        nextAnimation = "stand_down";
+                    if(currentAnimation.find("up")!=std::string::npos)
+                        nextAnimation = "stand_up";
+                }
+                else{
+                    nextAnimation = "stand_right";
+                }
             }
         }
-    }
-    nextAnimation+=std::to_string(speed);
-    if(animators[name].isPlayingAnimation()){
-        if(animators[name].getPlayingAnimation()!=nextAnimation)
-            animators[name].playAnimation(nextAnimation,true);
-    }
-    else
-        animators[name].playAnimation(nextAnimation,true);
-
-    player[playerIndex].setPosition(position);
-
-
-    //make the other player stand
-    if(index!=0)
-        index--;
-    else
-        index++;
-    playerIndex=index%2;
-    name="player"+std::to_string(playerIndex+1);
-    if(animators[name].isPlayingAnimation()){
-        std::string currentAnimation = animators[name].getPlayingAnimation();
-        if(currentAnimation.find("left")!=std::string::npos)
-            nextAnimation = "stand_left";
-        if(currentAnimation.find("right")!=std::string::npos)
-            nextAnimation = "stand_right";
-        if(currentAnimation.find("down")!=std::string::npos)
-            nextAnimation = "stand_down";
-        if(currentAnimation.find("up")!=std::string::npos)
-            nextAnimation = "stand_up";
         nextAnimation+=std::to_string(speed);
-        animators[name].playAnimation(nextAnimation,true);
-    }
-    health[playerIndex] = json_["turns"][index]["players_data"][0]["health"];
-    {
-        std::string bombCount = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_count_level"]));
-        std::string bombPower = std::to_string(int(json_["turns"][index]["players_data"][0]["bomb_power_level"]));
-        std::string mineCount = std::to_string(int(json_["turns"][index]["players_data"][0]["mines_left"]));
-        upgrades[playerIndex].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
+        if(animators[name].isPlayingAnimation()){
+            if(animators[name].getPlayingAnimation()!=nextAnimation)
+                animators[name].playAnimation(nextAnimation,true);
+        }
+        else
+            animators[name].playAnimation(nextAnimation,true);
+
+        player[i].setPosition(position);
     }
 
-    for(int i=0;i<2;i++){
-        int part = int(map(health[i],0,initialHealth,3,0));
-        heart[i].setTextureRect(IntRect(part*heartTextureSize,0,heartTextureSize,heartTextureSize));
-    }
 }
 
 
@@ -387,7 +346,5 @@ void Game::initPlayerAnimation(){
             animators["player1"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
             animators["player2"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
         }
-
-
 
 }

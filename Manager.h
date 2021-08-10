@@ -20,7 +20,7 @@ public:
 	State getState() { return this->active_screen; }
 	void update();
 private:
-	State active_screen = State::intro;
+	State active_screen = State::game;
 	Intro* intro_ptr;
 	Menu* menu_ptr;
 	Control* control_ptr;

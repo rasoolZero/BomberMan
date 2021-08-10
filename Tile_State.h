@@ -16,8 +16,10 @@ enum Tile_State
     bomb_blown,
     mine,
     mine_blown,
-    upgrade_power,
+    upgrade_range,
     upgrade_health,
+    upgrade_mine,
+    player,
 };
 
 bool has_state(int _state_mask, Tile_State _state_to_check);
