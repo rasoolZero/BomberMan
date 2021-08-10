@@ -10,6 +10,8 @@ enum Player_Action
     stay,
     place_bomb,
     place_mine,
+    init_action,
+    no_action,
     no_action_timeout,
 };
 
