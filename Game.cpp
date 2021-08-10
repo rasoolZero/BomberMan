@@ -162,6 +162,10 @@ void Game::draw(){
                 shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["powerup2"]);
             }
+            if(!isBox && has_state(mask,Tile_State::upgrade_mine)){
+                shapes["powerup3"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                window.draw(shapes["powerup3"]);
+            }
             if(has_state(mask,Tile_State::mine)){
                 shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["mine"]);
