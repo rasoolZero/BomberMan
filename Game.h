@@ -64,8 +64,8 @@ class Game
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
         void draw();
-        Vector2f getPlayerPosition(int index);
-        void updatePlayer(int index);
+        Vector2f getPlayerPosition(int _turn,int player);
+        void updatePlayer();
         void initPlayerAnimation();
 };
 
