@@ -6,7 +6,6 @@
 #include "Audio.h"
 #include "Game.h"
 #include <iostream>
-#include <fstream>
 #include <dirent.h>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
@@ -75,10 +74,6 @@ int main()
     #else
         system("mkdir Screenshots 2> /dev/null");
     #endif
-    std::ifstream i("log.json");
-    json j;
-    i >> j;
-    i.close();
     Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
@@ -87,7 +82,8 @@ int main()
     Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    Game game(window,j,textures,fonts,CONTROL_WIDTH);
+    Game game(window,textures,fonts,CONTROL_WIDTH);
+    game.load("log.json");
     Audio audio(soundBuffers);
     Intro intro(window, bg, &textures["logo"], audio);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);

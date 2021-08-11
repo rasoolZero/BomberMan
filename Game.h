@@ -17,10 +17,11 @@ class Game
 {
 
     public:
-        Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures ,
+        Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures ,
             thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
         void update();
         void changeSpeed(int _speed);
+        void load(std::string logAddress);
 
         bool setTurn(unsigned _turn);
         unsigned getTurn(){return this->turn;}
@@ -32,7 +33,7 @@ class Game
 
     private:
         RenderWindow &window;
-        json & json_;
+        json json_;
         thor::ResourceHolder<Texture,std::string> & textures;
         RectangleShape obstacle,box,deadzone, player[2], heart[2], playerInfo;
         int rows;

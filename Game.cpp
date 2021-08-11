@@ -2,58 +2,26 @@
 #include "Control.h"
 #include "Tile_State.h"
 #include <iostream>
+#include <fstream>
 using namespace sf;
 using json = nlohmann::json;
 float map(float value, float istart, float istop, float ostart, float ostop) {
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 }
 
-Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std::string> & _textures,
-           thor::ResourceHolder<Font,int> & _fonts , unsigned offset): window(_window),json_(_json),textures(_textures)
+Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures,
+           thor::ResourceHolder<Font,int> & _fonts , unsigned _offset): window(_window),textures(_textures)
 {
-    columns = _json["initial_game_data"]["map_width"];
-    rows = _json["initial_game_data"]["map_height"];
-    totalTurns = _json["initial_game_data"]["last_turn"];
-    initialHealth = _json["initial_game_data"]["initial_health"];
-    const std::string name1 = "test name 1"; // replace these with actual names from json
-    const std::string name2 = "test name 2";
-
-    timeThreshold=timeThresholds[speed];
-    turn = 0;
-
-
-
-    float widthRatio=(_window.getSize().x-offset)/(float)columns;
-    float heightRatio=(_window.getSize().y-playerInfoBoxHeight)/(float)rows;
-    scale = widthRatio<heightRatio ? widthRatio : heightRatio;
-    startPoint.x=(_window.getSize().x-offset-scale*columns)/2.0+offset;
-    startPoint.y=(_window.getSize().y-playerInfoBoxHeight-scale*rows)/2.0;
-    Vector2u textureSize = textures["floor"].getSize();
-    vertices.setPrimitiveType(Quads);
-    vertices.resize(columns * rows * 4);
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
-            Vertex* quad = &vertices[(i + j * columns) * 4];
-            quad[0].position = Vector2f(i*scale+startPoint.x,j*scale+startPoint.y);
-            quad[1].position = Vector2f((i+1)*scale+startPoint.x,j*scale+startPoint.y);
-            quad[2].position = Vector2f((i+1)*scale+startPoint.x,(j+1)*scale+startPoint.y);
-            quad[3].position = Vector2f(i*scale+startPoint.x,(j+1)*scale+startPoint.y);
-
-            quad[0].texCoords = Vector2f(0,0);
-            quad[1].texCoords = Vector2f(textureSize.x,0);
-            quad[2].texCoords = Vector2f(textureSize.x,textureSize.y);
-            quad[3].texCoords = Vector2f(0,textureSize.y);
-        }
-    }
-    obstacle.setSize(Vector2f(scale,scale));
     obstacle.setTexture(&textures["obstacle"]);
-    box.setSize(Vector2f(scale,scale));
     box.setTexture(&textures["box"]);
+    offset = _offset;
+
 
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
 
-        shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape(Vector2f(scale,scale))));
+//        shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape(Vector2f(scale,scale))));
+        shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape()));
         shapes[name].setTexture(&textures[name]);
         animations.insert(std::pair<std::string,thor::FrameAnimation>(name,thor::FrameAnimation()));
         int textureEdge=textures[name].getSize().y;
@@ -64,6 +32,7 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
         for(int j=1;j<=3;j++)
             animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
 
+//        animators[name].playAnimation(name+std::to_string(speed),true);
         animators[name].playAnimation(name+std::to_string(speed),true);
     }
     player[0].setTexture(&textures["player1"]);
@@ -71,23 +40,16 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
 
 
     deadzone.setFillColor(Color(250,0,0,80));
-    deadzone.setSize(Vector2f(scale,scale));
 
 
-    player[0].setSize(Vector2f(scale,scale));
-    player[1].setSize(Vector2f(scale,scale));
     initPlayerAnimation();
-    updatePlayer();
 
     int playerInfoBoxWidth = window.getSize().x - offset;
-    int playerInfoBoxY = _window.getSize().y-playerInfoBoxHeight;
+    int playerInfoBoxY = window.getSize().y-playerInfoBoxHeight;
     playerInfo.setSize(Vector2f(playerInfoBoxWidth,playerInfoBoxHeight));
     playerInfo.setPosition(offset,playerInfoBoxY);
     playerInfo.setFillColor(Color(10,10,10));
 
-
-    names[0].setString(name1);
-    names[1].setString(name2);
     for(int i=0;i<2;i++){
         heart[i].setSize(Vector2f(playerInfoBoxHeight,playerInfoBoxHeight));
         heart[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().y)/2 , playerInfoBoxY);
@@ -112,6 +74,58 @@ Game::Game(RenderWindow & _window,json & _json,thor::ResourceHolder<Texture,std:
     upgrades[1].setFillColor(Color(40,40,156));
     names[0].setFillColor(Color(156,40,40));
     names[1].setFillColor(Color(40,40,156));
+}
+void Game::load(std::string logAddress){
+
+    std::ifstream i(logAddress);
+    i >> json_;
+    i.close();
+
+    timePassed=0;
+    speed=1;
+    columns = json_["initial_game_data"]["map_width"];
+    rows = json_["initial_game_data"]["map_height"];
+    totalTurns = json_["initial_game_data"]["last_turn"];
+    initialHealth = json_["initial_game_data"]["initial_health"];
+    const std::string name1 = "test name 1"; // replace these with actual names from json
+    const std::string name2 = "test name 2";
+    names[0].setString(name1);
+    names[1].setString(name2);
+
+    timeThreshold=timeThresholds[speed];
+    turn = 0;
+
+    float widthRatio=(window.getSize().x-offset)/(float)columns;
+    float heightRatio=(window.getSize().y-playerInfoBoxHeight)/(float)rows;
+    scale = widthRatio<heightRatio ? widthRatio : heightRatio;
+    startPoint.x=(window.getSize().x-offset-scale*columns)/2.0+offset;
+    startPoint.y=(window.getSize().y-playerInfoBoxHeight-scale*rows)/2.0;
+    Vector2u textureSize = textures["floor"].getSize();
+    vertices.setPrimitiveType(Quads);
+    vertices.resize(columns * rows * 4);
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<columns;j++){
+            Vertex* quad = &vertices[(i + j * columns) * 4];
+            quad[0].position = Vector2f(i*scale+startPoint.x,j*scale+startPoint.y);
+            quad[1].position = Vector2f((i+1)*scale+startPoint.x,j*scale+startPoint.y);
+            quad[2].position = Vector2f((i+1)*scale+startPoint.x,(j+1)*scale+startPoint.y);
+            quad[3].position = Vector2f(i*scale+startPoint.x,(j+1)*scale+startPoint.y);
+
+            quad[0].texCoords = Vector2f(0,0);
+            quad[1].texCoords = Vector2f(textureSize.x,0);
+            quad[2].texCoords = Vector2f(textureSize.x,textureSize.y);
+            quad[3].texCoords = Vector2f(0,textureSize.y);
+        }
+    }
+    obstacle.setSize(Vector2f(scale,scale));
+    box.setSize(Vector2f(scale,scale));
+    deadzone.setSize(Vector2f(scale,scale));
+    player[0].setSize(Vector2f(scale,scale));
+    player[1].setSize(Vector2f(scale,scale));
+
+
+
+    updatePlayer();
 }
 
 void Game::update(){
