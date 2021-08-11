@@ -21,17 +21,17 @@ void Manager::setState(State state) {
 	this->active_screen = state;
 }
 
-void Manager::update() {
+void Manager::update(Time DeltaTime) {
 	switch (this->active_screen) {
 	case State::game:
 		control_ptr->draw();
-		game_ptr->update();
+		game_ptr->update(DeltaTime);
 		break;
 	case State::menu:
 		//menu_ptr->update;
 		break;
 	case State::intro:
-		intro_ptr->update();
+		intro_ptr->update(DeltaTime);
 		break;
 	default:
 		break;

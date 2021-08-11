@@ -18,7 +18,7 @@ public:
 	void setPointers(Intro* intro_ptr, /*Menu* menu_ptr,*/ Control* control_ptr, Game* game_ptr);
 	void setState(State state = State::intro);
 	State getState() { return this->active_screen; }
-	void update();
+	void update(Time DeltaTime);
 private:
 	State active_screen = State::intro;
 	Intro* intro_ptr;

@@ -8,13 +8,12 @@
 #include "Mask.h"
 #include "Audio.h"
 using namespace sf;
-extern Time DeltaTime;
 
 class Intro
 {
 public:
 	Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio);
-	void update();
+	void update(Time DeltaTime);
 private:
 	enum Piece {
 		A, A_flipped, I, I_flipped, left_big, right_big, left_small, right_small

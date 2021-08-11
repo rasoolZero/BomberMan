@@ -128,7 +128,7 @@ void Game::load(std::string logAddress){
     updatePlayer();
 }
 
-void Game::update(){
+void Game::update(Time DeltaTime){
     timePassed+=DeltaTime.asSeconds();
     if(!playing || turn==totalTurns-1)
         timePassed=0.0;

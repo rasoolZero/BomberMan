@@ -14,7 +14,6 @@
 #define CONTROL_WIDTH 150
 using namespace sf;
 using json = nlohmann::json;
-Time DeltaTime;
 
 void capture(sf::RenderWindow & window){
     Texture capture;
@@ -47,6 +46,7 @@ void capture(sf::RenderWindow & window){
 
 int main()
 {
+    Time DeltaTime;
     thor::ResourceHolder<Texture,std::string> textures;
     thor::ResourceHolder<SoundBuffer,int> soundBuffers;
     thor::ResourceHolder<Font,int> fonts;
@@ -122,7 +122,7 @@ int main()
         window.clear(bg);
         //controls.draw();
         //game.update();
-        manager.update();
+        manager.update(DeltaTime);
         #ifdef DEBUGGING
         //if (manager.getState() == Manager::State::game) {
             Time t = timer.restart();

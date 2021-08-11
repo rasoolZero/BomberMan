@@ -84,7 +84,7 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	wait(seconds(0.75f));
 }
 
-void Intro::update()
+void Intro::update(Time DeltaTime)
 {
 	/*if (active_piece <= 6)/* &&
 		(!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()))

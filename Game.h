@@ -9,7 +9,6 @@
 #define ANIMATOR thor::Animator<sf::RectangleShape, std::string>
 using namespace sf;
 using json = nlohmann::json;
-extern Time DeltaTime;
 
 class Control;
 
@@ -19,7 +18,7 @@ class Game
     public:
         Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures ,
             thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
-        void update();
+        void update(Time DeltaTime);
         void changeSpeed(int _speed);
         void load(std::string logAddress);
 
