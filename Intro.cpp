@@ -6,7 +6,7 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	,audio{ audio }
 	,bg{background_color}
 	,logo_texture{logo_texture}
-	,pieces{ 
+	,pieces{
 		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A
 		{'^', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //A_flipped
 		{'\\', Color(0, 149,250), Vector2f(125, 217), 69, bg}, //I
@@ -81,7 +81,6 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	}
 	logo_texture.setSmooth(true);*/
 
-	frame_timer.restart();
 	wait(seconds(0.75f));
 }
 
@@ -93,17 +92,17 @@ void Intro::update()
 		//ready = false;
 		l_mask.update(frame_timer.getElapsedTime());
 		r_mask.update(frame_timer.restart());
-		
+
 	}*/
 	if (ready) {
 		if (active_piece >= 6)/* &&
 		(!l_parallel_animator.isPlayingAnimation() && !r_parallel_animator.isPlayingAnimation()))*/
 		{
 			//ready = false;
-			l_mask.update(frame_timer.getElapsedTime());
-			logo_animator.update(frame_timer.getElapsedTime());
+			l_mask.update(DeltaTime);
+			logo_animator.update(DeltaTime);
 			logo_animator.animate(logo_transform);
-			r_mask.update(frame_timer.restart());
+			r_mask.update(DeltaTime);
 			logo_transform.setScale(Vector2f(1.f, 1.f) - Vector2f(.5f, .5f) * static_cast<float>(logo_animation.getProgress()));
 			if (l_mask.getProgress() == 1.f && r_mask.getProgress() == 1.f) {
 				if (active_piece == 6) {
@@ -117,15 +116,15 @@ void Intro::update()
 			}
 		}
 		else {
-			l_animator.update(frame_timer.getElapsedTime());
+			l_animator.update(DeltaTime);
 			l_animator.animate(pieces[active_piece]);
 			if (active_piece == 4) {
-				l_parallel_animator.update(frame_timer.getElapsedTime());
+				l_parallel_animator.update(DeltaTime);
 				l_parallel_animator.animate(pieces[active_piece + 2]);
-				r_parallel_animator.update(frame_timer.getElapsedTime());
+				r_parallel_animator.update(DeltaTime);
 				r_parallel_animator.animate(pieces[active_piece + 3]);
 			}
-			r_animator.update(frame_timer.restart());
+			r_animator.update(DeltaTime);
 			r_animator.animate(pieces[active_piece + 1]);
 
 
@@ -151,7 +150,7 @@ void Intro::update()
 				}
 			}
 		}
-		
+
 	}
 	else {
 		checkDelay();
@@ -165,12 +164,12 @@ void Intro::update()
 			}
 		}
 	}
-	
+
 	if (active_piece >= 6) {
 		for (int i = 0; i < 6; i++) {
 			if (i % 2) {
 				logo[i].position = r_mask.getPosition(6 - i);
-				
+
 			}
 			else {
 				logo[i].position = l_mask.getPosition(i + 1);
@@ -316,6 +315,5 @@ void Intro::checkDelay()
 		if (active_piece == 0) {
 			audio.play(Audio::Sounds::Intro);
 		}
-		frame_timer.restart();
 	}
 }

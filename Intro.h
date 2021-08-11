@@ -8,6 +8,7 @@
 #include "Mask.h"
 #include "Audio.h"
 using namespace sf;
+extern Time DeltaTime;
 
 class Intro
 {
@@ -46,7 +47,6 @@ private:
 	void setNextAnimation();
 	short active_piece = 0;
 	bool A_appeared = false;
-	Clock frame_timer;
 	Clock stall;
 	Time delay;
 	bool ready = true;
