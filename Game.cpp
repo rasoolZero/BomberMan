@@ -20,7 +20,6 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
 
-//        shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape(Vector2f(scale,scale))));
         shapes.insert(std::pair<std::string,RectangleShape>(name,RectangleShape()));
         shapes[name].setTexture(&textures[name]);
         animations.insert(std::pair<std::string,thor::FrameAnimation>(name,thor::FrameAnimation()));
@@ -32,7 +31,6 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
         for(int j=1;j<=3;j++)
             animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
 
-//        animators[name].playAnimation(name+std::to_string(speed),true);
         animators[name].playAnimation(name+std::to_string(speed),true);
     }
     player[0].setTexture(&textures["player1"]);
@@ -82,7 +80,6 @@ void Game::load(std::string logAddress){
     i.close();
 
     timePassed=0;
-    speed=1;
     columns = json_["initial_game_data"]["map_width"];
     rows = json_["initial_game_data"]["map_height"];
     totalTurns = json_["initial_game_data"]["last_turn"];
@@ -122,8 +119,11 @@ void Game::load(std::string logAddress){
     deadzone.setSize(Vector2f(scale,scale));
     player[0].setSize(Vector2f(scale,scale));
     player[1].setSize(Vector2f(scale,scale));
-
-
+    for(int i=0;i<Resources_n::spritesCount;i++){
+        std::string & name=Resources_n::sprites[i];
+        shapes[name].setSize(Vector2f(scale,scale));
+        animators[name].playAnimation(name+std::to_string(speed),true);
+    }
 
     updatePlayer();
 }
