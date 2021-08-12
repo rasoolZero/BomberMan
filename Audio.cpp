@@ -17,7 +17,7 @@ Audio::Audio( thor::ResourceHolder<SoundBuffer,int> &soundBuffers) : buffers(sou
 
 void Audio::play(Sounds _sound){
     int i=static_cast<int>(_sound);
-    if(i==(SOUNDS-1))
+    if(i==(static_cast<int>(Sounds::Music)))
         sounds[i].play();
     else
         if(this->sound){
