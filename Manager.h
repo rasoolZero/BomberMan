@@ -15,7 +15,7 @@ public:
 		intro, menu, game
 	};
 	Manager(RenderWindow* window_ptr);
-	void setPointers(Intro* intro_ptr, /*Menu* menu_ptr,*/ Control* control_ptr, Game* game_ptr);
+	void setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr);
 	void setState(State state = State::intro);
 	State getState() { return this->active_screen; }
 	void update(Time DeltaTime);

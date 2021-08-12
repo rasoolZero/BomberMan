@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Manager.h"
 #include "Intro.h"
+#include "Menu.h"
 #include "Control.h"
 #include "Resources_n.h"
 #include "Audio.h"
@@ -94,9 +95,10 @@ int main()
     Game game(window,textures,fonts,CONTROL_WIDTH);
     game.load("log.json");
     Audio audio(soundBuffers);
-    Intro intro(window, bg, &textures["logo"], audio);
+    Intro intro(window, bg, &textures["logo"], manager, audio);
+    Menu menu(window, bg, &textures["logo"], audio);
     Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
-    manager.setPointers(&intro, &controls, &game);
+    manager.setPointers(&intro, &menu, &controls, &game);
 
     #ifdef DEBUGGING
     Clock timer;

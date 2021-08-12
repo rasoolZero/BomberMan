@@ -1,8 +1,9 @@
 #include "Intro.h"
 #include "CharShape.h"
 #include <stdexcept>
-Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio)
+Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Manager& manager, Audio& audio)
 	:window{ window }
+	,manager{manager}
 	,audio{ audio }
 	,bg{background_color}
 	,logo_texture{logo_texture}
@@ -113,6 +114,7 @@ void Intro::update(Time DeltaTime)
 			}
 			if (active_piece == 8 && !logo_animator.isPlayingAnimation()) { //end of intro
 				logo_animation(logo_transform, 1.f);
+				manager.setState(Manager::State::menu);
 			}
 		}
 		else {
