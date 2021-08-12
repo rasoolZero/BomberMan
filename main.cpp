@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
+#include "tinyfiledialogs.h"
 #define DEBUGGING
 #define OS Windows
 #define CONTROL_WIDTH 150
@@ -63,6 +64,14 @@ int main()
         fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Roboto-Light.ttf"));
     }
     catch(thor::ResourceLoadingException& e){
+        std::string message = e.what();
+        while (message.find_first_of('\"') != std::string::npos) {
+            message[message.find_first_of('\"')] = '*';
+        }
+        while (message.find_first_of('\'') != std::string::npos) {
+            message[message.find_first_of('\'')] = '*';
+        }
+        tinyfd_messageBox("missing file!", message.c_str(), "ok", "error", 1);
         std::cout << e.what() << std::endl;
         return 1;
     }
