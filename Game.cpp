@@ -258,12 +258,12 @@ Vector2f Game::getPlayerPosition(int _turn,int player){
     int x;
     int y;
     if(_turn == -1){
-        x = json_["initial_game_data"][std::string("player_")+std::to_string(player+1)+std::string("_init_x")];
-        y = json_["initial_game_data"][std::string("player_")+std::to_string(player+1)+std::string("_init_y")];
+        x = json_["initial_game_data"][std::string("player_")+std::to_string(player+1)+std::string("_init_y")];
+        y = json_["initial_game_data"][std::string("player_")+std::to_string(player+1)+std::string("_init_x")];
     }
     else{
-        x = json_["turns"][_turn]["players_data"][player]["x_position"];
-        y = json_["turns"][_turn]["players_data"][player]["y_position"];
+        x = json_["turns"][_turn]["players_data"][player]["y_position"];
+        y = json_["turns"][_turn]["players_data"][player]["x_position"];
     }
     return Vector2f(x*scale+startPoint.x,y*scale+startPoint.y);
 }

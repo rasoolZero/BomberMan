@@ -135,7 +135,7 @@ int main()
         #ifdef DEBUGGING
         //if (manager.getState() == Manager::State::game) {
             Time t = timer.restart();
-            text.setString("state: " + std::to_string(game.getTurn()) + "\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
+            text.setString("step: " + std::to_string(game.getTurn()) + "\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
             window.draw(text);
         //}
         #endif // DEBUGGING
