@@ -19,6 +19,7 @@ public:
 	void setState(State state = State::intro);
 	State getState() { return this->active_screen; }
 	void update(Time DeltaTime);
+	void manageInput(Event event);
 private:
 	State active_screen = State::intro;
 	Intro* intro_ptr;

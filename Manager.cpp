@@ -38,3 +38,47 @@ void Manager::update(Time DeltaTime) {
 		break;
 	}
 }
+
+void Manager::manageInput(Event event)
+{
+	if (event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
+		bool released = false;
+		if (event.type == Event::KeyReleased) {
+			released = true;
+		}
+		switch (active_screen)
+		{
+		case State::intro:
+			intro_ptr->manageKey(event.key, released);
+			break;
+		case State::menu:
+			menu_ptr->manageKey(event.key, released);
+			break;
+		case State::game:
+			control_ptr->manageKey(event.key, released);
+			break;
+		default:
+			break;
+		}
+	}
+	else if (event.type == Event::MouseButtonPressed || event.type == Event::MouseButtonReleased) {
+		bool released = false;
+		if (event.type == Event::MouseButtonReleased) {
+			released = true;
+		}
+		switch (active_screen)
+		{
+		case State::intro:
+			intro_ptr->manageMouse(event.mouseButton, released);
+			break;
+		case State::menu:
+			menu_ptr->manageMouse(event.mouseButton, released);
+			break;
+		case State::game:
+			control_ptr->manageMouse(event.mouseButton, released);
+			break;
+		default:
+			break;
+		}
+	}
+}

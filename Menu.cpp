@@ -1,9 +1,10 @@
 #include "Menu.h"
 
-Menu::Menu(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio)
+Menu::Menu(RenderWindow& window, Color background_color, Texture* logo_texture, Manager& manager, Audio& audio)
 	:window{window}
 	, bg{ background_color }
 	, logo_texture{ logo_texture }
+	, manager{ manager }
 	, audio{ audio }
 	, middle{ static_cast<Vector2f>(window.getSize()) / 2.f }
 {
@@ -16,4 +17,14 @@ Menu::Menu(RenderWindow& window, Color background_color, Texture* logo_texture, 
 void Menu::update(Time DeltaTime)
 {
 	window.draw(logo);
+}
+
+void Menu::manageKey(Event::KeyEvent key, bool released) {
+	if (key.code == Keyboard::Key::Escape && !released) {
+		window.close();
+	}
+}
+
+void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
+{
 }

@@ -15,6 +15,8 @@ class Intro
 public:
 	Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Manager& manager, Audio& audio);
 	void update(Time DeltaTime);
+	void manageKey(Event::KeyEvent key, bool released = false);
+	void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);
 private:
 	enum Piece {
 		A, A_flipped, I, I_flipped, left_big, right_big, left_small, right_small

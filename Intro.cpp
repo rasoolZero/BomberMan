@@ -187,6 +187,28 @@ void Intro::update(Time DeltaTime)
 	}
 }
 
+void Intro::manageKey(Event::KeyEvent key, bool released)
+{
+	if (active_piece == 8 && !released) {
+		if (key.code == Keyboard::Key::Space || key.code == Keyboard::Key::Escape || key.code == Keyboard::Key::Enter) {
+			//skip the final logo animation
+			logo_animation(logo_transform, 1.f);
+			manager.setState(Manager::State::menu);
+		}
+	}
+}
+
+void Intro::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
+{
+	if (active_piece == 8 && !released) {
+		if (mouseButton.button == Mouse::Button::Left) {
+			//skip the final logo animation
+			logo_animation(logo_transform, 1.f);
+			manager.setState(Manager::State::menu);
+		}
+	}
+}
+
 void Intro::setNextVeil()
 {
 	//Vector2f middle = static_cast<Vector2f>(window.getSize()) / 2.f;
