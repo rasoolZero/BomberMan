@@ -100,8 +100,8 @@ void Game::load(std::string logAddress){
     Vector2u textureSize = textures["floor"].getSize();
     vertices.setPrimitiveType(Quads);
     vertices.resize(columns * rows * 4);
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
+    for(int i=0;i<columns;i++){
+        for(int j=0;j<rows;j++){
             Vertex* quad = &vertices[(i + j * columns) * 4];
             quad[0].position = Vector2f(i*scale+startPoint.x,j*scale+startPoint.y);
             quad[1].position = Vector2f((i+1)*scale+startPoint.x,j*scale+startPoint.y);
@@ -130,12 +130,12 @@ void Game::load(std::string logAddress){
 
 void Game::update(Time DeltaTime){
     timePassed+=DeltaTime.asSeconds();
-    if(!playing || turn==totalTurns-1)
+    if(!playing || turn==totalTurns)
         timePassed=0.0;
     if(timePassed>=timeThreshold){
         timePassed=0.0;
         turn++;
-        if(turn==totalTurns){
+        if(turn==totalTurns+1){
             turn--;
         }
     }
@@ -261,10 +261,9 @@ Vector2f Game::getPlayerPosition(int _turn,int player){
 void Game::updatePlayer(){
     for(int i=0;i<2;i++){
         health[i] = json_["turns"][turn]["players_data"][i]["health"];
-        std::string bombCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_count_level"]));
         std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
         std::string mineCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["mines_left"]));
-        upgrades[i].setString("BOMBS:"+bombCount+"  POWER:"+bombPower+"  MINES:"+mineCount);
+        upgrades[i].setString("POWER:"+bombPower+"  MINES:"+mineCount);
 
         int part;
         if(health[i]>initialHealth){
