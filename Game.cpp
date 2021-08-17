@@ -55,7 +55,7 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
         upgrades[i].setFont(_fonts[0]);
         upgrades[i].setCharacterSize(fontSize);
         upgrades[i].setStyle(Text::Bold);
-        upgrades[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().x)/2 + heart[i].getSize().x + fontSize,playerInfoBoxY+(playerInfoBoxHeight)/2-upgrades[i].getLocalBounds().height);
+        upgrades[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (playerInfoBoxWidth/2-heart[i].getSize().x)/2 + heart[i].getSize().x + fontSize,playerInfoBoxY+(playerInfoBoxHeight-fontSize)/2);
         names[i].setFont(_fonts[0]);
         names[i].setCharacterSize(fontSize);
         names[i].setStyle(Text::Bold);
@@ -63,8 +63,6 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
         extraHealth[i].setCharacterSize(fontSize-3);
         extraHealth[i].setStyle(Text::Bold);
         extraHealth[i].setPosition(heart[i].getPosition().x+heart[i].getSize().x*3/4,window.getSize().y-fontSize);
-        FloatRect const bound = names[i].getLocalBounds();
-        names[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (((playerInfoBoxWidth/2-heart[i].getSize().x)/2)-bound.width)/2 ,playerInfoBoxY+(playerInfoBoxHeight)/2-bound.height);
     }
 
     heartTextureSize = textures["heart"].getSize().y;
@@ -84,10 +82,17 @@ void Game::load(std::string logAddress){
     rows = json_["initial_game_data"]["map_height"];
     totalTurns = json_["initial_game_data"]["last_turn"];
     initialHealth = json_["initial_game_data"]["initial_health"];
-    const std::string name1 = "test name 1"; // replace these with actual names from json
-    const std::string name2 = "test name 2";
+    const std::string name1 = json_["initial_game_data"]["player_1_name"];
+    const std::string name2 = json_["initial_game_data"]["player_2_name"];
     names[0].setString(name1);
     names[1].setString(name2);
+
+    int playerInfoBoxWidth = window.getSize().x - offset;
+    int playerInfoBoxY = window.getSize().y-playerInfoBoxHeight;
+    for(int i=0;i<2;i++){
+        FloatRect const bound = names[i].getLocalBounds();
+        names[i].setPosition(offset + (playerInfoBoxWidth/2)*i + (((playerInfoBoxWidth/2-heart[i].getSize().x)/2)-bound.width)/2 ,playerInfoBoxY+(playerInfoBoxHeight-fontSize)/2);
+    }
 
     timeThreshold=timeThresholds[speed];
     turn = 0;
