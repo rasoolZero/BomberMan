@@ -16,6 +16,8 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     box.setTexture(&textures["box"]);
     offset = _offset;
 
+    blendMode.alphaDstFactor = blendMode.DstAlpha;
+    blendMode.alphaSrcFactor = blendMode.DstAlpha;
 
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
@@ -73,6 +75,7 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
 }
 void Game::load(std::string logAddress){
 
+
     std::ifstream i(logAddress);
     i >> json_;
     i.close();
@@ -82,6 +85,7 @@ void Game::load(std::string logAddress){
     rows = json_["initial_game_data"]["map_height"];
     totalTurns = json_["initial_game_data"]["last_turn"];
     initialHealth = json_["initial_game_data"]["initial_health"];
+    bombDelay = json_["initial_game_data"]["bomb_delay"];
     const std::string name1 = json_["initial_game_data"]["player_1_name"];
     const std::string name2 = json_["initial_game_data"]["player_2_name"];
     names[0].setString(name1);
@@ -122,6 +126,8 @@ void Game::load(std::string logAddress){
     obstacle.setSize(Vector2f(scale,scale));
     box.setSize(Vector2f(scale,scale));
     deadzone.setSize(Vector2f(scale,scale));
+    bombMask.setSize(Vector2f(scale,scale));
+    rTexture.create(scale,scale);
     player[0].setSize(Vector2f(scale,scale));
     player[1].setSize(Vector2f(scale,scale));
     for(int i=0;i<Resources_n::spritesCount;i++){
@@ -189,30 +195,46 @@ void Game::draw(){
                 shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["mine"]);
             }
-            if(has_state(mask,Tile_State::bomb)){
-                shapes["bomb"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["bomb"]);
-            }
+        }
+    }
 
-            for(int i=0;i<2;i++)
-                window.draw(player[i]);
 
+    //draw bombs
+    for(int i=0;i<json_["turns"][turn]["bombs"].size();i++){
+        int x = json_["turns"][turn]["bombs"][i]["y"];
+        int y = json_["turns"][turn]["bombs"][i]["x"];
+        int stepsPassed = json_["turns"][turn]["bombs"][i]["steps_passed"];
+        int alpha = map(stepsPassed,0,bombDelay,0,100);
+        bombMask.setFillColor(Color(255,0,0,alpha));
+
+        rTexture.clear(Color(0,0,0,0));
+        rTexture.draw(shapes["bomb"]);
+        rTexture.draw(bombMask,sf::RenderStates(blendMode));
+        rTexture.display();
+        const sf::Texture& texture = rTexture.getTexture();
+        sf::Sprite sprite(texture);
+        sprite.setPosition(x*scale+startPoint.x,y*scale+startPoint.y);
+        window.draw(sprite);
+    }
+
+    for(int i=0;i<2;i++)
+        window.draw(player[i]);
+
+
+    for(int i=0;i<rows;i++){
+        for(int j=0;j<columns;j++){
+            int mask = json_["turns"][turn]["map_data"][i][j];
             if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
                 shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(shapes["fire"]);
             }
-
-
-
-
-
-
             if(has_state(mask,Tile_State::deadzone)){
                 deadzone.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 window.draw(deadzone);
             }
         }
     }
+
     window.draw(playerInfo);
     for(int i=0;i<2;i++){
         window.draw(heart[i]);

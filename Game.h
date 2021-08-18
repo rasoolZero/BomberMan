@@ -34,14 +34,18 @@ class Game
         RenderWindow &window;
         json json_;
         thor::ResourceHolder<Texture,std::string> & textures;
-        RectangleShape obstacle,box,deadzone, player[2], heart[2], playerInfo;
+        RectangleShape obstacle,box,deadzone,bombMask, player[2], heart[2], playerInfo;
         int rows;
         int columns;
         int totalTurns;
         float scale;
         Vector2f startPoint;
         int initialHealth;
+        int bombDelay;
         VertexArray vertices;
+        sf::RenderTexture rTexture;
+
+        sf::BlendMode blendMode=sf::BlendAdd;
 
         int const playerInfoBoxHeight = 50;
         int health[2];
