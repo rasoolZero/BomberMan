@@ -20,6 +20,7 @@ public:
 	State getState() { return this->active_screen; }
 	void update(Time DeltaTime);
 	void manageInput(Event event);
+	void loadGame(std::string log_dir);
 private:
 	State active_screen = State::intro;
 	Intro* intro_ptr;

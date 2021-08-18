@@ -93,10 +93,10 @@ int main()
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
     Game game(window,textures,fonts,CONTROL_WIDTH);
-    game.load("log.json");
+    //game.load("log.json");
     Audio audio(soundBuffers);
     Intro intro(window, bg, &textures["logo"], manager, audio);
-    Menu menu(window, bg, &textures["logo"], manager, audio);
+    Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
     Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
     manager.setPointers(&intro, &menu, &controls, &game);
 

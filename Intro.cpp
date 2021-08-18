@@ -192,8 +192,7 @@ void Intro::manageKey(Event::KeyEvent key, bool released)
 	if (active_piece == 8 && !released) {
 		if (key.code == Keyboard::Key::Space || key.code == Keyboard::Key::Escape || key.code == Keyboard::Key::Enter) {
 			//skip the final logo animation
-			logo_animation(logo_transform, 1.f);
-			manager.setState(Manager::State::menu);
+			end();
 		}
 	}
 }
@@ -203,8 +202,7 @@ void Intro::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
 	if (active_piece == 8 && !released) {
 		if (mouseButton.button == Mouse::Button::Left) {
 			//skip the final logo animation
-			logo_animation(logo_transform, 1.f);
-			manager.setState(Manager::State::menu);
+			end();
 		}
 	}
 }
@@ -340,4 +338,11 @@ void Intro::checkDelay()
 			audio.play(Audio::Sounds::Intro);
 		}
 	}
+}
+
+void Intro::end()
+{
+	logo_animation(logo_transform, 1.f);
+	audio.stop(Audio::Sounds::Intro);
+	manager.setState(Manager::State::menu);
 }

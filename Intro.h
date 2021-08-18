@@ -55,6 +55,7 @@ private:
 	bool ready = true;
 	void wait(Time delay);
 	void checkDelay();
+	void end();
 };
 
 #endif // !INTRO_H
