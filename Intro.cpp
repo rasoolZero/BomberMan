@@ -1,8 +1,10 @@
 #include "Intro.h"
 #include "CharShape.h"
 #include <stdexcept>
-Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio)
+#include "macros.h"
+Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Manager& manager, Audio& audio)
 	:window{ window }
+	,manager{manager}
 	,audio{ audio }
 	,bg{background_color}
 	,logo_texture{logo_texture}
@@ -113,6 +115,7 @@ void Intro::update(Time DeltaTime)
 			}
 			if (active_piece == 8 && !logo_animator.isPlayingAnimation()) { //end of intro
 				logo_animation(logo_transform, 1.f);
+				manager.setState(Manager::State::menu);
 			}
 		}
 		else {
@@ -182,6 +185,30 @@ void Intro::update(Time DeltaTime)
 		window.draw(l_mask);
 		window.draw(r_mask);
 
+	}
+}
+
+void Intro::manageKey(Event::KeyEvent key, bool released)
+{
+#ifdef DEBUGGING
+	if (active_piece >= 0 && !released) {
+#else
+	if (active_piece == 8 && !released) {
+#endif // DEBUGGING
+		if (key.code == Keyboard::Key::Space || key.code == Keyboard::Key::Escape || key.code == Keyboard::Key::Enter) {
+			//skip the final logo animation
+			end();
+		}
+	}
+}
+
+void Intro::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
+{
+	if (active_piece == 8 && !released) {
+		if (mouseButton.button == Mouse::Button::Left) {
+			//skip the final logo animation
+			end();
+		}
 	}
 }
 
@@ -316,4 +343,11 @@ void Intro::checkDelay()
 			audio.play(Audio::Sounds::Intro);
 		}
 	}
+}
+
+void Intro::end()
+{
+	logo_animation(logo_transform, 1.f);
+	audio.stop(Audio::Sounds::Intro);
+	manager.setState(Manager::State::menu);
 }

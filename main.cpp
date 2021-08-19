@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Manager.h"
 #include "Intro.h"
+#include "Menu.h"
 #include "Control.h"
 #include "Resources_n.h"
 #include "Audio.h"
@@ -10,7 +11,7 @@
 #include <Thor/Resources.hpp>
 #include <json.hpp>
 #include "tinyfiledialogs.h"
-#define DEBUGGING
+#include "macros.h"
 #define OS Windows
 #define CONTROL_WIDTH 150
 using namespace sf;
@@ -92,11 +93,12 @@ int main()
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
     Game game(window,textures,fonts,CONTROL_WIDTH);
-    game.load("log.json");
+    //game.load("log.json");
     Audio audio(soundBuffers);
-    Intro intro(window, bg, &textures["logo"], audio);
-    Control controls(window,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
-    manager.setPointers(&intro, &controls, &game);
+    Intro intro(window, bg, &textures["logo"], manager, audio);
+    Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
+    Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+    manager.setPointers(&intro, &menu, &controls, &game);
 
     #ifdef DEBUGGING
     Clock timer;
@@ -113,18 +115,16 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
-            if (event.type == sf::Event::MouseButtonPressed)
-                if(event.mouseButton.button == sf::Mouse::Left)
-                    controls.update();
-            if (event.type == sf::Event::KeyPressed){
-                if (event.key.code == sf::Keyboard::Escape)
-                    window.close();
-                if (event.key.code == sf::Keyboard::F2){
-                    capture(window);
-                    audio.play(Audio::Capture);
-                }
+            }
+            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
+                capture(window);
+                audio.play(Audio::Capture);
+            }
+            else if (event.type == sf::Event::MouseButtonPressed || event.type == Event::MouseButtonReleased
+            || event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
+                manager.manageInput(event);
             }
         }
 

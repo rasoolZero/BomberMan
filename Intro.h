@@ -6,19 +6,23 @@
 #include "CharShape.h"
 #include "MoveAnimation.h"
 #include "Mask.h"
+#include "Manager.h"
 #include "Audio.h"
 using namespace sf;
 
 class Intro
 {
 public:
-	Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Audio& audio);
+	Intro(RenderWindow& window, Color background_color, Texture* logo_texture, Manager& manager, Audio& audio);
 	void update(Time DeltaTime);
+	void manageKey(Event::KeyEvent key, bool released = false);
+	void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);
 private:
 	enum Piece {
 		A, A_flipped, I, I_flipped, left_big, right_big, left_small, right_small
 	};
 	RenderWindow& window;
+	Manager& manager;
 	Audio& audio;
 	Color bg;
 	CharShape pieces[8];
@@ -51,6 +55,7 @@ private:
 	bool ready = true;
 	void wait(Time delay);
 	void checkDelay();
+	void end();
 };
 
 #endif // !INTRO_H

@@ -7,8 +7,8 @@ using namespace sf;
 
 
 
-Control::Control(RenderWindow & _window,Game & _game,Audio & _audio, int _width, int _height,thor::ResourceHolder<Texture,std::string> & _textures) :
-                window(_window),game(_game),audio(_audio),width(_width),height(_height),textures(_textures)
+Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio & _audio, int _width,int _height, thor::ResourceHolder<Texture,std::string> & _textures) :
+                window(_window),game(_game),audio(_audio),width(_width),height(_height),textures(_textures),manager(_manager)
 {
 
 
@@ -51,8 +51,8 @@ void Control::draw(){
 }
 
 void Control::update(){
-    Vector2i mousePositioni = Mouse::getPosition(window);
-    Vector2f mousePosition = Vector2f(mousePositioni.x,mousePositioni.y);
+    //Vector2i mousePositioni = Mouse::getPosition(window);
+    Vector2f mousePosition = static_cast<Vector2f>(Mouse::getPosition(window));
     for(int i=0;i<BUTTONS;i++){
         if(buttons[i].getGlobalBounds().contains(mousePosition)){
             if(i==0){ //rewind
@@ -105,5 +105,35 @@ void Control::update(){
                 audio.play(Audio::Click);
             }
         }
+    }
+}
+
+void Control::manageKey(Event::KeyEvent key, bool released)
+{
+    if (!released) {
+        if (key.code == Keyboard::Key::Escape) {
+            if (music) {
+                music = false;
+                audio.stop(Audio::Music);
+                soundButtons[0].setTexture(&textures["music_off"]);
+            }
+            playing = false;
+            game.setPlaying(false);
+            manager.setState(Manager::State::menu);
+        }
+    }
+    else {
+
+    }
+}
+
+void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
+    if (!released) {
+        if (mouseButton.button == Mouse::Button::Left) {
+            update();
+        }
+    }
+    else {
+
     }
 }
