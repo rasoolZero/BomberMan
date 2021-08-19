@@ -112,6 +112,13 @@ void Control::manageKey(Event::KeyEvent key, bool released)
 {
     if (!released) {
         if (key.code == Keyboard::Key::Escape) {
+            if (music) {
+                music = false;
+                audio.stop(Audio::Music);
+                soundButtons[0].setTexture(&textures["music_off"]);
+            }
+            playing = false;
+            game.setPlaying(false);
             manager.setState(Manager::State::menu);
         }
     }

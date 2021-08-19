@@ -11,7 +11,7 @@
 #include <Thor/Resources.hpp>
 #include <json.hpp>
 #include "tinyfiledialogs.h"
-#define DEBUGGING
+#include "macros.h"
 #define OS Windows
 #define CONTROL_WIDTH 150
 using namespace sf;

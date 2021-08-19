@@ -2,7 +2,7 @@
 #include "tinyfiledialogs.h"
 #include <json.hpp>
 #include <cmath>
-#define DEBUGGING
+#include "macros.h"
 Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio)
 	:window{window}
 	, bg{ background_color }
@@ -20,6 +20,7 @@ Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* lo
 		buttons[i].setCharacterSize(24);
 		buttons[i].setFont(font);
 		buttons[i].setPosition(middle + Vector2f(-110 + 220 * i, 90));
+		buttons[i].setFillColor(normal_button_color);
 	}
 	buttons[choose].setString(" Choose file ");
 	buttons[play].setString(" Play ");
@@ -49,7 +50,7 @@ Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* lo
 
 void Menu::update(Time DeltaTime)
 {
-	if (info[error].getFillColor().a > 0) {
+	if (info[error].getFillColor().a > 0) { // error fade
 		message_timer += DeltaTime;
 		if (message_timer >= message_display_time) {
 			info[error].setFillColor(Color::Transparent);
@@ -58,6 +59,42 @@ void Menu::update(Time DeltaTime)
 			Color temp = info[error].getFillColor();
 			temp.a = (1 - pow(message_timer / message_display_time, 3)) * 255;
 			info[error].setFillColor(temp);
+		}
+	} // error fade
+
+	float progress = DeltaTime.asSeconds() / button_color_change_time.asSeconds();
+	for (int i = 0; i < BUTTONCOUNT; i++)
+	{
+		Color current_color = buttons[i].getFillColor();
+		if (i == selected) {
+			if (current_color != selected_button_color) {
+				current_color =  current_color - Color(color_difference.r * progress, color_difference.g * progress, color_difference.b * progress, 0);
+				if (current_color.r < selected_button_color.r) {
+					current_color.r = selected_button_color.r;
+				}
+				if (current_color.g < selected_button_color.g) {
+					current_color.g = selected_button_color.g;
+				}
+				if (current_color.b < selected_button_color.b) {
+					current_color.b = selected_button_color.b;
+				}
+				buttons[i].setFillColor(current_color);
+			}
+		}
+		else {
+			if (current_color != normal_button_color && (i != play || (i == play && !log_dir.empty() ))) {
+				current_color =  current_color + Color(color_difference.r * progress, color_difference.g * progress, color_difference.b * progress, 0);
+				if (current_color.r > normal_button_color.r) {
+					current_color.r = normal_button_color.r;
+				}
+				if (current_color.g > normal_button_color.g) {
+					current_color.g = normal_button_color.g;
+				}
+				if (current_color.b > normal_button_color.b) {
+					current_color.b = normal_button_color.b;
+				}
+				buttons[i].setFillColor(current_color);
+			}
 		}
 	}
 	window.draw(logo);
@@ -72,9 +109,42 @@ void Menu::update(Time DeltaTime)
 }
 
 void Menu::manageKey(Event::KeyEvent key, bool released) {
-	if (key.code == Keyboard::Key::Escape && !released) {
-		window.close();
+	if (!released) {
+		if (key.code == Keyboard::Key::Escape) {
+			window.close();
+		}
+		else if (key.code == Keyboard::Key::Left) {
+			selected = static_cast<Button>((selected + 1) % BUTTONCOUNT);
+			if (selected == play && log_dir.empty()) {
+				// skip play button if not available
+				selected = static_cast<Button>((selected + 1) % BUTTONCOUNT);
+			}
+		}
+		else if (key.code == Keyboard::Key::Right) {
+			selected = static_cast<Button>((selected + BUTTONCOUNT - 1) % BUTTONCOUNT);
+			if (selected == play && log_dir.empty()) {
+				// skip play button if not available
+				selected = static_cast<Button>((selected + BUTTONCOUNT - 1) % BUTTONCOUNT);
+			}
+		}
+		else if (key.code == Keyboard::Key::Space || key.code == Keyboard::Key::Enter) {
+			switch (selected)
+			{
+			case Menu::choose:
+				chooseFile();
+				break;
+			case Menu::play:
+			#ifdef DEBUGGING
+				assert(!log_dir.empty());
+			#endif // DEBUGGING
+				load();
+				break;
+			default:
+				break;
+			}
+		}
 	}
+	
 }
 
 void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
@@ -83,25 +153,9 @@ void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
 		if (mouseButton.button == Mouse::Button::Left) {
 			if (buttons[choose].getGlobalBounds().contains(mouseButton.x, mouseButton.y)) {
 				chooseFile();
-				if (!log_dir.empty()) {
-					buttons[play].setFillColor(Color::White);
-				}
 			}
 			else if (buttons[play].getGlobalBounds().contains(mouseButton.x, mouseButton.y) && !log_dir.empty()) {
-				try
-				{
-					manager.loadGame(log_dir);
-					manager.setState(Manager::State::game);
-				}
-				catch (const nlohmann::json::exception& e)
-				{
-				#ifdef DEBUGGING
-					info[error].setString(e.what());
-				#endif // DEBUGGING
-					info[error].setFillColor(Color::Red);
-					info[error].setOrigin(info[error].getLocalBounds().width / 2, 0);
-					message_timer = Time::Zero;
-				}
+				load();
 			}
 		}
 	}
@@ -123,5 +177,26 @@ void Menu::chooseFile()
 	#endif
 		info[file].setString(temp_str);
 		info[file].setOrigin(info[file].getLocalBounds().width / 2, 0);
+	}
+	if (!log_dir.empty()) {
+		buttons[play].setFillColor(normal_button_color);
+	}
+}
+
+void Menu::load()
+{
+	try
+	{
+		manager.loadGame(log_dir);
+		manager.setState(Manager::State::game);
+	}
+	catch (const nlohmann::json::exception& e)
+	{
+#ifdef DEBUGGING
+		info[error].setString(e.what());
+		info[error].setOrigin(info[error].getLocalBounds().width / 2, 0);
+#endif // DEBUGGING
+		info[error].setFillColor(Color::Red);
+		message_timer = Time::Zero;
 	}
 }
