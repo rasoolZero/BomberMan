@@ -42,8 +42,8 @@ Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* lo
 	for (int i = 0; i < INFOCOUNT; i++) {
 		info[i].setOrigin(info[i].getLocalBounds().width / 2, 0);
 	}
-	info[Bomberman].setPosition(middle - Vector2f(0, middle.y * 0.78));
-	info[AICup].setPosition(middle - Vector2f(0, middle.y * 0.78 - 45));
+	info[Bomberman].setPosition(middle.x, 120);
+	info[AICup].setPosition(middle.x, 165);
 	info[file].setPosition(middle);
 	info[error].setPosition(middle + Vector2f(0, 40));
 }
