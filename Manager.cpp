@@ -61,6 +61,20 @@ void Manager::manageInput(Event event)
 			break;
 		}
 	}
+	else if (event.type == Event::MouseMoved) {
+		switch (active_screen)
+		{
+		case Manager::intro:
+			break;
+		case Manager::menu:
+			menu_ptr->updateMouse(event.mouseMove);
+			break;
+		case Manager::game:
+			break;
+		default:
+			break;
+		}
+	}
 	else if (event.type == Event::MouseButtonPressed || event.type == Event::MouseButtonReleased) {
 		bool released = false;
 		if (event.type == Event::MouseButtonReleased) {

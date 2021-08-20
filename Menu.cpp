@@ -161,6 +161,17 @@ void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
 	}
 }
 
+void Menu::updateMouse(Event::MouseMoveEvent mouseMove)
+{
+	for (int i = 0; i < BUTTONCOUNT; i++)
+	{
+		if ((i != play || (i == play && !log_dir.empty())) && buttons[i].getGlobalBounds().contains(mouseMove.x, mouseMove.y)) {
+			selected = static_cast<Button>(i);
+			break;
+		}
+	}
+}
+
 void Menu::chooseFile()
 {
 	char* temp_chr;
