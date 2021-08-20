@@ -14,6 +14,7 @@ public:
 	void update(Time DeltaTime);
 	void manageKey(Event::KeyEvent key, bool released = false);
 	void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);
+	void updateMouse(Event::MouseMoveEvent mouseMove);
 private:
 	RenderWindow& window;
 	Manager& manager;

@@ -122,7 +122,7 @@ int main()
                 capture(window);
                 audio.play(Audio::Capture);
             }
-            else if (event.type == sf::Event::MouseButtonPressed || event.type == Event::MouseButtonReleased
+            else if (event.type == Event::MouseMoved || event.type == sf::Event::MouseButtonPressed || event.type == Event::MouseButtonReleased
             || event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
                 manager.manageInput(event);
             }

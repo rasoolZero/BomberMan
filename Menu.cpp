@@ -42,8 +42,8 @@ Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* lo
 	for (int i = 0; i < INFOCOUNT; i++) {
 		info[i].setOrigin(info[i].getLocalBounds().width / 2, 0);
 	}
-	info[Bomberman].setPosition(middle - Vector2f(0, middle.y * 0.78));
-	info[AICup].setPosition(middle - Vector2f(0, middle.y * 0.78 - 45));
+	info[Bomberman].setPosition(middle.x, 120);
+	info[AICup].setPosition(middle.x, 165);
 	info[file].setPosition(middle);
 	info[error].setPosition(middle + Vector2f(0, 40));
 }
@@ -157,6 +157,17 @@ void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
 			else if (buttons[play].getGlobalBounds().contains(mouseButton.x, mouseButton.y) && !log_dir.empty()) {
 				load();
 			}
+		}
+	}
+}
+
+void Menu::updateMouse(Event::MouseMoveEvent mouseMove)
+{
+	for (int i = 0; i < BUTTONCOUNT; i++)
+	{
+		if ((i != play || (i == play && !log_dir.empty())) && buttons[i].getGlobalBounds().contains(mouseMove.x, mouseMove.y)) {
+			selected = static_cast<Button>(i);
+			break;
 		}
 	}
 }
