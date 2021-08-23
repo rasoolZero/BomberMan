@@ -90,20 +90,7 @@ void Control::update(){
     }
     for(int i=0;i<2;i++){
         if(soundButtons[i].getGlobalBounds().contains(mousePosition)){
-            if(i==0){
-                music=!music;
-                soundButtons[i].setTexture(music?&textures["music_on"]:&textures["music_off"]);
-                if(music)
-                    audio.play(Audio::Music);
-                else
-                    audio.stop(Audio::Music);
-            }
-            if(i==1){
-                sound=!sound;
-                soundButtons[i].setTexture(sound?&textures["sound_on"]:&textures["sound_off"]);
-                audio.setSound(sound);
-                audio.play(Audio::Click);
-            }
+            toggleSound(i);
         }
     }
 }
@@ -111,19 +98,110 @@ void Control::update(){
 void Control::manageKey(Event::KeyEvent key, bool released)
 {
     if (!released) {
-        if (key.code == Keyboard::Key::Escape) {
+        switch (key.code)
+        {
+        case Keyboard::Key::Space:
+        case Keyboard::Key::Enter:
+            playing = !playing;
+            game.setPlaying(playing);
+            audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
+            break;
+
+        case Keyboard::Key::D:
+        case Keyboard::Key::Right: {
+            int step = 1;
+            if (key.control) {
+                step = 5;
+            }
+            if (game.setTurn(game.getTurn() + step)) {
+                audio.play(Audio::Click);
+            }
+            else {
+                audio.play(Audio::Failed);
+            }
+            break;
+        }
+        case Keyboard::Key::A:
+        case Keyboard::Key::Left: {
+            int step = 1;
+            if (key.control) {
+                step = 5;
+            }
+            if (game.setTurn(game.getTurn() - step)) {
+                audio.play(Audio::Click);
+            }
+            else {
+                audio.play(Audio::Failed);
+            }
+            break;
+        }
+        default:
+            if (Keyboard::Key::Num0 <= key.code && key.code <= Keyboard::Key::Num9) {
+                if (game.setTurn((key.code - Keyboard::Key::Num0) / 10.0)) {
+                    audio.play(Audio::Click);
+                }
+                else {
+                    audio.play(Audio::Failed);
+                }
+            }
+            else if (Keyboard::Key::Numpad0 <= key.code && key.code <= Keyboard::Key::Numpad9) {
+                if (game.setTurn((key.code - Keyboard::Key::Numpad0) / 10.0)) {
+                    audio.play(Audio::Click);
+                }
+                else {
+                    audio.play(Audio::Failed);
+                }
+            }
+            break;
+        }
+    }
+    else { // on release
+        switch (key.code)
+        {
+        case Keyboard::Key::Escape:
             if (music) {
                 music = false;
                 audio.stop(Audio::Music);
+                buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
                 soundButtons[0].setTexture(&textures["music_off"]);
             }
             playing = false;
             game.setPlaying(false);
+            game.changeSpeed(1);
             manager.setState(Manager::State::menu);
-        }
-    }
-    else {
+            break;
 
+        case Keyboard::Key::W:
+        case Keyboard::Key::Up:
+        case Keyboard::Key::S:
+        case Keyboard::Key::Down:
+            if (key.code == Keyboard::Key::Up || key.code == Keyboard::Key::W) {
+                speed = speed % 3 + 1;
+            }
+            else {
+                speed = (speed + 1) % 3 + 1;
+            }
+            buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
+            game.changeSpeed(speed);
+            audio.play(Audio::Click);
+            break;
+
+        case Keyboard::Key::E:
+            toggleSound(1);
+            break;
+
+        case Keyboard::Key::Q:
+            toggleSound(0);
+            break;
+
+        case Keyboard::Key::R:
+            game.setTurn(0);
+            audio.play(Audio::Rewind);
+            break;
+
+        default:
+            break;
+        }
     }
 }
 
@@ -135,5 +213,23 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
     }
     else {
 
+    }
+}
+
+void Control::toggleSound(bool sound_selected)
+{
+    if (!sound_selected) {
+        music = !music;
+        soundButtons[sound_selected].setTexture(music ? &textures["music_on"] : &textures["music_off"]);
+        if (music)
+            audio.play(Audio::Music);
+        else
+            audio.stop(Audio::Music);
+    }
+    else {
+        sound = !sound;
+        soundButtons[sound_selected].setTexture(sound ? &textures["sound_on"] : &textures["sound_off"]);
+        audio.setSound(sound);
+        audio.play(Audio::Click);
     }
 }

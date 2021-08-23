@@ -39,6 +39,7 @@ class Control
         bool sound=true;
         bool music=false;
 
+        void toggleSound(bool sound_selected);
 };
 
 #endif // CONTROL_H

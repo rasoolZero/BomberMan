@@ -22,8 +22,9 @@ class Game
         void changeSpeed(int _speed);
         void load(std::string logAddress);
 
-        bool setTurn(unsigned _turn);
-        unsigned getTurn(){return this->turn;}
+        bool setTurn(int _turn);
+        bool setTurn(double progress); // progress between 0 and 1
+        int getTurn(){return this->turn;}
 
         void setPlaying(bool _playing);
         bool getPlaying(){return playing;}
@@ -54,7 +55,7 @@ class Game
         Text upgrades[2], names[2], extraHealth[2];
         unsigned offset;
 
-        unsigned turn;
+        int turn;
         float timePassed=0;
         float timeThreshold;
         bool playing=false;

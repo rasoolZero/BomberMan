@@ -3,6 +3,7 @@
 #include "Tile_State.h"
 #include <iostream>
 #include <fstream>
+#include "macros.h"
 using namespace sf;
 using json = nlohmann::json;
 float map(float value, float istart, float istop, float ostart, float ostop) {
@@ -265,15 +266,33 @@ void Game::setPlaying(bool _playing){
     playing=_playing;
 }
 
-bool Game::setTurn(unsigned _turn){
-    if(_turn >= totalTurns)
-        return false;
-    if(_turn < 0)
-        return false;
-    turn = _turn;
+bool Game::setTurn(int _turn){
+    if (_turn > totalTurns) {
+        if (turn == totalTurns) {
+            return false;
+        }
+        turn = totalTurns;
+    }
+    else if (_turn < 0) {
+        if (turn == 0) {
+            return false;
+        }
+        turn = 0;
+    }
+    else {
+        turn = _turn;
+    }
     timePassed=0;
     updatePlayer();
     return true;
+}
+
+bool Game::setTurn(double progress) // progress between 0 and 1
+{
+#ifdef DEBUGGING
+    assert(0 <= progress && progress <= 1);
+#endif // DEBUGGING
+    return setTurn(static_cast<int>(progress * totalTurns));
 }
 
 Vector2f Game::getPlayerPosition(int _turn,int player){
