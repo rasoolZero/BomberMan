@@ -25,8 +25,8 @@ void Manager::setState(State state) {
 void Manager::update(Time DeltaTime) {
 	switch (this->active_screen) {
 	case State::game:
-		control_ptr->draw();
 		game_ptr->update(DeltaTime);
+		control_ptr->draw();
 		break;
 	case State::menu:
 		menu_ptr->update(DeltaTime);

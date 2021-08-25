@@ -13,7 +13,7 @@
 #include "tinyfiledialogs.h"
 #include "macros.h"
 #define OS Windows
-#define CONTROL_WIDTH 150
+#define CONTROL_WIDTH 50
 using namespace sf;
 using json = nlohmann::json;
 
@@ -97,7 +97,8 @@ int main()
     Audio audio(soundBuffers);
     Intro intro(window, bg, &textures["logo"], manager, audio);
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
-    Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+    //Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+    Control controls(window, manager, game, audio, window.getSize().x, CONTROL_WIDTH, textures);
     manager.setPointers(&intro, &menu, &controls, &game);
 
     #ifdef DEBUGGING

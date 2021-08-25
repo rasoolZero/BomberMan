@@ -12,17 +12,18 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
 {
 
 
-    background.setPosition(0,0);
+    background.setPosition(0, window.getSize().y - height);
     background.setSize(Vector2f(width,height));
     background.setFillColor(Color(50,50,50));
 
-    float const scale = std::min((width-20)/2.0,(height-300)/double(BUTTONS));
-    float const left_offset = (width - scale)/2.0;
+    //float const scale = std::min((width-20)/2.0,(height-300)/double(BUTTONS));
+    float const scale = std::min((width - 300) / 2.0, double(height));
+    float const side_offset = window.getSize().y - scale * 1.25;
     float const side_margin = 30;
-    float const side_offset = (height/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
+    float const left_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
     for(int i=0;i<BUTTONS;i++){
         buttons[i].setSize(Vector2f(scale,scale));
-        buttons[i].setPosition(left_offset,side_offset+i*side_margin+i*scale);
+        buttons[i].setPosition(left_offset + i * side_margin + i * scale, side_offset);
     }
     buttons[0].setTexture(&textures["rewind_button"]);
     buttons[1].setTexture(&textures["backward_button"]);
