@@ -16,6 +16,12 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     obstacle.setTexture(&textures["obstacle"]);
     box.setTexture(&textures["box"]);
     offset = _offset;
+    winnerText.setFont(_fonts[0]);
+    winnerText.setStyle(Text::Bold);
+    winnerText.setCharacterSize(fontSize+12);
+    winnerText.setColor(Color::White);
+    winnerDisplay.setOutlineColor(Color::White);
+    winnerDisplay.setOutlineThickness(3);
 
     blendMode.alphaDstFactor = blendMode.DstAlpha;
     blendMode.alphaSrcFactor = blendMode.DstAlpha;
@@ -69,10 +75,10 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     }
 
     heartTextureSize = textures["heart"].getSize().y;
-    upgrades[0].setFillColor(Color(156,40,40));
-    upgrades[1].setFillColor(Color(40,40,156));
-    names[0].setFillColor(Color(156,40,40));
-    names[1].setFillColor(Color(40,40,156));
+    upgrades[0].setFillColor(player1Theme);
+    upgrades[1].setFillColor(player2Theme);
+    names[0].setFillColor(player1Theme);
+    names[1].setFillColor(player2Theme);
 }
 void Game::load(std::string logAddress){
 
@@ -243,6 +249,33 @@ void Game::draw(){
         window.draw(names[i]);
         window.draw(extraHealth[i]);
     }
+    if(turn == totalTurns)
+        displayWinner();
+}
+
+void Game::displayWinner(){
+    std::string textToDisplay;
+    sf::Color color;
+    if(health[0]==0){
+        textToDisplay = names[1].getString();
+        color = player2Theme;
+        color.a=200;
+    }
+    else{
+        textToDisplay = names[0].getString();
+        color = player1Theme;
+        color.a=200;
+    }
+    textToDisplay+=std::string(" WINS!");
+    winnerText.setString(textToDisplay);
+    winnerText.setPosition((window.getSize().x-winnerText.getGlobalBounds().width)/2,(window.getSize().y-winnerText.getGlobalBounds().height)/2);
+    winnerDisplay.setFillColor(color);
+    winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width+10,winnerText.getGlobalBounds().height*3));
+    winnerDisplay.setPosition((window.getSize().x-winnerDisplay.getSize().x)/2.0,(window.getSize().y-winnerDisplay.getSize().y)/2.0);
+
+    window.draw(winnerDisplay);
+    window.draw(winnerText);
+
 }
 
 void Game::changeSpeed(int _speed){

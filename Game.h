@@ -32,10 +32,12 @@ class Game
     protected:
 
     private:
+        const sf::Color player1Theme = sf::Color(156,40,40);
+        const sf::Color player2Theme = sf::Color(40,40,156);
         RenderWindow &window;
         json json_;
         thor::ResourceHolder<Texture,std::string> & textures;
-        RectangleShape obstacle,box,deadzone,bombMask, player[2], heart[2], playerInfo;
+        RectangleShape obstacle,box,deadzone,bombMask,winnerDisplay,player[2], heart[2], playerInfo;
         int rows;
         int columns;
         int totalTurns;
@@ -52,7 +54,7 @@ class Game
         int health[2];
         int heartTextureSize;
         int const fontSize=17;
-        Text upgrades[2], names[2], extraHealth[2];
+        Text upgrades[2], names[2], extraHealth[2], winnerText;
         unsigned offset;
 
         int turn;
@@ -69,6 +71,7 @@ class Game
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
         void draw();
+        void displayWinner();
         Vector2f getPlayerPosition(int _turn,int player);
         void updatePlayer();
         void initPlayerAnimation();
