@@ -75,10 +75,17 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     }
 
     heartTextureSize = textures["heart"].getSize().y;
+<<<<<<< HEAD
     upgrades[0].setFillColor(player1Theme);
     upgrades[1].setFillColor(player2Theme);
     names[0].setFillColor(player1Theme);
     names[1].setFillColor(player2Theme);
+=======
+    upgrades[0].setFillColor(Color(255, 176, 32));
+    upgrades[1].setFillColor(Color(0, 200, 255));
+    names[0].setFillColor(Color(255, 176, 32));
+    names[1].setFillColor(Color(0, 200, 255));
+>>>>>>> 82e97d179b67ceac5d4badd25b5e56c02cc2b78a
 }
 void Game::load(std::string logAddress){
 
