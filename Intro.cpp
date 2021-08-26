@@ -117,6 +117,7 @@ void Intro::update(Time DeltaTime)
 				logo_animation(logo_transform, 1.f);
 				manager.setState(Manager::State::menu);
 			}
+			manager.loadMenu(logo_animation.getProgress());
 		}
 		else {
 			l_animator.update(DeltaTime);

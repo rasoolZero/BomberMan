@@ -108,6 +108,25 @@ void Menu::update(Time DeltaTime)
 	}
 }
 
+void Menu::appear(double progress)
+{
+	if (progress == 0.0) {
+		return;
+	}
+	for (int i = 0; i < BUTTONCOUNT; i++) {
+		window.draw(buttons[i]);
+	}
+	for (int i = INFOCOUNT - 1; i >= 2; i--) {
+		if (i != error || (i == error && info[error].getFillColor().a > 0)) {
+			window.draw(info[i]);
+		}
+	}
+	if (progress >= 0.7) {
+		window.draw(info[1]);
+		window.draw(info[0]);
+	}
+}
+
 void Menu::manageKey(Event::KeyEvent key, bool released) {
 	if (!released) {
 		if (key.code == Keyboard::Key::Escape) {

@@ -97,6 +97,11 @@ void Manager::manageInput(Event event)
 	}
 }
 
+void Manager::loadMenu(double progress)
+{
+	menu_ptr->appear(progress);
+}
+
 void Manager::loadGame(std::string log_dir)
 {
 	game_ptr->load(log_dir);
