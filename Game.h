@@ -17,7 +17,7 @@ class Game
 
     public:
         Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures ,
-            thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
+            thor::ResourceHolder<Font,int> & _fonts, unsigned _controlHeight);
         void update(Time DeltaTime);
         void changeSpeed(int _speed);
         void load(std::string logAddress);
@@ -43,6 +43,8 @@ class Game
         int totalTurns;
         float scale;
         Vector2f startPoint;
+        Vector2f infoSize;
+        const int playerInfoLeftOffset = 5;
         int initialHealth;
         int bombDelay;
         VertexArray vertices;
@@ -50,12 +52,11 @@ class Game
 
         sf::BlendMode blendMode=sf::BlendAdd;
 
-        int const playerInfoBoxHeight = 50;
+        unsigned controlHeight;
         int health[2];
         int heartTextureSize;
         int const fontSize=17;
         Text upgrades[2], names[2], extraHealth[2], winnerText;
-        unsigned offset;
 
         int turn;
         float timePassed=0;
