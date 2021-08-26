@@ -99,6 +99,11 @@ void Game::load(std::string logAddress){
     const std::string name2 = json_["initial_game_data"]["player_2_name"];
     names[0].setString(name1);
     names[1].setString(name2);
+    for(int i=0;i<2;i++){
+        names[i].setCharacterSize(fontSize);
+        while((names[i].getGlobalBounds().width + playerInfoLeftOffset) >= infoSize.x)
+            names[i].setCharacterSize(names[i].getCharacterSize()-1);
+    }
 
     timeThreshold=timeThresholds[speed];
     turn = 0;
