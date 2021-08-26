@@ -18,7 +18,7 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
 
     //float const scale = std::min((width-20)/2.0,(height-300)/double(BUTTONS));
     float const scale = std::min((width - 300) / 2.0, double(height));
-    float const side_offset = window.getSize().y - scale * 1.25;
+    float const side_offset = window.getSize().y - scale;
     float const side_margin = 30;
     float const left_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
     for(int i=0;i<BUTTONS;i++){
@@ -31,12 +31,10 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     buttons[3].setTexture(&textures["play_button"]);
     buttons[4].setTexture(&textures["forward_button"]);
     buttons[5].setTexture(&textures["speed_button_1"]);
-
-    float const _scale=30.0;
-    float const offset = (width-2*_scale)/4.0;
     for(int i=0;i<2;i++){
-        soundButtons[i].setSize(Vector2f(_scale,_scale));
-        soundButtons[i].setPosition((2*i+1)*offset+(i)*_scale,height-_scale-5);
+        soundButtons[i].setSize(Vector2f(scale,scale));
+        Vector2f referencePos = buttons[i*5].getPosition();
+        soundButtons[i].setPosition(referencePos.x + (i==0?-side_margin - scale:side_margin + scale) , referencePos.y);
     }
     soundButtons[0].setTexture(&textures["music_off"]);
     soundButtons[1].setTexture(&textures["sound_on"]);

@@ -13,7 +13,7 @@
 #include "tinyfiledialogs.h"
 #include "macros.h"
 #define OS Windows
-#define CONTROL_WIDTH 50
+#define CONTROL_HEIGHT 50
 using namespace sf;
 using json = nlohmann::json;
 
@@ -92,13 +92,13 @@ int main()
     Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    Game game(window,textures,fonts,CONTROL_WIDTH);
+    Game game(window,textures,fonts,CONTROL_HEIGHT);
     //game.load("log.json");
     Audio audio(soundBuffers);
     Intro intro(window, bg, &textures["logo"], manager, audio);
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
     //Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
-    Control controls(window, manager, game, audio, window.getSize().x, CONTROL_WIDTH, textures);
+    Control controls(window, manager, game, audio, window.getSize().x, CONTROL_HEIGHT, textures);
     manager.setPointers(&intro, &menu, &controls, &game);
 
     #ifdef DEBUGGING
