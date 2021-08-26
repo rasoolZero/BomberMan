@@ -28,6 +28,13 @@ Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* lo
 	for (int i = 0; i < BUTTONCOUNT; i++) {
 		buttons[i].setOrigin(buttons[i].getLocalBounds().width / 2, 0);
 	}
+	for (int i = 0; i < BUTTONCOUNT; i++) {
+		FloatRect temp = buttons[i].getGlobalBounds();
+		selectboxes[i].top = temp.top - 20;
+		selectboxes[i].left = temp.left - 40;
+		selectboxes[i].width = temp.width + 80;
+		selectboxes[i].height = temp.height + 40;
+	}
 
 	for (int i = 0; i < INFOCOUNT; i++) {
 		info[i].setFont(font);
@@ -170,10 +177,10 @@ void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)
 {
 	if (!released) {
 		if (mouseButton.button == Mouse::Button::Left) {
-			if (buttons[choose].getGlobalBounds().contains(mouseButton.x, mouseButton.y)) {
+			if (selectboxes[choose].contains(mouseButton.x, mouseButton.y)) {
 				chooseFile();
 			}
-			else if (buttons[play].getGlobalBounds().contains(mouseButton.x, mouseButton.y) && !log_dir.empty()) {
+			else if (selectboxes[play].contains(mouseButton.x, mouseButton.y) && !log_dir.empty()) {
 				load();
 			}
 		}
@@ -184,7 +191,7 @@ void Menu::updateMouse(Event::MouseMoveEvent mouseMove)
 {
 	for (int i = 0; i < BUTTONCOUNT; i++)
 	{
-		if ((i != play || (i == play && !log_dir.empty())) && buttons[i].getGlobalBounds().contains(mouseMove.x, mouseMove.y)) {
+		if ((i != play || (i == play && !log_dir.empty())) && selectboxes[i].contains(mouseMove.x, mouseMove.y)) {
 			selected = static_cast<Button>(i);
 			break;
 		}

@@ -34,6 +34,7 @@ private:
 	};
 	Text buttons[BUTTONCOUNT];
 	Button selected = Button::choose;
+	IntRect selectboxes[BUTTONCOUNT];
 	const Color selected_button_color = Color(30, 180, 250);
 	const Color normal_button_color = Color(250, 250, 250);
 	const Color color_difference = normal_button_color - selected_button_color;
