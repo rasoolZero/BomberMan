@@ -32,9 +32,8 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     buttons[4].setTexture(&textures["forward_button"]);
     buttons[5].setTexture(&textures["speed_button_1"]);
     for(int i=0;i<2;i++){
-        soundButtons[i].setSize(Vector2f(scale,scale));
-        Vector2f referencePos = buttons[i*5].getPosition();
-        soundButtons[i].setPosition(referencePos.x + (i==0?-side_margin - scale:side_margin + scale) , referencePos.y);
+        soundButtons[i].setSize(Vector2f(scale/2.0,scale/2.0));
+        soundButtons[i].setPosition(side_margin/2.0*(i+1) + scale/2.0*i , side_offset + scale/4.0);
     }
     soundButtons[0].setTexture(&textures["music_off"]);
     soundButtons[1].setTexture(&textures["sound_on"]);
