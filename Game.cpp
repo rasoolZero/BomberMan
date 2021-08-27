@@ -16,11 +16,11 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     obstacle.setTexture(&textures["obstacle"]);
     box.setTexture(&textures["box"]);
     controlHeight = _controlHeight;
-    infoSize = Vector2f(150,window.getSize().y - controlHeight);
+    infoSize = Vector2f(190,window.getSize().y - controlHeight);
     winnerText.setFont(_fonts[0]);
     winnerText.setStyle(Text::Bold);
     winnerText.setCharacterSize(fontSize+12);
-    winnerText.setColor(Color::White);
+    winnerText.setFillColor(Color::White);
     winnerDisplay.setOutlineColor(Color::White);
     winnerDisplay.setOutlineThickness(3);
 
@@ -54,24 +54,24 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
 
     playerInfo.setSize(infoSize);
     playerInfo.setPosition(0,0);
-    playerInfo.setFillColor(Color(25,25,25));
+    playerInfo.setFillColor(Color(13,13,13));
 
-    const float spacing = (window.getSize().y-controlHeight) / 8.0;
+    const float spacing = 50;// (window.getSize().y - controlHeight) / 8.0;
 
     for(int i=0;i<2;i++){
+        names[i].setFont(_fonts[0]);
+        names[i].setCharacterSize(fontSize);
+        names[i].setStyle(Text::Bold);
+        names[i].setPosition(0,50);
         heart[i].setSize(Vector2f(spacing,spacing));
-        heart[i].setPosition(0,fontSize+5);
+        heart[i].setPosition(names[i].getPosition() + Vector2f(infoSize.x - spacing - 20, fontSize+5));
         heart[i].setTexture(&textures["heart"]);
         upgrades[i].setFont(_fonts[0]);
         upgrades[i].setCharacterSize(fontSize);
         upgrades[i].setStyle(Text::Bold);
-        upgrades[i].setPosition(0,spacing+fontSize+10);
-        names[i].setFont(_fonts[0]);
-        names[i].setCharacterSize(fontSize);
-        names[i].setStyle(Text::Bold);
-        names[i].setPosition(0,0);
+        upgrades[i].setPosition(names[i].getPosition() + Vector2f(0,/*spacing+*/fontSize+10));
         extraHealth[i].setFont(_fonts[0]);
-        extraHealth[i].setCharacterSize(fontSize-3);
+        extraHealth[i].setCharacterSize(fontSize-1);
         extraHealth[i].setStyle(Text::Bold);
         extraHealth[i].setPosition(heart[i].getPosition().x+heart[i].getSize().x*3/4,heart[i].getPosition().y+heart[i].getSize().y-fontSize);
     }
@@ -101,7 +101,7 @@ void Game::load(std::string logAddress){
     names[1].setString(name2);
     for(int i=0;i<2;i++){
         names[i].setCharacterSize(fontSize);
-        while((names[i].getGlobalBounds().width + playerInfoLeftOffset) >= infoSize.x)
+        while((names[i].getGlobalBounds().width + playerInfoLeftOffset) >= infoSize.x && names[i].getCharacterSize() >= minFontSize)
             names[i].setCharacterSize(names[i].getCharacterSize()-1);
     }
 
@@ -244,12 +244,11 @@ void Game::draw(){
 
     window.draw(playerInfo);
     for(int i=0;i<2;i++){
-        Transformable transformable;
-        transformable.setPosition(playerInfoLeftOffset,5+i*(infoSize.y/2));
-        window.draw(heart[i],transformable.getTransform());
-        window.draw(upgrades[i],transformable.getTransform());
-        window.draw(names[i],transformable.getTransform());
-        window.draw(extraHealth[i],transformable.getTransform());
+        player_info_transformable.setPosition(playerInfoLeftOffset,5+i*(infoSize.y/2));
+        window.draw(heart[i],        player_info_transformable.getTransform());
+        window.draw(upgrades[i],     player_info_transformable.getTransform());
+        window.draw(names[i],        player_info_transformable.getTransform());
+        window.draw(extraHealth[i],  player_info_transformable.getTransform());
     }
     if(turn == totalTurns)
         displayWinner();
@@ -268,7 +267,7 @@ void Game::displayWinner(){
         color = player1Theme;
         color.a=200;
     }
-    textToDisplay+=std::string(" WINS!");
+    textToDisplay+=std::string(" WINS! ");
     winnerText.setString(textToDisplay);
     winnerText.setPosition((window.getSize().x-winnerText.getGlobalBounds().width)/2,(window.getSize().y-winnerText.getGlobalBounds().height)/2);
     winnerDisplay.setFillColor(color);
@@ -349,7 +348,7 @@ void Game::updatePlayer(){
         health[i] = json_["turns"][turn]["players_data"][i]["health"];
         std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
         std::string mineCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["mines_left"]));
-        upgrades[i].setString("POWER:"+bombPower+"\nMINES:"+mineCount);
+        upgrades[i].setString("POWER: "+bombPower+"\nMINES:  "+mineCount);
 
         int part;
         if(health[i]>initialHealth){

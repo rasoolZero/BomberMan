@@ -32,8 +32,8 @@ class Game
     protected:
 
     private:
-        const sf::Color player1Theme = sf::Color(156,40,40);
-        const sf::Color player2Theme = sf::Color(40,40,156);
+        const sf::Color player1Theme = sf::Color(255, 176, 32);
+        const sf::Color player2Theme = sf::Color(0, 200, 255);
         RenderWindow &window;
         json json_;
         thor::ResourceHolder<Texture,std::string> & textures;
@@ -55,8 +55,10 @@ class Game
         unsigned controlHeight;
         int health[2];
         int heartTextureSize;
-        int const fontSize=17;
+        int const fontSize=18;
+        int const minFontSize = 12;
         Text upgrades[2], names[2], extraHealth[2], winnerText;
+        Transformable player_info_transformable;
 
         int turn;
         float timePassed=0;
