@@ -9,6 +9,7 @@ using namespace sf;
 
 Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio & _audio, int _width,int _height, thor::ResourceHolder<Texture,std::string> & _textures) :
                 window(_window),game(_game),audio(_audio),width(_width),height(_height),textures(_textures),manager(_manager)
+    ,turn_seek{ {_window.getSize().x - 40.f, 9.f} }
 {
 
 
@@ -38,6 +39,12 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     soundButtons[0].setTexture(&textures["music_off"]);
     soundButtons[1].setTexture(&textures["sound_on"]);
 
+    turn_seek.setPosition(20, window.getSize().y - (height + 9) / 2);
+}
+
+void Control::load(int turnCount)
+{
+    turn_seek.setTurnCount(turnCount);
 }
 
 void Control::draw(){
@@ -46,6 +53,7 @@ void Control::draw(){
         window.draw(buttons[i]);
     for(int i=0;i<2;i++)
         window.draw(soundButtons[i]);
+    window.draw(turn_seek);
 }
 
 void Control::update(){

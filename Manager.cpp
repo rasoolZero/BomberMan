@@ -100,4 +100,5 @@ void Manager::manageInput(Event event)
 void Manager::loadGame(std::string log_dir)
 {
 	game_ptr->load(log_dir);
+	control_ptr->load(game_ptr->getLastTurn());
 }

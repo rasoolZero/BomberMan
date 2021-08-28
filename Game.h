@@ -25,6 +25,7 @@ class Game
         bool setTurn(int _turn);
         bool setTurn(double progress); // progress between 0 and 1
         int getTurn(){return this->turn;}
+        int getLastTurn() { return this->totalTurns; }
 
         void setPlaying(bool _playing);
         bool getPlaying(){return playing;}

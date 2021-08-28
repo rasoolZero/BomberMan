@@ -4,6 +4,7 @@
 #include <Thor/Resources.hpp>
 #include "Manager.h"
 #include "Audio.h"
+#include "AdjustBar.h"
 #define BUTTONS 6
 
 using namespace sf;
@@ -14,6 +15,7 @@ class Control
 {
     public:
         Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio & _audio, int _width,int _height, thor::ResourceHolder<Texture,std::string> & _textures);
+        void load(int turnCount);
         void draw();
         void update();
         void manageKey(Event::KeyEvent key, bool released = false);
@@ -27,11 +29,12 @@ class Control
         RectangleShape buttons[BUTTONS];
         RectangleShape background;
         RectangleShape soundButtons[2];
-
+        AdjustBar turn_seek;
         RenderWindow &window;
         Manager& manager;
         Audio & audio;
         Game & game;
+
         int width;
         int height;
         int speed=1;
