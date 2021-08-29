@@ -10,8 +10,8 @@ float map(float value, float istart, float istop, float ostart, float ostop) {
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 }
 
-Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures,
-           thor::ResourceHolder<Font,int> & _fonts , unsigned _offset): window(_window),textures(_textures)
+Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,std::string> & _textures,
+           thor::ResourceHolder<Font,int> & _fonts , unsigned _offset): window(_window),audio(_audio),textures(_textures)
 {
     obstacle.setTexture(&textures["obstacle"]);
     box.setTexture(&textures["box"]);
@@ -153,6 +153,7 @@ void Game::update(Time DeltaTime){
     if(timePassed>=timeThreshold){
         timePassed=0.0;
         turn++;
+        playSoundEffect();
         if(turn==totalTurns+1){
             turn--;
         }
@@ -305,6 +306,7 @@ bool Game::setTurn(int _turn){
             return false;
         }
         turn = totalTurns;
+        playSoundEffect();
     }
     else if (_turn < 0) {
         if (turn == 0) {
@@ -314,6 +316,7 @@ bool Game::setTurn(int _turn){
     }
     else {
         turn = _turn;
+        playSoundEffect();
     }
     timePassed=0;
     updatePlayer();
@@ -444,4 +447,21 @@ void Game::initPlayerAnimation(){
             animators["player2"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
         }
 
+}
+
+void Game::playSoundEffect(){
+    if(turn == totalTurns){
+        audio.play(Audio::Winner);
+    }
+    if(turn>0){
+        bool flag = false;
+        for(int i=0;i<json_["turns"][turn-1]["bombs"].size();i++){
+            if(json_["turns"][turn-1]["bombs"][i]["steps_passed"] == bombDelay){
+                flag = true;
+                break;
+            }
+        }
+        if(flag)
+            audio.play(Audio::Boom);
+    }
 }

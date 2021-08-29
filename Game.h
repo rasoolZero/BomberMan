@@ -5,6 +5,7 @@
 #include <Thor/Animations.hpp>
 #include <SFML/Graphics.hpp>
 #include "Player_Action.h"
+#include "Audio.h"
 #include <unordered_map>
 #define ANIMATOR thor::Animator<sf::RectangleShape, std::string>
 using namespace sf;
@@ -16,7 +17,7 @@ class Game
 {
 
     public:
-        Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures ,
+        Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,std::string> & _textures ,
             thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
         void update(Time DeltaTime);
         void changeSpeed(int _speed);
@@ -35,6 +36,7 @@ class Game
         const sf::Color player1Theme = sf::Color(156,40,40);
         const sf::Color player2Theme = sf::Color(40,40,156);
         RenderWindow &window;
+        Audio &audio;
         json json_;
         thor::ResourceHolder<Texture,std::string> & textures;
         RectangleShape obstacle,box,deadzone,bombMask,winnerDisplay,player[2], heart[2], playerInfo;
@@ -75,6 +77,7 @@ class Game
         Vector2f getPlayerPosition(int _turn,int player);
         void updatePlayer();
         void initPlayerAnimation();
+        void playSoundEffect();
 };
 
 #endif // GAME_H
