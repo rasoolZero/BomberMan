@@ -26,6 +26,7 @@ void Manager::update(Time DeltaTime) {
 	switch (this->active_screen) {
 	case State::game:
 		game_ptr->update(DeltaTime);
+		control_ptr->update(DeltaTime);
 		control_ptr->draw();
 		break;
 	case State::menu:
@@ -70,6 +71,7 @@ void Manager::manageInput(Event event)
 			menu_ptr->updateMouse(event.mouseMove);
 			break;
 		case Manager::game:
+			control_ptr->updateMouse(event.mouseMove);
 			break;
 		default:
 			break;

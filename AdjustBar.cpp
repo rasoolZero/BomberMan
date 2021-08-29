@@ -20,17 +20,19 @@ void AdjustBar::setTurnCount(int turnCount)
 {
 	this->turn_count = turnCount;
 	this->turn_width = static_cast<double>(size.x) / turn_count;
+	bar.setSize(Vector2f(0, size.y));
 }
 
-void AdjustBar::setValue(float mouseX)
+void AdjustBar::setProgress(float mouseX)
 {
-	mouseX = mouseX - this->getPosition().x;
+	mouseX = mouseX - this->getPosition().x + turn_width / 3;
 	if (mouseX < 0) {
 		mouseX = 0;
 	}
 	else if (mouseX > size.x) {
 		mouseX = size.x;
 	}
+	mouseX = static_cast<int>(mouseX / turn_width) * turn_width;
 	bar.setSize(Vector2f(mouseX, size.y));
 }
 
@@ -39,9 +41,14 @@ double AdjustBar::getProgress()
 	return static_cast<double>(bar.getSize().x) / size.x;
 }
 
+void AdjustBar::setValue(int value)
+{
+	bar.setSize(Vector2f(turn_width * value, size.y));
+}
+
 int AdjustBar::getValue()
 {
-	return bar.getSize().x / turn_width;
+	return (bar.getSize().x + 0.5) / turn_width;
 }
 
 void AdjustBar::advance(double turns)
@@ -53,6 +60,11 @@ void AdjustBar::advance(double turns)
 	else if (bar.getSize().x > size.x) {
 		bar.setSize(size);
 	}
+}
+
+bool AdjustBar::contains(Vector2f point)
+{
+	return base.getGlobalBounds().contains(this->getTransform().getInverse() * point);
 }
 
 void AdjustBar::draw(sf::RenderTarget& target, sf::RenderStates states) const

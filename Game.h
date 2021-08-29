@@ -20,6 +20,7 @@ class Game
             thor::ResourceHolder<Font,int> & _fonts, unsigned _controlHeight);
         void update(Time DeltaTime);
         void changeSpeed(int _speed);
+        float getTurnTime() { return this->timeThreshold; }
         void load(std::string logAddress);
 
         bool setTurn(int _turn);

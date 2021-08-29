@@ -17,9 +17,10 @@ class Control
         Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio & _audio, int _width,int _height, thor::ResourceHolder<Texture,std::string> & _textures);
         void load(int turnCount);
         void draw();
-        void update();
+        void update(Time DeltaTime);
         void manageKey(Event::KeyEvent key, bool released = false);
         void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);
+        void updateMouse(Event::MouseMoveEvent mouseMove);
         bool isPlaying(){return playing;}
 
     protected:
@@ -41,8 +42,11 @@ class Control
         bool playing=false;
         bool sound=true;
         bool music=false;
+        bool adjusting = false;
 
         void toggleSound(bool sound_selected);
+        void setTurn(int turn);
+        void setTurn(double progress);
 };
 
 #endif // CONTROL_H
