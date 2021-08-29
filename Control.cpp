@@ -2,6 +2,7 @@
 #include "Game.h"
 #include <string>
 #include <iostream>
+#include <cmath>
 
 using namespace sf;
 
@@ -15,11 +16,11 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
 
     background.setPosition(0, window.getSize().y - height);
     background.setSize(Vector2f(width,height));
-    background.setFillColor(Color(50,50,50));
+    background.setFillColor(Color(20,20,20));
 
     //float const scale = std::min((width-20)/2.0,(height-300)/double(BUTTONS));
-    float const scale = std::min((width - 300) / 2.0, double(height));
-    float const side_offset = window.getSize().y - scale;
+    float const scale = std::min((width - 300) / 2.0, 40.0);
+    float const side_offset = window.getSize().y - scale * 1.125;
     float const side_margin = 30;
     float const left_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
     for(int i=0;i<BUTTONS;i++){
@@ -39,26 +40,63 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     soundButtons[0].setTexture(&textures["music_off"]);
     soundButtons[1].setTexture(&textures["sound_on"]);
 
-    turn_seek.setPosition(20, window.getSize().y - (height + 18) );
+    turn_seek.setPosition(20, window.getSize().y - (height + 58) );
+    bar_transformable.setOrigin(turn_seek.getPosition());
+
+    active_area.top     = window.getSize().y * 0.875;
+    active_area.height  = window.getSize().y * 0.125;
+    active_area.width   = window.getSize().x;
+    active_area.left    = 0;
 }
 
 void Control::load(int turnCount)
 {
     turn_seek.setTurnCount(turnCount);
+    for (int i = 0; i < BUTTONS; i++) {
+        button_transformable[i].setPosition((active_position - inactive_position));
+        buttons[i].setFillColor(Color(255, 255, 255, 0));
+    }
+    bar_transformable.setScale(1, 0.5);
+    bar_transformable.setPosition(turn_seek.getPosition() + (active_position - inactive_position) * 1.125f);
 }
 
 void Control::draw(){
     window.draw(background);
     for(int i=0;i<BUTTONS;i++)
-        window.draw(buttons[i]);
+        window.draw(buttons[i], button_transformable[i].getTransform());
     for(int i=0;i<2;i++)
-        window.draw(soundButtons[i]);
-    window.draw(turn_seek);
+        window.draw(soundButtons[i], button_transformable[i + 1].getTransform());
+    window.draw(turn_seek, bar_transformable.getTransform());
 }
 
 void Control::update(Time DeltaTime){
     if (playing) {
         turn_seek.advance(static_cast<double>(DeltaTime.asSeconds()) / game.getTurnTime());
+    }
+    bool changed = false;
+    if (active_area.contains(Mouse::getPosition()) && progress < 1.0) {
+        progress += DeltaTime / activation_time;
+        changed = true;
+    }
+    else if (!active_area.contains(Mouse::getPosition()) && progress > 0.0) {
+        progress -= DeltaTime / activation_time;
+        changed = true;
+    }
+    if (changed) {
+        if (progress > 1.0) {
+            progress = 1.0;
+        }
+        else if (progress < 0.0) {
+            progress = 0.0;
+        }
+        for (int i = 0; i < BUTTONS; i++) {
+            button_transformable[i].setPosition((active_position - inactive_position) * (1.f - pow(progress, 1 + abs(2 - i) / 2.f)));
+            Color t = buttons[i].getFillColor();
+            t.a = 255 * pow(progress, 2);
+            buttons[i].setFillColor(t);
+        }
+        bar_transformable.setScale(1, 0.5 + 0.5 * progress);
+        bar_transformable.setPosition(turn_seek.getPosition() + (active_position - inactive_position) * (1.f - progress) * 1.125f);
     }
 }
 

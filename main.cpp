@@ -13,7 +13,7 @@
 #include "tinyfiledialogs.h"
 #include "macros.h"
 #define OS Windows
-#define CONTROL_HEIGHT 50
+#define CONTROL_HEIGHT 20
 using namespace sf;
 using json = nlohmann::json;
 

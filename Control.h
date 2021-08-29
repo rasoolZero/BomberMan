@@ -44,6 +44,14 @@ class Control
         bool music=false;
         bool adjusting = false;
 
+        const Vector2f active_position = Vector2f(0, 0);
+        const Vector2f inactive_position = Vector2f(0, -60);
+        const Time activation_time = seconds(0.25);
+        float progress = 0;
+        Transformable button_transformable[BUTTONS];
+        Transformable bar_transformable;
+        IntRect active_area;
+
         void toggleSound(bool sound_selected);
         void setTurn(int turn);
         void setTurn(double progress);
