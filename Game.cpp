@@ -281,7 +281,9 @@ void Game::displayWinner(){
 
 void Game::changeSpeed(int _speed){
     speed=_speed;
+    float timeRatio = timePassed / timeThreshold;
     timeThreshold = timeThresholds[speed];
+    timePassed = timeThreshold * timeRatio;
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name = Resources_n::sprites[i];
         animators[name].playAnimation(name+std::to_string(speed),true);
