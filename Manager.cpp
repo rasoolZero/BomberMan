@@ -11,14 +11,23 @@ Manager::Manager(RenderWindow* window_ptr)
 {
 }
 
-void Manager::setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr) {
+void Manager::setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr,thor::ResourceHolder<SoundBuffer,int>* soundBuffers) {
 	this->intro_ptr = intro_ptr;
 	this->menu_ptr = menu_ptr;
 	this->control_ptr = control_ptr;
 	this->game_ptr = game_ptr;
+	this->soundBuffers = soundBuffers;
 }
 
 void Manager::setState(State state) {
+    if(this->active_screen == State::intro){
+        for(int i=0;i<Resources_n::soundsCount;i++){
+            if(Resources_n::sounds[i] == "Intro"){
+                soundBuffers->release(i);
+                break;
+            }
+        }
+    }
 	this->active_screen = state;
 }
 

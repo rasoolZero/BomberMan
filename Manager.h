@@ -2,6 +2,9 @@
 #define MANAGER_H
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <Thor/Resources.hpp>
+#include <SFML/Audio.hpp>
+#include "Resources_n.h"
 using namespace sf;
 class Intro;
 class Menu;
@@ -15,7 +18,7 @@ public:
 		intro, menu, game
 	};
 	Manager(RenderWindow* window_ptr);
-	void setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr);
+	void setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr,thor::ResourceHolder<SoundBuffer,int>* soundBuffers);
 	void setState(State state = State::intro);
 	State getState() { return this->active_screen; }
 	void update(Time DeltaTime);
@@ -28,6 +31,7 @@ private:
 	Menu* menu_ptr;
 	Control* control_ptr;
 	Game* game_ptr;
+    thor::ResourceHolder<SoundBuffer,int>* soundBuffers;
 	RenderWindow* window_ptr;
 };
 

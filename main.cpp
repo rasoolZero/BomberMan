@@ -99,7 +99,7 @@ int main()
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
     //Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
     Control controls(window, manager, game, audio, window.getSize().x, CONTROL_HEIGHT, textures);
-    manager.setPointers(&intro, &menu, &controls, &game);
+    manager.setPointers(&intro, &menu, &controls, &game, &soundBuffers);
 
     #ifdef DEBUGGING
     Clock timer;
