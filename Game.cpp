@@ -510,7 +510,8 @@ void Game::playSoundEffect(){
             }
         }
         if(flag){
-            audio.play(Audio::Boom);
+            if(playing)
+                audio.play(Audio::Boom);
             animators["fire"].playAnimation(std::string("fire")+std::to_string(speed),true);
         }
     }
