@@ -92,9 +92,9 @@ int main()
     Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    Game game(window,textures,fonts,CONTROL_WIDTH);
     //game.load("log.json");
     Audio audio(soundBuffers);
+    Game game(window,audio,textures,fonts,CONTROL_WIDTH);
     Intro intro(window, bg, &textures["logo"], manager, audio);
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
     Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
