@@ -25,8 +25,9 @@ void Manager::setState(State state) {
 void Manager::update(Time DeltaTime) {
 	switch (this->active_screen) {
 	case State::game:
-		control_ptr->draw();
 		game_ptr->update(DeltaTime);
+		control_ptr->update(DeltaTime);
+		control_ptr->draw();
 		break;
 	case State::menu:
 		menu_ptr->update(DeltaTime);
@@ -70,6 +71,7 @@ void Manager::manageInput(Event event)
 			menu_ptr->updateMouse(event.mouseMove);
 			break;
 		case Manager::game:
+			control_ptr->updateMouse(event.mouseMove);
 			break;
 		default:
 			break;
@@ -105,4 +107,5 @@ void Manager::loadMenu(double progress)
 void Manager::loadGame(std::string log_dir)
 {
 	game_ptr->load(log_dir);
+	control_ptr->load(game_ptr->getLastTurn());
 }

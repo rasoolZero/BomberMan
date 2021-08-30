@@ -13,7 +13,7 @@
 #include "tinyfiledialogs.h"
 #include "macros.h"
 #define OS Windows
-#define CONTROL_WIDTH 150
+#define CONTROL_HEIGHT 20
 using namespace sf;
 using json = nlohmann::json;
 
@@ -92,12 +92,13 @@ int main()
     Color bg(10, 10, 10);
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
-    //game.load("log.json");
+
     Audio audio(soundBuffers);
-    Game game(window,audio,textures,fonts,CONTROL_WIDTH);
+    Game game(window,audio,textures,fonts, CONTROL_HEIGHT);
     Intro intro(window, bg, &textures["logo"], manager, audio);
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
-    Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+    //Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
+    Control controls(window, manager, game, audio, window.getSize().x, CONTROL_HEIGHT, textures);
     manager.setPointers(&intro, &menu, &controls, &game);
 
     #ifdef DEBUGGING
@@ -135,7 +136,7 @@ int main()
         #ifdef DEBUGGING
         //if (manager.getState() == Manager::State::game) {
             Time t = timer.restart();
-            text.setString("step: " + std::to_string(game.getTurn()) + "\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
+            text.setString("step: " + std::to_string(game.getTurn()) + "\t@(" + std::to_string(Mouse::getPosition().x) + ", " + std::to_string(Mouse::getPosition().y) +")\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
             window.draw(text);
         //}
         #endif // DEBUGGING
