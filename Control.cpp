@@ -133,6 +133,11 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             setTurn(game.getTurn() - step);
             break;
         }
+        case Keyboard::Key::F:
+            game.showFullName(0, 1);
+            game.showFullName(1, 1);
+            break;
+
         default:
             if (Keyboard::Key::Num0 <= key.code && key.code <= Keyboard::Key::Num9) {
                 setTurn((key.code - Keyboard::Key::Num0) / 10.0);
@@ -185,6 +190,11 @@ void Control::manageKey(Event::KeyEvent key, bool released)
         case Keyboard::Key::R:
             setTurn(0);
             audio.play(Audio::Rewind);
+            break;
+
+        case Keyboard::Key::F:
+            game.showFullName(0, 0);
+            game.showFullName(1, 0);
             break;
 
         default:
@@ -258,6 +268,9 @@ void Control::updateMouse(Event::MouseMoveEvent mouseMove)
         turn_seek.setProgress(mouseMove.x);
         //assert(turn_seek.getValue() == int(turn_seek.getProgress() * game.getLastTurn()));
         setTurn(turn_seek.getValue());
+    }
+    else {
+        game.updateMouse(Vector2f(mouseMove.x, mouseMove.y));
     }
 }
 

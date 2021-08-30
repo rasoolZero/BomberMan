@@ -59,10 +59,15 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     const float spacing = 50;// (window.getSize().y - controlHeight) / 8.0;
 
     for(int i=0;i<2;i++){
+        player_info_transformable[i].setPosition(playerInfoLeftOffset, 5 + i * (infoSize.y / 2));
         names[i].setFont(_fonts[0]);
         names[i].setCharacterSize(fontSize);
         names[i].setStyle(Text::Bold);
         names[i].setPosition(0,50);
+        fullnames[i].setFont(_fonts[0]);
+        fullnames[i].setCharacterSize(minFontSize);
+        fullnames[i].setStyle(Text::Bold);
+        fullnames[i].setPosition(0, 50);
         heart[i].setSize(Vector2f(spacing,spacing));
         heart[i].setPosition(names[i].getPosition() + Vector2f(infoSize.x - spacing - 20, fontSize+5));
         heart[i].setTexture(&textures["heart"]);
@@ -81,6 +86,10 @@ Game::Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _t
     upgrades[1].setFillColor(player2Theme);
     names[0].setFillColor(player1Theme);
     names[1].setFillColor(player2Theme);
+    fullnames[0].setFillColor(player1Theme);
+    fullnames[1].setFillColor(player2Theme);
+    fullnames[0].setString("...");
+    three_dot_width = fullnames[0].getGlobalBounds().width;
 }
 void Game::load(std::string logAddress){
 
@@ -99,10 +108,24 @@ void Game::load(std::string logAddress){
     const std::string name2 = json_["initial_game_data"]["player_2_name"];
     names[0].setString(name1);
     names[1].setString(name2);
+    fullnames[0].setString(name1);
+    fullnames[1].setString(name2);
     for(int i=0;i<2;i++){
+        showing_fullname[i] = false;
         names[i].setCharacterSize(fontSize);
         while((names[i].getGlobalBounds().width + playerInfoLeftOffset) >= infoSize.x && names[i].getCharacterSize() >= minFontSize)
             names[i].setCharacterSize(names[i].getCharacterSize()-1);
+        truncated[i] = false;
+        if ((names[i].getGlobalBounds().width + playerInfoLeftOffset) >= infoSize.x) {
+            //truncate if still bigger than allowed
+            int c = 0;
+            float x = names[i].findCharacterPos(c).x;
+            while (names[i].findCharacterPos(c).x + three_dot_width <= infoSize.x) {
+                c++;
+            }
+            names[i].setString(names[i].getString().substring(0, c - 2) + "...");
+            truncated[i] = true;
+        }
     }
 
     timeThreshold=timeThresholds[speed];
@@ -169,6 +192,18 @@ void Game::update(Time DeltaTime){
     }
     updatePlayer();
     draw();
+}
+
+void Game::updateMouse(Vector2f position)
+{
+    for (int i = 0; i < 2; i++) {
+        if (names[i].getGlobalBounds().contains(player_info_transformable[i].getInverseTransform() * position)) {
+            showing_fullname[i] = true;
+        }
+        else {
+            showing_fullname[i] = false;
+        }
+    }
 }
 
 void Game::draw(){
@@ -244,11 +279,15 @@ void Game::draw(){
 
     window.draw(playerInfo);
     for(int i=0;i<2;i++){
-        player_info_transformable.setPosition(playerInfoLeftOffset,5+i*(infoSize.y/2));
-        window.draw(heart[i],        player_info_transformable.getTransform());
-        window.draw(upgrades[i],     player_info_transformable.getTransform());
-        window.draw(names[i],        player_info_transformable.getTransform());
-        window.draw(extraHealth[i],  player_info_transformable.getTransform());
+        window.draw(heart[i],        player_info_transformable[i].getTransform());
+        window.draw(upgrades[i],     player_info_transformable[i].getTransform());
+        window.draw(extraHealth[i],  player_info_transformable[i].getTransform());
+        if (truncated[i] && showing_fullname[i]) {
+            window.draw(fullnames[i],player_info_transformable[i].getTransform());
+        }
+        else {
+            window.draw(names[i],    player_info_transformable[i].getTransform());
+        }
     }
     if(turn == totalTurns)
         displayWinner();
@@ -300,6 +339,11 @@ void Game::changeSpeed(int _speed){
 }
 void Game::setPlaying(bool _playing){
     playing=_playing;
+}
+
+void Game::showFullName(bool player, bool show)
+{
+    showing_fullname[player] = show;
 }
 
 bool Game::setTurn(int _turn){

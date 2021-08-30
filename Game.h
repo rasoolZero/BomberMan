@@ -19,6 +19,7 @@ class Game
         Game(RenderWindow & _window,thor::ResourceHolder<Texture,std::string> & _textures ,
             thor::ResourceHolder<Font,int> & _fonts, unsigned _controlHeight);
         void update(Time DeltaTime);
+        void updateMouse(Vector2f position);
         void changeSpeed(int _speed);
         float getTurnTime() { return this->timeThreshold; }
         void load(std::string logAddress);
@@ -30,6 +31,8 @@ class Game
 
         void setPlaying(bool _playing);
         bool getPlaying(){return playing;}
+
+        void showFullName(bool player, bool show);
 
     protected:
 
@@ -59,8 +62,11 @@ class Game
         int heartTextureSize;
         int const fontSize=18;
         int const minFontSize = 12;
-        Text upgrades[2], names[2], extraHealth[2], winnerText;
-        Transformable player_info_transformable;
+        Text upgrades[2], names[2], fullnames[2], extraHealth[2], winnerText;
+        float three_dot_width;
+        bool truncated[2];
+        bool showing_fullname[2];
+        Transformable player_info_transformable[2];
 
         int turn;
         float timePassed=0;
