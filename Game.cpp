@@ -150,8 +150,8 @@ void Game::update(Time DeltaTime){
     timePassed+=DeltaTime.asSeconds();
     if(!playing || turn==totalTurns)
         timePassed=0.0;
-    if(timePassed>=timeThreshold){
-        timePassed=0.0;
+    while(timePassed/timeThreshold>=1){
+        timePassed=timePassed-timeThreshold;
         turn++;
         if(turn==totalTurns+1){
             turn--;

@@ -90,7 +90,7 @@ void Control::update(Time DeltaTime){
             progress = 0.0;
         }
         for (int i = 0; i < BUTTONS; i++) {
-            button_transformable[i].setPosition((active_position - inactive_position) * (1.f - pow(progress, 1 + abs(2 - i) / 2.f)));
+            button_transformable[i].setPosition((active_position - inactive_position) * (1.f - powf(progress, 1 + abs(2 - i) / 2.f)));
             Color t = buttons[i].getFillColor();
             t.a = 255 * pow(progress, 2);
             buttons[i].setFillColor(t);
