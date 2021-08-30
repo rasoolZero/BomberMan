@@ -170,8 +170,9 @@ void Game::load(std::string logAddress){
 }
 
 void Game::update(Time DeltaTime){
-    timePassed+=DeltaTime.asSeconds();
-    if(!playing || turn==totalTurns)
+    if(playing)
+        timePassed+=DeltaTime.asSeconds();
+    if(turn==totalTurns)
         timePassed=0.0;
     while(timePassed/timeThreshold>=1){
         timePassed=timePassed-timeThreshold;
@@ -508,7 +509,9 @@ void Game::playSoundEffect(){
                 break;
             }
         }
-        if(flag)
+        if(flag){
             audio.play(Audio::Boom);
+            animators["fire"].playAnimation(std::string("fire")+std::to_string(speed),true);
+        }
     }
 }
