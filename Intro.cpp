@@ -192,9 +192,9 @@ void Intro::update(Time DeltaTime)
 void Intro::manageKey(Event::KeyEvent key, bool released)
 {
 #ifdef DEBUGGING
-	if (active_piece >= 0 && !released) {
+	if (active_piece >= 0 && released) {
 #else
-	if (active_piece == 8 && !released) {
+	if (active_piece == 8 && released) {
 #endif // DEBUGGING
 		if (key.code == Keyboard::Key::Space || key.code == Keyboard::Key::Escape || key.code == Keyboard::Key::Enter) {
 			//skip the final logo animation

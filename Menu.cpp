@@ -135,7 +135,7 @@ void Menu::appear(double progress)
 }
 
 void Menu::manageKey(Event::KeyEvent key, bool released) {
-	if (!released) {
+	if (released) {
 		if (key.code == Keyboard::Key::Escape) {
 			window.close();
 		}
