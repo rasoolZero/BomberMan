@@ -342,7 +342,7 @@ void Game::changeSpeed(int _speed){
 void Game::setPlaying(bool _playing){
     playing=_playing;
     if(playing && timePassed==0.0)
-        playSoundEffect();
+        setupTurn();
 }
 
 void Game::showFullName(bool player, bool show)
