@@ -146,7 +146,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             if (music) {
                 music = false;
                 audio.stop(Audio::Music);
-                buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
+                buttons[4].setTexture(&textures["speed_button_" + std::to_string(speed)]);
                 soundButtons[0].setTexture(&textures["music_off"]);
             }
             playing = false;
@@ -165,7 +165,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             else {
                 speed = (speed + 1) % 3 + 1;
             }
-            buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
+            buttons[4].setTexture(&textures["speed_button_" + std::to_string(speed)]);
             game.changeSpeed(speed);
             audio.play(Audio::Click);
             break;
@@ -218,7 +218,7 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
                     }
                     else if (i == 4) { //change speed
                         speed = speed % 3 + 1;
-                        buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
+                        buttons[4].setTexture(&textures["speed_button_" + std::to_string(speed)]);
                         game.changeSpeed(speed);
                         audio.play(Audio::Click);
                     }
