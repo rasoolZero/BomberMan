@@ -55,6 +55,7 @@ class Control
         void toggleSound(bool sound_selected);
         void setTurn(int turn);
         void setTurn(double progress);
+        void setPlaying();
 };
 
 #endif // CONTROL_H

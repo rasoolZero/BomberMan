@@ -70,7 +70,7 @@ void Control::draw(){
 }
 
 void Control::update(Time DeltaTime){
-    if (playing) {
+    if (playing && !adjusting) {
         turn_seek.advance(static_cast<double>(DeltaTime.asSeconds()) / game.getTurnTime());
     }
     bool changed = false;
@@ -138,7 +138,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
         case Keyboard::Key::Space:
         case Keyboard::Key::Enter:
             playing = !playing;
-            game.setPlaying(playing);
+            setPlaying();
             audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
             break;
 
@@ -150,7 +150,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
                 soundButtons[0].setTexture(&textures["music_off"]);
             }
             playing = false;
-            game.setPlaying(false);
+            setPlaying();
             game.changeSpeed(1);
             manager.setState(Manager::State::menu);
             break;
@@ -213,12 +213,12 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
                     }
                     else if (i == 2) { //stop
                         playing = false;
-                        game.setPlaying(playing);
+                        setPlaying();
                         audio.play(Audio::Pause);
                     }
                     else if (i == 3) { //play
                         playing = true;
-                        game.setPlaying(playing);
+                        setPlaying();
                         audio.play(Audio::Play);
                     }
                     else if (i == 5) { //change speed
@@ -244,7 +244,8 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
             }
             adjusting = turn_seek.contains(pos);
             if (adjusting) {
-                 turn_seek.setProgress(pos.x);
+                turn_seek.setProgress(pos.x);
+                setPlaying();
                 setTurn(turn_seek.getValue());
             }
         }
@@ -253,6 +254,7 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
         if (mouseButton.button == Mouse::Button::Left) {
             if (adjusting) {
                 adjusting = false;
+                setPlaying();
                 audio.play(Audio::Sounds::Click);
             }
         }
@@ -313,4 +315,9 @@ void Control::setTurn(double progress)
     else {
         audio.play(Audio::Failed);
     }
+}
+
+void Control::setPlaying()
+{
+    game.setPlaying(playing && !adjusting);
 }
