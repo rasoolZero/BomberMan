@@ -38,10 +38,8 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
         for(int j=0;j<frames;j++)
             animations[name].addFrame(1.f,IntRect(j*textureEdge,0,textureEdge,textureEdge));
         animators.insert(std::pair<std::string,ANIMATOR>(name,ANIMATOR()));
-        for(int j=1;j<=3;j++)
-            animators[name].addAnimation(name+std::to_string(j),animations[name],seconds(timeThresholds[j]));
-
-        animators[name].playAnimation(name+std::to_string(speed),true);
+        animators[name].addAnimation(name,animations[name],seconds(timeThresholds[1]));
+        animators[name].playAnimation(name,true);
     }
     player[0].setTexture(&textures["player1"]);
     player[1].setTexture(&textures["player2"]);
@@ -163,7 +161,7 @@ void Game::load(std::string logAddress){
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
         shapes[name].setSize(Vector2f(scale,scale));
-        animators[name].playAnimation(name+std::to_string(speed),true);
+        animators[name].playAnimation(name,true);
     }
 
     updatePlayer();
@@ -182,14 +180,15 @@ void Game::update(Time DeltaTime){
             turn--;
         }
     }
+    Time realDeltaTime = seconds(DeltaTime.asSeconds()*timeThresholds[1]/timeThreshold);
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
-        animators[name].update(playing?DeltaTime:seconds(0));
+        animators[name].update(playing?realDeltaTime:seconds(0));
         animators[name].animate(shapes[name]);
     }
     for(int i=0;i<2;i++){
         std::string name = "player"+std::to_string(i+1);
-        animators[name].update(playing?DeltaTime:seconds(0));
+        animators[name].update(playing?realDeltaTime:seconds(0));
         animators[name].animate(player[i]);
     }
     updatePlayer();
@@ -325,19 +324,6 @@ void Game::changeSpeed(int _speed){
     float timeRatio = timePassed / timeThreshold;
     timeThreshold = timeThresholds[speed];
     timePassed = timeThreshold * timeRatio;
-    for(int i=0;i<Resources_n::spritesCount;i++){
-        std::string & name = Resources_n::sprites[i];
-        animators[name].playAnimation(name+std::to_string(speed),true);
-    }
-    for(int i=0;i<2;i++){
-        std::string name = "player"+std::to_string(i+1);
-        if(animators[name].isPlayingAnimation()){
-            std::string animation = animators[name].getPlayingAnimation();
-            animation.pop_back();
-            animation+=std::to_string(speed);
-            animators[name].playAnimation(animation,true);
-        }
-    }
 }
 void Game::setPlaying(bool _playing){
     playing=_playing;
@@ -458,7 +444,6 @@ void Game::updatePlayer(){
                 }
             }
         }
-        nextAnimation+=std::to_string(speed);
         if(animators[name].isPlayingAnimation()){
             if(animators[name].getPlayingAnimation()!=nextAnimation)
                 animators[name].playAnimation(nextAnimation,true);
@@ -491,12 +476,10 @@ void Game::initPlayerAnimation(){
     for(int i=0;i<2;i++)
         animators.insert(std::pair<std::string,ANIMATOR>("player"+std::to_string(i+1),ANIMATOR()));
 
-    for(int i=0;i<8;i++)
-        for(int j=1;j<=3;j++){
-            animators["player1"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
-            animators["player2"].addAnimation(playerAnimations[i]+std::to_string(j),animations[playerAnimations[i]],seconds(timeThresholds[j]));
-        }
-
+    for(int i=0;i<8;i++){
+        animators["player1"].addAnimation(playerAnimations[i],animations[playerAnimations[i]],seconds(timeThresholds[1]));
+        animators["player2"].addAnimation(playerAnimations[i],animations[playerAnimations[i]],seconds(timeThresholds[1]));
+    }
 }
 
 void Game::setupTurn(){
@@ -514,7 +497,7 @@ void Game::setupTurn(){
         if(flag){
             if(playing)
                 audio.play(Audio::Boom);
-                animators["fire"].playAnimation(std::string("fire") + std::to_string(speed), false);
+                animators["fire"].playAnimation("fire", false);
         }
     }
 }
