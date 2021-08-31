@@ -10,8 +10,8 @@ using namespace sf;
 class Audio
 {
     public:
-        enum Sounds{Pause,Play,Rewind,Click,Failed,Capture,Music,Intro,Boom,Winner};
-        Audio( thor::ResourceHolder<SoundBuffer,int> & soundBuffers);
+        enum Sounds{Pause,Play,Rewind,Click,Failed,Capture,Intro,Boom,Winner,Music};
+        Audio( thor::ResourceHolder<SoundBuffer,int> & soundBuffers, sf::Music* _music);
         void play(Sounds _sound);
         void stop(Sounds _sound);
         void setSound(bool _sound){this->sound=_sound;}
@@ -21,6 +21,7 @@ class Audio
     private:
     std::vector<Sound> sounds;
     thor::ResourceHolder<SoundBuffer,int> & buffers;
+    sf::Music* music;
     bool sound=true;
     int const SOUNDS = Resources_n::soundsCount;
 };

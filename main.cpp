@@ -52,6 +52,7 @@ int main()
     thor::ResourceHolder<Texture,std::string> textures;
     thor::ResourceHolder<SoundBuffer,int> soundBuffers;
     thor::ResourceHolder<Font,int> fonts;
+    Music music;
     try{
         for(int i=0;i<Resources_n::texturesCount;i++)
             textures.acquire(Resources_n::textures[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::textures[i]+".png")).setSmooth(true);
@@ -63,6 +64,9 @@ int main()
         for(int i=0;i<Resources_n::soundsCount;i++)
             soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources_n::sounds[i]+".flac"));
         fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Roboto-Light.ttf"));
+        if (!music.openFromFile("assets/sounds/" + Resources_n::music)) {
+            throw thor::ResourceLoadingException("Failed to open" + Resources_n::music);
+        }
     }
     catch(thor::ResourceLoadingException& e){
         std::string message = e.what();
@@ -72,7 +76,7 @@ int main()
         while (message.find_first_of('\'') != std::string::npos) {
             message[message.find_first_of('\'')] = '*';
         }
-        tinyfd_messageBox("missing file!", message.c_str(), "ok", "error", 1);
+        tinyfd_messageBox("error", message.c_str(), "ok", "error", 1);
         std::cout << e.what() << std::endl;
         return 1;
     }
@@ -93,7 +97,7 @@ int main()
     Manager manager(&window);
     window.setVerticalSyncEnabled(true);
 
-    Audio audio(soundBuffers);
+    Audio audio(soundBuffers, &music);
     Game game(window,audio,textures,fonts, CONTROL_HEIGHT);
     Intro intro(window, bg, &textures["logo"], manager, audio);
     Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
