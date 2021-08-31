@@ -5,7 +5,7 @@
 #include "Manager.h"
 #include "Audio.h"
 #include "AdjustBar.h"
-#define BUTTONS 6
+#define BUTTONS 5
 
 using namespace sf;
 

@@ -29,10 +29,10 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     }
     buttons[0].setTexture(&textures["rewind_button"]);
     buttons[1].setTexture(&textures["backward_button"]);
-    buttons[2].setTexture(&textures["pause_button"]);
-    buttons[3].setTexture(&textures["play_button"]);
-    buttons[4].setTexture(&textures["forward_button"]);
-    buttons[5].setTexture(&textures["speed_button_1"]);
+    //buttons[2].setTexture(&textures["pause_button"]);
+    buttons[2].setTexture(&textures["play_button"]);
+    buttons[3].setTexture(&textures["forward_button"]);
+    buttons[4].setTexture(&textures["speed_button_1"]);
     for(int i=0;i<2;i++){
         soundButtons[i].setSize(Vector2f(scale/2.0,scale/2.0));
         soundButtons[i].setPosition(side_margin/2.0*(i+1) + scale/2.0*i , side_offset + scale/4.0);
@@ -211,17 +211,12 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
                         setTurn(0);
                         audio.play(Audio::Rewind);
                     }
-                    else if (i == 2) { //stop
-                        playing = false;
+                    else if (i == 2) { //play / pause
+                        playing = !playing;
                         setPlaying();
-                        audio.play(Audio::Pause);
+                        audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
                     }
-                    else if (i == 3) { //play
-                        playing = true;
-                        setPlaying();
-                        audio.play(Audio::Play);
-                    }
-                    else if (i == 5) { //change speed
+                    else if (i == 4) { //change speed
                         speed = speed % 3 + 1;
                         buttons[5].setTexture(&textures["speed_button_" + std::to_string(speed)]);
                         game.changeSpeed(speed);
@@ -230,7 +225,7 @@ void Control::manageMouse(Event::MouseButtonEvent mouseButton, bool released) {
                     else if (i == 1) { //backward
                         setTurn(game.getTurn() - 1);
                     }
-                    else if (i == 4) { //forward
+                    else if (i == 3) { //forward
                         setTurn(game.getTurn() + 1);
                     }
                     return;
@@ -319,5 +314,6 @@ void Control::setTurn(double progress)
 
 void Control::setPlaying()
 {
+    buttons[2].setTexture(playing ? &textures["pause_button"] : &textures["play_button"]);
     game.setPlaying(playing && !adjusting);
 }
