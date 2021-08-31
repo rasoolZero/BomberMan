@@ -88,7 +88,7 @@ class Game
         Vector2f getPlayerPosition(int _turn,int player);
         void updatePlayer();
         void initPlayerAnimation();
-        void playSoundEffect();
+        void setupTurn();
 };
 
 #endif // GAME_H

@@ -139,9 +139,6 @@ void Control::manageKey(Event::KeyEvent key, bool released)
         case Keyboard::Key::Enter:
             playing = !playing;
             game.setPlaying(playing);
-            if (!playing) {
-                turn_seek.setValue(game.getTurn());
-            }
             audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
             break;
 

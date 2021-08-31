@@ -177,7 +177,7 @@ void Game::update(Time DeltaTime){
     while(timePassed/timeThreshold>=1){
         timePassed=timePassed-timeThreshold;
         turn++;
-        playSoundEffect();
+        setupTurn();
         if(turn==totalTurns+1){
             turn--;
         }
@@ -354,7 +354,7 @@ bool Game::setTurn(int _turn){
             return false;
         }
         turn = totalTurns;
-        playSoundEffect();
+        setupTurn();
     }
     else if (_turn < 0) {
         if (turn == 0) {
@@ -364,7 +364,7 @@ bool Game::setTurn(int _turn){
     }
     else {
         turn = _turn;
-        playSoundEffect();
+        setupTurn();
     }
     timePassed=0;
     updatePlayer();
@@ -497,7 +497,7 @@ void Game::initPlayerAnimation(){
 
 }
 
-void Game::playSoundEffect(){
+void Game::setupTurn(){
     if(turn == totalTurns){
         audio.play(Audio::Winner);
     }
@@ -512,7 +512,7 @@ void Game::playSoundEffect(){
         if(flag){
             if(playing)
                 audio.play(Audio::Boom);
-            animators["fire"].playAnimation(std::string("fire")+std::to_string(speed),true);
+                animators["fire"].playAnimation(std::string("fire") + std::to_string(speed), false);
         }
     }
 }
