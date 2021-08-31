@@ -22,7 +22,7 @@ Control::Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio &
     float const scale = std::min((width - 300) / 2.0, 40.0);
     float const side_offset = window.getSize().y - scale * 1.125;
     float const side_margin = 30;
-    float const left_offset = (width/2.0)-(BUTTONS/2-1)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
+    float const left_offset = (width/2.0)-(BUTTONS/2)*side_margin-(side_margin/2)-(BUTTONS/2)*scale;
     for(int i=0;i<BUTTONS;i++){
         buttons[i].setSize(Vector2f(scale,scale));
         buttons[i].setPosition(left_offset + i * side_margin + i * scale, side_offset);
