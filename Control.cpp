@@ -105,16 +105,6 @@ void Control::manageKey(Event::KeyEvent key, bool released)
     if (!released) {
         switch (key.code)
         {
-        case Keyboard::Key::Space:
-        case Keyboard::Key::Enter:
-            playing = !playing;
-            game.setPlaying(playing);
-            if (!playing) {
-                turn_seek.setValue(game.getTurn());
-            }
-            audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
-            break;
-
         case Keyboard::Key::D:
         case Keyboard::Key::Right: {
             int step = 1;
@@ -139,18 +129,22 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             break;
 
         default:
-            if (Keyboard::Key::Num0 <= key.code && key.code <= Keyboard::Key::Num9) {
-                setTurn((key.code - Keyboard::Key::Num0) / 10.0);
-            }
-            else if (Keyboard::Key::Numpad0 <= key.code && key.code <= Keyboard::Key::Numpad9) {
-                setTurn((key.code - Keyboard::Key::Numpad0) / 10.0);
-            }
             break;
         }
     }
     else { // on release
         switch (key.code)
         {
+        case Keyboard::Key::Space:
+        case Keyboard::Key::Enter:
+            playing = !playing;
+            game.setPlaying(playing);
+            if (!playing) {
+                turn_seek.setValue(game.getTurn());
+            }
+            audio.play(playing ? Audio::Sounds::Play : Audio::Sounds::Pause);
+            break;
+
         case Keyboard::Key::Escape:
             if (music) {
                 music = false;
@@ -198,6 +192,12 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             break;
 
         default:
+            if (Keyboard::Key::Num0 <= key.code && key.code <= Keyboard::Key::Num9) {
+                setTurn((key.code - Keyboard::Key::Num0) / 10.0);
+            }
+            else if (Keyboard::Key::Numpad0 <= key.code && key.code <= Keyboard::Key::Numpad9) {
+                setTurn((key.code - Keyboard::Key::Numpad0) / 10.0);
+            }
             break;
         }
     }
