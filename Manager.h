@@ -5,6 +5,7 @@
 #include <Thor/Resources.hpp>
 #include <SFML/Audio.hpp>
 #include "Resources_n.h"
+#include "Mask.h"
 using namespace sf;
 class Intro;
 class Menu;
@@ -17,7 +18,7 @@ public:
 	enum State {
 		intro, menu, game
 	};
-	Manager(RenderWindow* window_ptr);
+	Manager(RenderWindow* window_ptr, Color background_color, Texture* logo_texture);
 	void setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr,thor::ResourceHolder<SoundBuffer,int>* soundBuffers);
 	void setState(State state = State::intro);
 	State getState() { return this->active_screen; }
@@ -27,12 +28,20 @@ public:
 	void loadGame(std::string log_dir);
 private:
 	State active_screen = State::intro;
+	State next_state;
+	RenderTexture next_screen;
 	Intro* intro_ptr;
 	Menu* menu_ptr;
 	Control* control_ptr;
 	Game* game_ptr;
     thor::ResourceHolder<SoundBuffer,int>* soundBuffers;
 	RenderWindow* window_ptr;
+	Color bg;
+
+	bool transiting;
+	Mask masks[2];
+	RenderTexture new_screen;
+	Texture* logo_texture;
 };
 
 #endif // !MANAGER_H

@@ -12,6 +12,7 @@ class Menu
 public:
 	Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio);
 	void update(Time DeltaTime);
+	void draw(RenderTarget* target = nullptr);
 	void appear(double progress);
 	void manageKey(Event::KeyEvent key, bool released = false);
 	void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);

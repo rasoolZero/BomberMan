@@ -6,9 +6,21 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 using namespace sf;
-Manager::Manager(RenderWindow* window_ptr)
+Manager::Manager(RenderWindow* window_ptr, Color background_color, Texture* logo_texture)
 	:window_ptr{ window_ptr }
+	,bg{background_color}
+	,masks{
+		{static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {window_ptr->getSize().x + static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(0,0,0)}
+		, {static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {-static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(0,0,0)}
+	}
 {
+	next_screen.create(window_ptr->getSize().x, window_ptr->getSize().y);
+	for (int i = 0; i < 2; i++) {
+		masks[i].setBackTexture(&next_screen.getTexture());
+		masks[i].setBodyTexture(logo_texture);
+		masks[i].setBodyTextureColor(Color(150, 150, 200));
+	}
+	
 }
 
 void Manager::setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr,thor::ResourceHolder<SoundBuffer,int>* soundBuffers) {
@@ -28,7 +40,27 @@ void Manager::setState(State state) {
             }
         }
     }
-	this->active_screen = state;
+	if (active_screen != State::intro) {
+		transiting = true;
+		next_state = state;
+		next_screen.clear(bg);
+		switch (active_screen)
+		{
+		case Manager::game:
+			menu_ptr->draw(&next_screen);
+			break;
+		case Manager::menu:
+			game_ptr->draw(&next_screen);
+			control_ptr->draw(&next_screen);
+			break;
+		default:
+			break;
+		}
+		next_screen.display();
+	}
+	else {
+		active_screen = state;
+	}
 }
 
 void Manager::update(Time DeltaTime) {
@@ -47,10 +79,25 @@ void Manager::update(Time DeltaTime) {
 	default:
 		break;
 	}
+	if (transiting) {
+		masks[0].update(DeltaTime);
+		masks[1].update(DeltaTime);
+		window_ptr->draw(masks[0]);
+		window_ptr->draw(masks[1]);
+		if (masks[0].getProgress() == 1.f && masks[1].getProgress() == 1.f) {
+			transiting = false;
+			masks[0].reset();
+			masks[1].reset();
+			this->active_screen = next_state;
+		}
+	}
 }
 
 void Manager::manageInput(Event event)
 {
+	if (transiting) {
+		return;
+	}
 	if (event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
 		bool released = false;
 		if (event.type == Event::KeyReleased) {

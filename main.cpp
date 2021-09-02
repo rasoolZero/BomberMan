@@ -94,7 +94,7 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
 
     Color bg(10, 10, 10);
-    Manager manager(&window);
+    Manager manager(&window, bg, &textures["logo"]);
     window.setVerticalSyncEnabled(true);
 
     Audio audio(soundBuffers, &music);

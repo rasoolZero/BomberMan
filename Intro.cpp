@@ -25,8 +25,8 @@ Intro::Intro(RenderWindow& window, Color background_color, Texture* logo_texture
 	, l_parallel_move{ {-(pieces[left_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 	, r_parallel_move{ {(pieces[right_big].getThickness() + gap.x) * 2,0}, MoveAnimation::Mode::settle }
 	, logo_animation{ { 0, -middle.y }, MoveAnimation::Mode::uniform }
-	, l_mask{ middle, middle - Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[left_big].getWing().x, -pieces[left_big].getWing().y) * 1.1f, Color::White, bg }
-	, r_mask{ middle, middle + Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[right_big].getWing().x, -pieces[right_big].getWing().y) * 1.1f, Color::White, bg }
+	, l_mask{ middle, middle - Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[left_big].getWing().x, -pieces[left_big].getWing().y) * 1.1f, Color::White }
+	, r_mask{ middle, middle + Vector2f{400, 0}, seconds(1.75), Vector2f(pieces[right_big].getWing().x, -pieces[right_big].getWing().y) * 1.1f, Color::White }
 {
 	top_veil.setPrimitiveType(TriangleStrip);
 	bot_veil.setPrimitiveType(TriangleStrip);

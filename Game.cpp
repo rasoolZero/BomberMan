@@ -208,36 +208,39 @@ void Game::updateMouse(Vector2f position)
     }
 }
 
-void Game::draw(){
-    window.draw(vertices,&textures["floor"]);
+void Game::draw(RenderTarget* target){
+    if (target == nullptr) {
+        target = &this->window;
+    }
+    target->draw(vertices,&textures["floor"]);
     for(int i=0;i<rows;i++){
         for(int j=0;j<columns;j++){
             int mask = json_["turns"][turn]["map_data"][i][j];
             bool isBox=false;
             if(has_state(mask,Tile_State::wall)){
                 obstacle.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(obstacle);
+                target->draw(obstacle);
             }
             if(has_state(mask,Tile_State::box)){
                 box.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(box);
+                target->draw(box);
                 isBox=true;
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_health)){
                 shapes["powerup1"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["powerup1"]);
+                target->draw(shapes["powerup1"]);
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_range)){
                 shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["powerup2"]);
+                target->draw(shapes["powerup2"]);
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_mine)){
                 shapes["powerup3"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["powerup3"]);
+                target->draw(shapes["powerup3"]);
             }
             if(has_state(mask,Tile_State::mine)){
                 shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["mine"]);
+                target->draw(shapes["mine"]);
             }
         }
     }
@@ -258,11 +261,11 @@ void Game::draw(){
         const sf::Texture& texture = rTexture.getTexture();
         sf::Sprite sprite(texture);
         sprite.setPosition(x*scale+startPoint.x,y*scale+startPoint.y);
-        window.draw(sprite);
+        target->draw(sprite);
     }
 
     for(int i=0;i<2;i++)
-        window.draw(player[i]);
+        target->draw(player[i]);
 
 
     for(int i=0;i<rows;i++){
@@ -270,32 +273,32 @@ void Game::draw(){
             int mask = json_["turns"][turn]["map_data"][i][j];
             if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
                 shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(shapes["fire"]);
+                target->draw(shapes["fire"]);
             }
             if(has_state(mask,Tile_State::deadzone)){
                 deadzone.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                window.draw(deadzone);
+                target->draw(deadzone);
             }
         }
     }
 
-    window.draw(playerInfo);
+    target->draw(playerInfo);
     for(int i=0;i<2;i++){
-        window.draw(heart[i],        player_info_transformable[i].getTransform());
-        window.draw(upgrades[i],     player_info_transformable[i].getTransform());
-        window.draw(extraHealth[i],  player_info_transformable[i].getTransform());
+        target->draw(heart[i],        player_info_transformable[i].getTransform());
+        target->draw(upgrades[i],     player_info_transformable[i].getTransform());
+        target->draw(extraHealth[i],  player_info_transformable[i].getTransform());
         if (truncated[i] && showing_fullname[i]) {
-            window.draw(fullnames[i],player_info_transformable[i].getTransform());
+            target->draw(fullnames[i],player_info_transformable[i].getTransform());
         }
         else {
-            window.draw(names[i],    player_info_transformable[i].getTransform());
+            target->draw(names[i],    player_info_transformable[i].getTransform());
         }
     }
     if(turn == totalTurns)
-        displayWinner();
+        displayWinner(target);
 }
 
-void Game::displayWinner(){
+void Game::displayWinner(RenderTarget* target){
     std::string textToDisplay;
     sf::Color color;
     if(health[0]==0){
@@ -310,13 +313,13 @@ void Game::displayWinner(){
     }
     textToDisplay+=std::string(" WINS! ");
     winnerText.setString(textToDisplay);
-    winnerText.setPosition((window.getSize().x-winnerText.getGlobalBounds().width)/2,(window.getSize().y-winnerText.getGlobalBounds().height)/2);
+    winnerText.setPosition((target->getSize().x-winnerText.getGlobalBounds().width)/2,(target->getSize().y-winnerText.getGlobalBounds().height)/2);
     winnerDisplay.setFillColor(color);
     winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width+10,winnerText.getGlobalBounds().height*3));
-    winnerDisplay.setPosition((window.getSize().x-winnerDisplay.getSize().x)/2.0,(window.getSize().y-winnerDisplay.getSize().y)/2.0);
+    winnerDisplay.setPosition((target->getSize().x-winnerDisplay.getSize().x)/2.0,(target->getSize().y-winnerDisplay.getSize().y)/2.0);
 
-    window.draw(winnerDisplay);
-    window.draw(winnerText);
+    target->draw(winnerDisplay);
+    target->draw(winnerText);
 
 }
 
