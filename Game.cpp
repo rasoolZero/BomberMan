@@ -195,14 +195,14 @@ void Game::update(Time DeltaTime){
     draw();
 }
 
-void Game::updateMouse(Vector2f position)
+void Game::updateMouse(Vector2f position, bool F_pressed)
 {
     for (int i = 0; i < 2; i++) {
         if (names[i].getGlobalBounds().contains(player_info_transformable[i].getInverseTransform() * position)) {
             showing_fullname[i] = true;
         }
         else {
-            showing_fullname[i] = false;
+            showing_fullname[i] = F_pressed;
         }
     }
 }

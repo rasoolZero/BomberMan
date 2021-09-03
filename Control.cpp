@@ -189,6 +189,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
         case Keyboard::Key::F:
             game.showFullName(0, 0);
             game.showFullName(1, 0);
+            game.updateMouse(static_cast<Vector2f>(Mouse::getPosition()));
             break;
 
         default:
@@ -267,7 +268,7 @@ void Control::updateMouse(Event::MouseMoveEvent mouseMove)
         setTurn(turn_seek.getValue());
     }
     else {
-        game.updateMouse(Vector2f(mouseMove.x, mouseMove.y));
+        game.updateMouse(Vector2f(mouseMove.x, mouseMove.y), Keyboard::isKeyPressed(Keyboard::Key::F));
     }
 }
 

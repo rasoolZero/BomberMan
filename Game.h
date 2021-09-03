@@ -21,7 +21,7 @@ class Game
             thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
         void update(Time DeltaTime);
         void draw(RenderTarget* target = nullptr);
-        void updateMouse(Vector2f position);
+        void updateMouse(Vector2f position, bool F_pressed = false);
         void changeSpeed(int _speed);
         float getTurnTime() { return this->timeThreshold; }
         void load(std::string logAddress);
