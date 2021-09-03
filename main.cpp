@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
+#include <memory>
 #include "tinyfiledialogs.h"
 #include "macros.h"
 #define OS Windows
@@ -94,19 +95,18 @@ int main()
     Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
-    RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
+    std::unique_ptr<RenderWindow> window = std::make_unique<RenderWindow>(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
 
     Color bg(10, 10, 10);
-    Manager manager(&window, bg, &textures["logo"], &shaders["blur"]);
-    window.setVerticalSyncEnabled(true);
+    window->setVerticalSyncEnabled(true);
 
-    Audio audio(soundBuffers, &music);
-    Game game(window,audio,textures,fonts, CONTROL_HEIGHT);
-    Intro intro(window, bg, &textures["logo"], manager, audio);
-    Menu menu(window, bg, fonts[0], &textures["logo"], manager, audio);
-    //Control controls(window, manager,game,audio,CONTROL_WIDTH,window.getSize().y,textures);
-    Control controls(window, manager, game, audio, window.getSize().x, CONTROL_HEIGHT, textures);
-    manager.setPointers(&intro, &menu, &controls, &game, &soundBuffers);
+    std::unique_ptr<Manager> manager = std::make_unique<Manager>(window.get(), bg, &textures["logo"], &shaders["blur"]);
+    std::unique_ptr<Audio> audio = std::make_unique<Audio>(soundBuffers, &music);
+    std::unique_ptr<Game> game = std::make_unique<Game>(*window,*audio,textures,fonts, CONTROL_HEIGHT);
+    std::unique_ptr<Intro> intro = std::make_unique<Intro>(*window, bg, &textures["logo"], *manager, *audio);
+    std::unique_ptr<Menu> menu = std::make_unique<Menu>(*window, bg, fonts[0], &textures["logo"], *manager, *audio);
+    std::unique_ptr<Control> controls = std::make_unique<Control>(*window, *manager, *game, *audio, window->getSize().x, CONTROL_HEIGHT, textures);
+    manager->setPointers(intro.get(), menu.get(), controls.get(), game.get(), &soundBuffers);
 
     #ifdef DEBUGGING
     Clock timer;
@@ -117,37 +117,35 @@ int main()
     text.setFont(fonts[0]);
     text.setCharacterSize(20);
     #endif // DEBUGGING
-    while (window.isOpen())
+    while (window->isOpen())
     {
         DeltaTime = clk.restart();
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             if (event.type == sf::Event::Closed) {
-                window.close();
+                window->close();
             }
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
-                capture(window);
-                audio.play(Audio::Capture);
+                capture(*window);
+                audio->play(Audio::Capture);
             }
             else if (event.type == Event::MouseMoved || event.type == sf::Event::MouseButtonPressed || event.type == Event::MouseButtonReleased
             || event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
-                manager.manageInput(event);
+                manager->manageInput(event);
             }
         }
 
-        window.clear(bg);
-        //controls.draw();
-        //game.update();
-        manager.update(DeltaTime);
+        window->clear(bg);
+        manager->update(DeltaTime);
         #ifdef DEBUGGING
-        //if (manager.getState() == Manager::State::game) {
+        //if (manager->getState() == Manager::State::game) {
             Time t = timer.restart();
-            text.setString("step: " + std::to_string(game.getTurn()) + "\t@(" + std::to_string(Mouse::getPosition().x) + ", " + std::to_string(Mouse::getPosition().y) +")\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
-            window.draw(text);
+            text.setString("step: " + std::to_string(game->getTurn()) + "\t@(" + std::to_string(Mouse::getPosition().x) + ", " + std::to_string(Mouse::getPosition().y) +")\nFPS: " + std::to_string((int)(1 / t.asSeconds())));
+            window->draw(text);
         //}
         #endif // DEBUGGING
-        window.display();
+        window->display();
     }
 
     return 0;
