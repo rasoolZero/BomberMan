@@ -60,13 +60,16 @@ void Control::load(int turnCount)
     bar_transformable.setPosition(turn_seek.getPosition() + (active_position - inactive_position) * 1.125f);
 }
 
-void Control::draw(){
-    window.draw(background);
+void Control::draw(RenderTarget* target){
+    if (target == nullptr) {
+        target = &this->window;
+    }
+    target->draw(background);
     for(int i=0;i<BUTTONS;i++)
-        window.draw(buttons[i], button_transformable[i].getTransform());
+        target->draw(buttons[i], button_transformable[i].getTransform());
     for(int i=0;i<2;i++)
-        window.draw(soundButtons[i], button_transformable[i + 1].getTransform());
-    window.draw(turn_seek, bar_transformable.getTransform());
+        target->draw(soundButtons[i], button_transformable[i + 1].getTransform());
+    target->draw(turn_seek, bar_transformable.getTransform());
 }
 
 void Control::update(Time DeltaTime){

@@ -50,6 +50,7 @@ int main()
 {
     Time DeltaTime;
     thor::ResourceHolder<Texture,std::string> textures;
+    thor::ResourceHolder<Shader, std::string> shaders;
     thor::ResourceHolder<SoundBuffer,int> soundBuffers;
     thor::ResourceHolder<Font,int> fonts;
     Music music;
@@ -60,7 +61,9 @@ int main()
         textures["player2"].setSmooth(false);
         for(int i=0;i<Resources_n::spritesCount;i++)
             textures.acquire(Resources_n::sprites[i],thor::Resources::fromFile<Texture>("assets/sprites/"+Resources_n::sprites[i]+".png")).setSmooth(true);
-
+        for (int i = 0; i < Resources_n::shadersCount; i++) {
+            shaders.acquire(Resources_n::shaders[i], thor::Resources::fromFile<Shader>("assets/shaders/" + Resources_n::shaders[i] + ".frag", Shader::Type::Fragment)).setUniform("blur_radius", Vector2f(0.006f,0.006f));
+        }
         for(int i=0;i<Resources_n::soundsCount;i++)
             soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources_n::sounds[i]+".flac"));
         fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Roboto-Light.ttf"));
@@ -94,7 +97,7 @@ int main()
     RenderWindow window(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
 
     Color bg(10, 10, 10);
-    Manager manager(&window);
+    Manager manager(&window, bg, &textures["logo"], &shaders["blur"]);
     window.setVerticalSyncEnabled(true);
 
     Audio audio(soundBuffers, &music);

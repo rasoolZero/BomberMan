@@ -104,13 +104,21 @@ void Menu::update(Time DeltaTime)
 			}
 		}
 	}
-	window.draw(logo);
+	draw();
+}
+
+void Menu::draw(RenderTarget* target)
+{
+	if (target == nullptr) {
+		target = &this->window;
+	}
+	target->draw(logo);
 	for (int i = 0; i < BUTTONCOUNT; i++) {
-		window.draw(buttons[i]);
+		target->draw(buttons[i]);
 	}
 	for (int i = 0; i < INFOCOUNT; i++) {
 		if (i != error || (i == error && info[error].getFillColor().a > 0)) {
-			window.draw(info[i]);
+			target->draw(info[i]);
 		}
 	}
 }

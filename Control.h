@@ -16,7 +16,7 @@ class Control
     public:
         Control(RenderWindow & _window, Manager& _manager,Game & _game, Audio & _audio, int _width,int _height, thor::ResourceHolder<Texture,std::string> & _textures);
         void load(int turnCount);
-        void draw();
+        void draw(RenderTarget* target = nullptr);
         void update(Time DeltaTime);
         void manageKey(Event::KeyEvent key, bool released = false);
         void manageMouse(Event::MouseButtonEvent mouseButton, bool released = false);

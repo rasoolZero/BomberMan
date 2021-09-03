@@ -20,6 +20,7 @@ class Game
         Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,std::string> & _textures ,
             thor::ResourceHolder<Font,int> & _fonts, unsigned _offset);
         void update(Time DeltaTime);
+        void draw(RenderTarget* target = nullptr);
         void updateMouse(Vector2f position);
         void changeSpeed(int _speed);
         float getTurnTime() { return this->timeThreshold; }
@@ -83,8 +84,7 @@ class Game
 
         float timeThresholds[4]={0,0.6,0.3,0.2};
 
-        void draw();
-        void displayWinner();
+        void displayWinner(RenderTarget* target);
         Vector2f getPlayerPosition(int _turn,int player);
         void updatePlayer();
         void initPlayerAnimation();

@@ -8,6 +8,9 @@ namespace Resources_n {
     extern int const spritesCount;
     extern std::string sprites[];
 
+    extern int const shadersCount;
+    extern std::string shaders[];
+
     extern int const soundsCount;
     extern std::string sounds[];
     extern std::string music;
