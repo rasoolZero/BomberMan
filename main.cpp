@@ -18,10 +18,13 @@
 using namespace sf;
 using json = nlohmann::json;
 
-void capture(sf::RenderWindow & window){
-    Texture capture;
-    capture.update(window);
-    Image img = capture.copyToImage();//window.capture();
+bool capture(sf::RenderWindow & window){
+    Texture texture;
+	if(!texture.create(window.getSize().x, window.getSize().y))
+		return false;
+
+    texture.update(window);
+    Image img = texture.copyToImage();//window.capture();
 
     size_t maxFound = 0;
     DIR *dir;
@@ -45,6 +48,7 @@ void capture(sf::RenderWindow & window){
     }
 
     img.saveToFile(std::string("Screenshots\\Scr") + std::to_string(maxFound+1) + std::string(".png") );
+    return true;
 }
 
 int main()
@@ -127,8 +131,10 @@ int main()
                 window->close();
             }
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F2) {
-                capture(*window);
-                audio->play(Audio::Capture);
+                if(capture(*window))
+					audio->play(Audio::Capture);
+				else
+					audio->play(Audio::Failed);
             }
             else if (event.type == Event::MouseMoved || event.type == sf::Event::MouseButtonPressed || event.type == Event::MouseButtonReleased
             || event.type == Event::KeyPressed || event.type == Event::KeyReleased) {
