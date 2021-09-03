@@ -11,6 +11,7 @@ public:
 	void update(Time elapsed);
 	Vector2f getPosition(short index = 2);
 	float getProgress() { return this->move.getProgress(); }
+	void setTailPowerScale(double scale) { this->tail_speed_scale = scale; }
 	void setBackTexture(const Texture * back_texture, float back_texture_coefficient = 1.f);
 	void setBodyTexture(const Texture* body_texture, float body_texture_coefficient = 1.f);
 	void setBodyTextureColor(Color color);
@@ -22,6 +23,7 @@ private:
 	Vector2f movement_vector;
 	Vector2f wing_vector;
 	VertexArray vertices;
+	double tail_speed_scale = 1.0;
 	VertexArray body; //target for body_texture 
 	Texture* body_texture = nullptr;
 	float body_texture_coefficient; //affects size of texture on target

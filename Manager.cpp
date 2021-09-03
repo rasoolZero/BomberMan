@@ -17,8 +17,9 @@ Manager::Manager(RenderWindow* window_ptr, Color background_color, Texture* logo
 	next_screen.create(window_ptr->getSize().x, window_ptr->getSize().y);
 	for (int i = 0; i < 2; i++) {
 		masks[i].setBackTexture(&next_screen.getTexture());
-		masks[i].setBodyTexture(logo_texture);
+		masks[i].setBodyTexture(logo_texture, logo_texture->getSize().y / (window_ptr->getSize().y * 1.25f));
 		masks[i].setBodyTextureColor(Color(150, 150, 200));
+		masks[i].setTailPowerScale(0.8);
 	}
 	
 }

@@ -132,7 +132,7 @@ void Mask::setPosition(Vector2f position)
 			return;
 		}
 		vertices[2].position = position;
-		vertices[3].position = source + movement_vector * static_cast<float>(pow(move.getProgress(), 3));
+		vertices[3].position = source + movement_vector * static_cast<float>(pow(move.getProgress(), 3 * tail_speed_scale));
 		//vertices[3].position = source + movement_vector * static_cast<float>(cbrt(2 * move.getProgress() - 1.5) / 1.94 + 0.59);
 		Vector2f difference = vertices[2].position - vertices[3].position; // head - tail
 		double distance = sqrt(pow(difference.x, 2) + pow(difference.y, 2));
