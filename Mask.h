@@ -15,6 +15,7 @@ public:
 	void setBackTexture(const Texture * back_texture, float back_texture_coefficient = 1.f);
 	void setBodyTexture(const Texture* body_texture, float body_texture_coefficient = 1.f);
 	void setBodyTextureColor(Color color);
+	void setBodyShader(Shader* shader) { this->body_shader = shader; }
 	void reset();
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -30,6 +31,7 @@ private:
 	VertexArray back; //target for back_texture
 	Texture* back_texture = nullptr;
 	float back_texture_coefficient; //affects size of texture on target
+	Shader* body_shader;
 	//VertexArray glow;
 	VertexArray front_glow;
 	VertexArray back_glow;

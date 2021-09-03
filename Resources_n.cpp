@@ -8,6 +8,9 @@ namespace Resources_n{
     int const spritesCount=6;
     std::string sprites[spritesCount]={"powerup1","powerup2","powerup3","fire","bomb","mine"};
 
+    int const shadersCount = 1;
+    std::string shaders[shadersCount] = { "blur" };
+
     int const soundsCount=9;
     std::string sounds[soundsCount] = {"Pause","Play","Rewind","Click","Failed","Capture","Intro","Boom","Winner"};
     std::string music = "Music.flac";

@@ -98,8 +98,10 @@ void Mask::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(back, back_texture);
 	}
 	if (body_texture != nullptr) {
-		target.draw(body, body_texture);
-		target.draw(body_fill, body_texture);
+		states.texture = body_texture;
+		states.shader = body_shader;
+		target.draw(body, states);
+		target.draw(body_fill, states);
 	}
 	if (move.getProgress() != 1.0) {
 		//target.draw(front_glow, states);

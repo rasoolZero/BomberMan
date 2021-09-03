@@ -6,20 +6,22 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 using namespace sf;
-Manager::Manager(RenderWindow* window_ptr, Color background_color, Texture* logo_texture)
+Manager::Manager(RenderWindow* window_ptr, Color background_color, Texture* logo_texture, Shader* shader)
 	:window_ptr{ window_ptr }
-	,bg{background_color}
+	, bg{ background_color }
+	, shader{ shader }
 	,masks{
-		{static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {window_ptr->getSize().x + static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(0,0,0)}
-		, {static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {-static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(0,0,0)}
+		{static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {window_ptr->getSize().x + static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(11,0,21)}
+		, {static_cast<Vector2f>(window_ptr->getSize()) / 2.f, {-static_cast<float>(window_ptr->getSize().y) * 125.f / 217.f, window_ptr->getSize().y / 2.f}, seconds(2), {window_ptr->getSize().y * 125.f / 217.f, -static_cast<float>(window_ptr->getSize().y) / 2.f}, Color(11,0,21)}
 	}
 {
 	next_screen.create(window_ptr->getSize().x, window_ptr->getSize().y);
 	for (int i = 0; i < 2; i++) {
 		masks[i].setBackTexture(&next_screen.getTexture());
-		masks[i].setBodyTexture(logo_texture, logo_texture->getSize().y / (window_ptr->getSize().y * 1.25f));
+		masks[i].setBodyTexture(logo_texture, logo_texture->getSize().y / (window_ptr->getSize().y * 1.4f));
 		masks[i].setBodyTextureColor(Color(150, 150, 200));
 		masks[i].setTailPowerScale(0.8);
+		masks[i].setBodyShader(shader);
 	}
 	
 }
