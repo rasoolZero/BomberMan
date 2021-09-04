@@ -165,6 +165,7 @@ void Game::load(std::string logAddress){
     }
 
     updatePlayer();
+    updateAnimators(Time::Zero);
 }
 
 void Game::update(Time DeltaTime){
@@ -180,19 +181,22 @@ void Game::update(Time DeltaTime){
             turn--;
         }
     }
+    updateAnimators(DeltaTime);
+    updatePlayer();
+    draw();
+}
+void Game::updateAnimators(Time DeltaTime){
     Time realDeltaTime = seconds(DeltaTime.asSeconds()*timeThresholds[1]/timeThreshold);
     for(int i=0;i<Resources_n::spritesCount;i++){
         std::string & name=Resources_n::sprites[i];
-        animators[name].update(playing?realDeltaTime:seconds(0));
+        animators[name].update(playing?realDeltaTime:Time::Zero);
         animators[name].animate(shapes[name]);
     }
     for(int i=0;i<2;i++){
         std::string name = "player"+std::to_string(i+1);
-        animators[name].update(playing?realDeltaTime:seconds(0));
+        animators[name].update(playing?realDeltaTime:Time::Zero);
         animators[name].animate(player[i]);
     }
-    updatePlayer();
-    draw();
 }
 
 void Game::updateMouse(Vector2f position, bool F_pressed)

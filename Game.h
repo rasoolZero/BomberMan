@@ -87,6 +87,7 @@ class Game
         void displayWinner(RenderTarget* target);
         Vector2f getPlayerPosition(int _turn,int player);
         void updatePlayer();
+        void updateAnimators(Time DeltaTime);
         void initPlayerAnimation();
         void setupTurn();
 };
