@@ -4,6 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include "macros.h"
+#include "UnicodeConverter.h"
+#include <stdexcept>
 using namespace sf;
 using json = nlohmann::json;
 float map(float value, float istart, float istop, float ostart, float ostop) {
@@ -89,10 +91,13 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
     fullnames[0].setString("...");
     three_dot_width = fullnames[0].getGlobalBounds().width;
 }
-void Game::load(std::string logAddress){
+void Game::load(std::wstring logAddress){
 
 
     std::ifstream i(logAddress);
+    if (!i.good()) {
+        throw std::ios_base::failure("failed to load file");
+    }
     i >> json_;
     i.close();
 
@@ -104,10 +109,10 @@ void Game::load(std::string logAddress){
     bombDelay = json_["initial_game_data"]["bomb_delay"];
     const std::string name1 = json_["initial_game_data"]["player_1_name"];
     const std::string name2 = json_["initial_game_data"]["player_2_name"];
-    names[0].setString(name1);
-    names[1].setString(name2);
-    fullnames[0].setString(name1);
-    fullnames[1].setString(name2);
+    names[0].setString(UnicodeConverter::to_wide(name1));
+    names[1].setString(UnicodeConverter::to_wide(name2));
+    fullnames[0].setString(names[0].getString());
+    fullnames[1].setString(names[1].getString());
     for(int i=0;i<2;i++){
         showing_fullname[i] = false;
         names[i].setCharacterSize(fontSize);

@@ -67,7 +67,7 @@ int main()
         }
         for(int i=0;i<Resources_n::soundsCount;i++)
             soundBuffers.acquire(i,thor::Resources::fromFile<SoundBuffer>("assets/sounds/"+Resources_n::sounds[i]+".flac"));
-        fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Roboto-Light.ttf"));
+        fonts.acquire(0,thor::Resources::fromFile<Font>("assets/fonts/Tahoma.ttf"));
         if (!music.openFromFile("assets/sounds/" + Resources_n::music)) {
             throw thor::ResourceLoadingException("Failed to open" + Resources_n::music);
         }
