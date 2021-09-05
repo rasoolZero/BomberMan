@@ -25,7 +25,7 @@ public:
 	void update(Time DeltaTime);
 	void manageInput(Event event);
 	void loadMenu(double progress);
-	void loadGame(std::string log_dir);
+	void loadGame(std::wstring log_dir);
 private:
 	State active_screen = State::intro;
 	State next_state;

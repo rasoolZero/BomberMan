@@ -24,7 +24,7 @@ class Game
         void updateMouse(Vector2f position, bool F_pressed = false);
         void changeSpeed(int _speed);
         float getTurnTime() { return this->timeThreshold; }
-        void load(std::string logAddress);
+        void load(std::wstring logAddress);
 
         bool setTurn(int _turn);
         bool setTurn(double progress); // progress between 0 and 1

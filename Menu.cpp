@@ -2,7 +2,10 @@
 #include "tinyfiledialogs.h"
 #include <json.hpp>
 #include <cmath>
+#include <stdlib.h>
+#include <string.h>
 #include "macros.h"
+#include "UnicodeConverter.h"
 Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio)
 	:window{window}
 	, bg{ background_color }
@@ -212,15 +215,21 @@ void Menu::chooseFile()
 	std::string temp_str;
 	temp_chr = tinyfd_openFileDialog("select a log file", "", 1, fileTypes, "JSON files", 0);
 	if (temp_chr != NULL) {
+		//int len = strlen(temp_chr);
 		temp_str = temp_chr;
+		//wchar_t* temp_wchr = new wchar_t[len + 1];
+		//mbstowcs(temp_wchr, temp_chr, len + 1);
+		//temp_str = temp_wchr;
+		//delete[] temp_wchr;
 		//free(temp_chr); //memory leak?
-		log_dir = temp_str;
+
+		log_dir = UnicodeConverter::to_wide(temp_str);
 	#ifdef _WIN32
 		temp_str.erase(0, temp_str.find_last_of('\\') + 1);
 	#else //unix
 		temp_str.erase(0, temp_str.find_last_of('/') + 1);
 	#endif
-		info[file].setString(temp_str);
+		info[file].setString(UnicodeConverter::to_wide(temp_str));
 		info[file].setOrigin(info[file].getLocalBounds().width / 2, 0);
 	}
 	if (!log_dir.empty()) {
@@ -239,8 +248,16 @@ void Menu::load()
 	{
 #ifdef DEBUGGING
 		info[error].setString(e.what());
-		info[error].setOrigin(info[error].getLocalBounds().width / 2, 0);
+#else
+		info[error].setString("Invalid file. try choosing a valid JSON file");
 #endif // DEBUGGING
+		info[error].setOrigin(info[error].getLocalBounds().width / 2, 0);
+		info[error].setFillColor(Color::Red);
+		message_timer = Time::Zero;
+	}
+	catch (const std::ios_base::failure& e) {
+		info[error].setString(e.what());
+		info[error].setOrigin(info[error].getLocalBounds().width / 2, 0);
 		info[error].setFillColor(Color::Red);
 		message_timer = Time::Zero;
 	}

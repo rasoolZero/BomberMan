@@ -42,7 +42,7 @@ private:
 	const Time button_color_change_time = seconds(0.25);
 
 	const char* fileTypes[1] = { "*.json" };
-	std::string log_dir;
+	std::wstring log_dir;
 
 	const Time message_display_time = seconds(2);
 	Time message_timer = Time::Zero;
