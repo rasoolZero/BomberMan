@@ -147,7 +147,7 @@ void Menu::appear(double progress)
 
 void Menu::manageKey(Event::KeyEvent key, bool released) {
 	if (released) {
-		if (key.code == Keyboard::Key::Escape) {
+		if (key.code == Keyboard::Key::Escape && exiting_flag) {
 			window.close();
 		}
 		else if (key.code == Keyboard::Key::Left) {
@@ -181,7 +181,11 @@ void Menu::manageKey(Event::KeyEvent key, bool released) {
 			}
 		}
 	}
-	
+	else { //on press
+		if (key.code == Keyboard::Key::Escape) {
+			exiting_flag = true;
+		}
+	}
 }
 
 void Menu::manageMouse(Event::MouseButtonEvent mouseButton, bool released)

@@ -26,6 +26,7 @@ private:
 	Color bg;
 	Texture* logo_texture;
 	Sprite logo;
+	bool exiting_flag = false;
 	enum Texts {
 		AICup, Bomberman, file, error
 	};
