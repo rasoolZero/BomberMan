@@ -7,7 +7,7 @@
 #include "Audio.h"
 #include "Game.h"
 #include <iostream>
-#include <dirent.h>
+#include <filesystem>
 #include <Thor/Resources.hpp>
 #include <json.hpp>
 #include <memory>
@@ -17,6 +17,7 @@
 #define CONTROL_HEIGHT 20
 using namespace sf;
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 bool capture(sf::RenderWindow & window){
     Texture texture;
@@ -27,27 +28,22 @@ bool capture(sf::RenderWindow & window){
     Image img = texture.copyToImage();//window.capture();
 
     size_t maxFound = 0;
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir ("Screenshots\\")) != NULL) {
-        while ((ent = readdir (dir)) != NULL) {
-            size_t number=0;
-            std::string s(ent->d_name);
-            size_t t = s.find_first_of("0123456789");
-            if(t!=std::string::npos){
-                number = std::stoi(ent->d_name+t);
-                if(number>maxFound)
-                    maxFound=number;
-            }
-        }
-        closedir(dir);
+    for(const auto & entry : fs::directory_iterator("Screenshots")) {
+		size_t number=0;
+		std::filesystem::path pathOfEntry = entry.path();
+		std::wstring s = pathOfEntry.filename().wstring();
+		size_t t = s.find_first_of(L"0123456789");
+		if(t!=std::wstring::npos){
+			number = std::stoi(s.c_str()+t);
+			if(number>maxFound)
+				maxFound=number;
+		}
     }
-    else {
-        perror ("Screenshots folder can't be opened");
-        exit(EXIT_FAILURE);
-    }
-
-    img.saveToFile(std::string("Screenshots\\Scr") + std::to_string(maxFound+1) + std::string(".png") );
+    #ifdef _WIN32
+		img.saveToFile(std::string("Screenshots\\Scr") + std::to_string(maxFound+1) + std::string(".png") );
+    #else //unix
+		img.saveToFile(std::string("Screenshots/Scr") + std::to_string(maxFound+1) + std::string(".png") );
+	#endif
     return true;
 }
 
