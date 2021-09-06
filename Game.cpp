@@ -92,7 +92,7 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
     three_dot_width = fullnames[0].getGlobalBounds().width;
 
     darkBackground = VertexArray(PrimitiveType::Quads,4);
-	Color clr = Color(0,0,0,150);
+	Color clr = Color(0,0,0,180);
 	for(int i=0;i<4;i++){
 		darkBackground[i].color = clr;
 	}
