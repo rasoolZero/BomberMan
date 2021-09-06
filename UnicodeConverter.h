@@ -3,7 +3,7 @@
 #include <codecvt>
 #include <locale>
 
-static class UnicodeConverter
+class UnicodeConverter
 {
 public:
 	static std::string to_utf8(const std::wstring& wide_str);

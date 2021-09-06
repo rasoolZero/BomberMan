@@ -56,6 +56,7 @@ class Game
         int initialHealth;
         int bombDelay;
         VertexArray vertices;
+        VertexArray darkBackground;
         sf::RenderTexture rTexture;
 
         sf::BlendMode blendMode=sf::BlendAdd;

@@ -90,6 +90,16 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
     fullnames[1].setFillColor(player2Theme);
     fullnames[0].setString("...");
     three_dot_width = fullnames[0].getGlobalBounds().width;
+
+    darkBackground = VertexArray(PrimitiveType::Quads,4);
+	Color clr = Color(0,0,0,150);
+	for(int i=0;i<4;i++){
+		darkBackground[i].color = clr;
+	}
+	darkBackground[0].position=Vector2f(0,0);
+	darkBackground[1].position=Vector2f(window.getSize().x,0);
+	darkBackground[2].position=static_cast<Vector2f>(window.getSize());
+	darkBackground[3].position=Vector2f(0,window.getSize().y);
 }
 void Game::load(std::wstring logAddress){
 
@@ -309,26 +319,29 @@ void Game::draw(RenderTarget* target){
 void Game::displayWinner(RenderTarget* target){
     std::string textToDisplay;
     sf::Color color;
+    //TODO: update for tiebreakers
+    int winnerIndex;
     if(health[0]==0){
-        textToDisplay = names[1].getString();
         color = player2Theme;
-        color.a=200;
+        color.a = 200;
+		winnerIndex = 1;
     }
     else{
-        textToDisplay = names[0].getString();
         color = player1Theme;
-        color.a=200;
+        color.a = 200;
+		winnerIndex = 0;
     }
+	textToDisplay = names[winnerIndex].getString();
     textToDisplay+=std::string(" WINS! ");
     winnerText.setString(textToDisplay);
     winnerText.setPosition((target->getSize().x-winnerText.getGlobalBounds().width)/2,(target->getSize().y-winnerText.getGlobalBounds().height)/2);
     winnerDisplay.setFillColor(color);
     winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width+10,winnerText.getGlobalBounds().height*3));
     winnerDisplay.setPosition((target->getSize().x-winnerDisplay.getSize().x)/2.0,(target->getSize().y-winnerDisplay.getSize().y)/2.0);
-
+	target->draw(darkBackground);
     target->draw(winnerDisplay);
     target->draw(winnerText);
-
+	target->draw(player[winnerIndex]);
 }
 
 void Game::changeSpeed(int _speed){
