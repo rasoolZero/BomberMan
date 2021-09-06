@@ -13,7 +13,6 @@
 #include <memory>
 #include "tinyfiledialogs.h"
 #include "macros.h"
-#define OS Windows
 #define CONTROL_HEIGHT 20
 using namespace sf;
 using json = nlohmann::json;
@@ -39,11 +38,7 @@ bool capture(sf::RenderWindow & window){
 				maxFound=number;
 		}
     }
-    #ifdef _WIN32
-		img.saveToFile(std::string("Screenshots\\Scr") + std::to_string(maxFound+1) + std::string(".png") );
-    #else //unix
-		img.saveToFile(std::string("Screenshots/Scr") + std::to_string(maxFound+1) + std::string(".png") );
-	#endif
+	img.saveToFile(std::string("Screenshots/Scr") + std::to_string(maxFound+1) + std::string(".png") );
     return true;
 }
 
@@ -84,14 +79,7 @@ int main()
         std::cout << e.what() << std::endl;
         return 1;
     }
-    #if !defined OS
-    #error OS is not defined.
-    #endif
-    #if(OS == Windows)
-        system("mkdir Screenshots 2> nul:");
-    #else
-        system("mkdir Screenshots 2> /dev/null");
-    #endif
+    std::filesystem::create_directory(std::filesystem::path("Screenshots"));
     Clock clk;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
