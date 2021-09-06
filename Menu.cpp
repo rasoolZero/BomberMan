@@ -4,6 +4,7 @@
 #include <cmath>
 #include <stdlib.h>
 #include <string.h>
+#include <filesystem>
 #include "macros.h"
 #include "UnicodeConverter.h"
 Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio)
@@ -219,21 +220,10 @@ void Menu::chooseFile()
 	std::string temp_str;
 	temp_chr = tinyfd_openFileDialog("select a log file", "", 1, fileTypes, "JSON files", 0);
 	if (temp_chr != NULL) {
-		//int len = strlen(temp_chr);
 		temp_str = temp_chr;
-		//wchar_t* temp_wchr = new wchar_t[len + 1];
-		//mbstowcs(temp_wchr, temp_chr, len + 1);
-		//temp_str = temp_wchr;
-		//delete[] temp_wchr;
-		//free(temp_chr); //memory leak?
 
 		log_dir = UnicodeConverter::to_wide(temp_str);
-	#ifdef _WIN32
-		temp_str.erase(0, temp_str.find_last_of('\\') + 1);
-	#else //unix
-		temp_str.erase(0, temp_str.find_last_of('/') + 1);
-	#endif
-		info[file].setString(UnicodeConverter::to_wide(temp_str));
+		info[file].setString(std::filesystem::path(log_dir).filename().wstring());
 		info[file].setOrigin(info[file].getLocalBounds().width / 2, 0);
 	}
 	if (!log_dir.empty()) {
