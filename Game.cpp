@@ -6,6 +6,7 @@
 #include "macros.h"
 #include "UnicodeConverter.h"
 #include <stdexcept>
+#include <filesystem>
 using namespace sf;
 using json = nlohmann::json;
 float map(float value, float istart, float istop, float ostart, float ostop) {
@@ -104,7 +105,8 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
 void Game::load(std::wstring logAddress){
 
 
-    std::ifstream i(logAddress);
+    std::ifstream i;
+    i.open(std::filesystem::path(logAddress));
     if (!i.good()) {
         throw std::ios_base::failure("failed to load file");
     }
