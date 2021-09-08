@@ -70,6 +70,7 @@ class Game
         float three_dot_width;
         bool truncated[2];
         bool showing_fullname[2];
+        int winnerIndex;
         Transformable player_info_transformable[2];
 
         int turn;

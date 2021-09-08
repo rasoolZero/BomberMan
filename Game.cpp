@@ -119,6 +119,8 @@ void Game::load(std::wstring logAddress){
     totalTurns = json_["initial_game_data"]["last_turn"];
     initialHealth = json_["initial_game_data"]["initial_health"];
     bombDelay = json_["initial_game_data"]["bomb_delay"];
+    winnerIndex = json_["initial_game_data"]["winnerId"];
+    winnerIndex--;
     const std::string name1 = json_["initial_game_data"]["player_1_name"];
     const std::string name2 = json_["initial_game_data"]["player_2_name"];
     names[0].setString(UnicodeConverter::to_wide(name1));
@@ -319,22 +321,18 @@ void Game::draw(RenderTarget* target){
 }
 
 void Game::displayWinner(RenderTarget* target){
-    std::string textToDisplay;
+    std::wstring textToDisplay;
     sf::Color color;
-    //TODO: update for tiebreakers
-    int winnerIndex;
-    if(health[0]==0){
+    if(winnerIndex==1){
         color = player2Theme;
         color.a = 200;
-		winnerIndex = 1;
     }
     else{
         color = player1Theme;
         color.a = 200;
-		winnerIndex = 0;
     }
-	textToDisplay = names[winnerIndex].getString();
-    textToDisplay+=std::string(" WINS! ");
+	textToDisplay = names[winnerIndex].getString().toWideString();
+    textToDisplay+=std::wstring(L" WINS! ");
     winnerText.setString(textToDisplay);
     winnerText.setPosition((target->getSize().x-winnerText.getGlobalBounds().width)/2,(target->getSize().y-winnerText.getGlobalBounds().height)/2);
     winnerDisplay.setFillColor(color);
