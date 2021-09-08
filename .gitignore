@@ -1,4 +1,7 @@
 *.dll
+*.rc
+*.ico
+resource.h
 bin
 obj
 BomberMan.*
