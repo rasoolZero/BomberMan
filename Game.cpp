@@ -291,7 +291,7 @@ void Game::draw(RenderTarget* target){
     for(int i=0;i<rows;i++){
         for(int j=0;j<columns;j++){
             int mask = json_["turns"][turn]["map_data"][i][j];
-            if(has_state(mask,Tile_State::fire_origin) || has_state(mask,Tile_State::fire_x) || has_state(mask,Tile_State::fire_y)){
+            if(has_state(mask,Tile_State::fire)){
                 shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 target->draw(shapes["fire"]);
             }

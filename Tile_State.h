@@ -3,23 +3,16 @@
 
 enum Tile_State
 {
-    ground_normal,
-    ground_broken,
     deadzone,
-    fire_x,
-    fire_y,
-    fire_origin,
+    fire,
     box,
-    box_broken,
     wall,
     bomb,
-    bomb_blown,
-    trap,
-    trap_blown,
     upgrade_range,
     upgrade_health,
     upgrade_trap,
     player,
+    trap,
 };
 
 bool has_state(int _state_mask, Tile_State _state_to_check);
