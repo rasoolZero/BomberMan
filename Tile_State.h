@@ -14,11 +14,11 @@ enum Tile_State
     wall,
     bomb,
     bomb_blown,
-    mine,
-    mine_blown,
+    trap,
+    trap_blown,
     upgrade_range,
     upgrade_health,
-    upgrade_mine,
+    upgrade_trap,
     player,
 };
 

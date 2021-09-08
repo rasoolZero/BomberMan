@@ -254,13 +254,13 @@ void Game::draw(RenderTarget* target){
                 shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 target->draw(shapes["powerup2"]);
             }
-            if(!isBox && has_state(mask,Tile_State::upgrade_mine)){
+            if(!isBox && has_state(mask,Tile_State::upgrade_trap)){
                 shapes["powerup3"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 target->draw(shapes["powerup3"]);
             }
-            if(has_state(mask,Tile_State::mine)){
-                shapes["mine"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                target->draw(shapes["mine"]);
+            if(has_state(mask,Tile_State::trap)){
+                shapes["trap"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                target->draw(shapes["trap"]);
             }
         }
     }
@@ -412,8 +412,8 @@ void Game::updatePlayer(){
     for(int i=0;i<2;i++){
         health[i] = json_["turns"][turn]["players_data"][i]["health"];
         std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
-        std::string mineCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["mines_left"]));
-        upgrades[i].setString("POWER: "+bombPower+"\nMINES:  "+mineCount);
+        std::string trapCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["traps_left"]));
+        upgrades[i].setString("POWER: "+bombPower+"\nTRAPS:  "+trapCount);
 
         int part;
         if(health[i]>initialHealth){

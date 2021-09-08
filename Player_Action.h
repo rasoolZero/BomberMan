@@ -9,7 +9,7 @@ enum Player_Action
     go_down,
     stay,
     place_bomb,
-    place_mine,
+    place_trap,
     init_action,
     no_action,
     no_action_timeout,
