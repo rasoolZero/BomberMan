@@ -84,7 +84,8 @@ int main()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 4;
     std::unique_ptr<RenderWindow> window = std::make_unique<RenderWindow>(VideoMode::getDesktopMode(), "BomberMan", Style::Fullscreen,settings);
-
+	sf::Image icon = textures["icon"].copyToImage();
+	window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     Color bg(10, 10, 10);
     window->setVerticalSyncEnabled(true);
 
