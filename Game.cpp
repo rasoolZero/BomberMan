@@ -247,16 +247,16 @@ void Game::draw(RenderTarget* target){
                 isBox=true;
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_health)){
-                shapes["powerup1"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                target->draw(shapes["powerup1"]);
+                shapes["upgrade_health"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                target->draw(shapes["upgrade_health"]);
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_range)){
-                shapes["powerup2"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                target->draw(shapes["powerup2"]);
+                shapes["upgrade_power"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                target->draw(shapes["upgrade_power"]);
             }
             if(!isBox && has_state(mask,Tile_State::upgrade_trap)){
-                shapes["powerup3"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
-                target->draw(shapes["powerup3"]);
+                shapes["upgrade_trap"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
+                target->draw(shapes["upgrade_trap"]);
             }
             if(has_state(mask,Tile_State::trap)){
                 shapes["trap"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);

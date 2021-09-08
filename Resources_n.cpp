@@ -6,7 +6,7 @@ namespace Resources_n{
                         "sound_on","sound_off","music_on","music_off","floor","box","obstacle","player1","player2","heart", "logo"};
 
     int const spritesCount=6;
-    std::string sprites[spritesCount]={"powerup1","powerup2","powerup3","fire","bomb","trap"};
+    std::string sprites[spritesCount]={"upgrade_power","upgrade_trap","upgrade_health","fire","bomb","trap"};
 
     int const shadersCount = 1;
     std::string shaders[shadersCount] = { "blur" };
