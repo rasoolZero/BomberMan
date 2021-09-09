@@ -37,5 +37,6 @@ void Audio::setMasterVolume(float volume)
     sounds[static_cast<int>(Sounds::Capture)].setVolume(60.0 * volume);
     sounds[static_cast<int>(Sounds::Intro)].setVolume(70.f * volume);
     sounds[static_cast<int>(Sounds::Boom)].setVolume(60.f * volume);
+    sounds[static_cast<int>(Sounds::Winner)].setVolume(100.f * volume);
     music->setVolume(45.f * volume);
 }
