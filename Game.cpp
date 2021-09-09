@@ -116,7 +116,7 @@ void Game::load(std::wstring logAddress){
     timePassed=0;
     columns = json_["initial_game_data"]["map_width"];
     rows = json_["initial_game_data"]["map_height"];
-    totalTurns = json_["initial_game_data"]["last_turn"];
+    totalTurns = json_["initial_game_data"]["last_step"];
     initialHealth = json_["initial_game_data"]["initial_health"];
     bombDelay = json_["initial_game_data"]["bomb_delay"];
     winnerIndex = json_["initial_game_data"]["winnerId"];
@@ -237,7 +237,7 @@ void Game::draw(RenderTarget* target){
     target->draw(vertices,&textures["floor"]);
     for(int i=0;i<rows;i++){
         for(int j=0;j<columns;j++){
-            int mask = json_["turns"][turn]["map_data"][i][j];
+            int mask = json_["steps"][turn]["map_data"][i][j];
             bool isBox=false;
             if(has_state(mask,Tile_State::wall)){
                 obstacle.setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
@@ -269,10 +269,10 @@ void Game::draw(RenderTarget* target){
 
 
     //draw bombs
-    for(int i=0;i<json_["turns"][turn]["bombs"].size();i++){
-        int x = json_["turns"][turn]["bombs"][i]["y"];
-        int y = json_["turns"][turn]["bombs"][i]["x"];
-        int stepsPassed = json_["turns"][turn]["bombs"][i]["steps_passed"];
+    for(int i=0;i<json_["steps"][turn]["bombs"].size();i++){
+        int x = json_["steps"][turn]["bombs"][i]["y"];
+        int y = json_["steps"][turn]["bombs"][i]["x"];
+        int stepsPassed = json_["steps"][turn]["bombs"][i]["steps_passed"];
         int alpha = map(stepsPassed,0,bombDelay,0,100);
         bombMask.setFillColor(Color(255,0,0,alpha));
 
@@ -292,7 +292,7 @@ void Game::draw(RenderTarget* target){
 
     for(int i=0;i<rows;i++){
         for(int j=0;j<columns;j++){
-            int mask = json_["turns"][turn]["map_data"][i][j];
+            int mask = json_["steps"][turn]["map_data"][i][j];
             if(has_state(mask,Tile_State::fire)){
                 shapes["fire"].setPosition(j*scale+startPoint.x,i*scale+startPoint.y);
                 target->draw(shapes["fire"]);
@@ -400,17 +400,17 @@ Vector2f Game::getPlayerPosition(int _turn,int player){
         y = json_["initial_game_data"][std::string("player_")+std::to_string(player+1)+std::string("_init_x")];
     }
     else{
-        x = json_["turns"][_turn]["players_data"][player]["y_position"];
-        y = json_["turns"][_turn]["players_data"][player]["x_position"];
+        x = json_["steps"][_turn]["players_data"][player]["y_position"];
+        y = json_["steps"][_turn]["players_data"][player]["x_position"];
     }
     return Vector2f(x*scale+startPoint.x,y*scale+startPoint.y);
 }
 
 void Game::updatePlayer(){
     for(int i=0;i<2;i++){
-        health[i] = json_["turns"][turn]["players_data"][i]["health"];
-        std::string bombPower = std::to_string(int(json_["turns"][turn]["players_data"][i]["bomb_power_level"]));
-        std::string trapCount = std::to_string(int(json_["turns"][turn]["players_data"][i]["traps_left"]));
+        health[i] = json_["steps"][turn]["players_data"][i]["health"];
+        std::string bombPower = std::to_string(int(json_["steps"][turn]["players_data"][i]["bomb_power_level"]));
+        std::string trapCount = std::to_string(int(json_["steps"][turn]["players_data"][i]["traps_left"]));
         upgrades[i].setString("POWER: "+bombPower+"\nTRAPS:  "+trapCount);
 
         int part;
@@ -439,7 +439,7 @@ void Game::updatePlayer(){
         else if(path.y>0)
             nextAnimation = "walk_down";
         else{
-            int actionTaken = json_["turns"][turn]["players_data"][i]["action_taken"];
+            int actionTaken = json_["steps"][turn]["players_data"][i]["action_taken"];
             Player_Action action = static_cast<Player_Action>(actionTaken);
 
             if(static_cast<int>(action) < 4){
@@ -513,8 +513,8 @@ void Game::setupTurn(){
     }
     if(turn>0){
         bool flag = false;
-        for(int i=0;i<json_["turns"][turn-1]["bombs"].size();i++){
-            if(json_["turns"][turn-1]["bombs"][i]["steps_passed"] == bombDelay){
+        for(int i=0;i<json_["steps"][turn-1]["bombs"].size();i++){
+            if(json_["steps"][turn-1]["bombs"][i]["steps_passed"] == bombDelay){
                 flag = true;
                 break;
             }
