@@ -95,7 +95,7 @@ int main()
     std::unique_ptr<Intro> intro = std::make_unique<Intro>(*window, bg, &textures["logo"], *manager, *audio);
     std::unique_ptr<Menu> menu = std::make_unique<Menu>(*window, bg, fonts[0], &textures["logo"], *manager, *audio);
     std::unique_ptr<Control> controls = std::make_unique<Control>(*window, *manager, *game, *audio, window->getSize().x, CONTROL_HEIGHT, textures);
-    manager->setPointers(intro.get(), menu.get(), controls.get(), game.get(), &soundBuffers);
+    manager->setPointers(intro.get(), menu.get(), controls.get(), game.get(), audio.get(), &soundBuffers);
 
     #ifdef DEBUGGING
     Clock timer;

@@ -26,11 +26,12 @@ Manager::Manager(RenderWindow* window_ptr, Color background_color, Texture* logo
 	
 }
 
-void Manager::setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr,thor::ResourceHolder<SoundBuffer,int>* soundBuffers) {
+void Manager::setPointers(Intro* intro_ptr, Menu* menu_ptr, Control* control_ptr, Game* game_ptr, Audio* audio,thor::ResourceHolder<SoundBuffer,int>* soundBuffers) {
 	this->intro_ptr = intro_ptr;
 	this->menu_ptr = menu_ptr;
 	this->control_ptr = control_ptr;
 	this->game_ptr = game_ptr;
+	this->audio_ptr = audio;
 	this->soundBuffers = soundBuffers;
 }
 
@@ -46,20 +47,6 @@ void Manager::setState(State state) {
 	if (active_screen != State::intro) {
 		transiting = true;
 		next_state = state;
-		next_screen.clear(bg);
-		switch (active_screen)
-		{
-		case Manager::game:
-			menu_ptr->draw(&next_screen);
-			break;
-		case Manager::menu:
-			game_ptr->draw(&next_screen);
-			control_ptr->draw(&next_screen);
-			break;
-		default:
-			break;
-		}
-		next_screen.display();
 	}
 	else {
 		active_screen = state;
@@ -83,14 +70,37 @@ void Manager::update(Time DeltaTime) {
 		break;
 	}
 	if (transiting) {
+		next_screen.clear(bg);
+		switch (active_screen)
+		{
+		case Manager::game:
+			menu_ptr->draw(&next_screen);
+			break;
+		case Manager::menu:
+			game_ptr->draw(&next_screen);
+			control_ptr->draw(&next_screen);
+			break;
+		default:
+			break;
+		}
+		next_screen.display();
 		masks[0].update(DeltaTime);
 		masks[1].update(DeltaTime);
+		if (active_screen == State::menu){
+			audio_ptr->setMasterVolume(masks[0].getProgress());
+		}
+		else if (active_screen == State::game) {
+			audio_ptr->setMasterVolume(1 - masks[0].getProgress());
+		}
 		window_ptr->draw(masks[0]);
 		window_ptr->draw(masks[1]);
 		if (masks[0].getProgress() == 1.f && masks[1].getProgress() == 1.f) {
 			transiting = false;
 			masks[0].reset();
 			masks[1].reset();
+			if (active_screen == State::game) {
+				unloadGame();
+			}
 			this->active_screen = next_state;
 		}
 	}
@@ -167,4 +177,9 @@ void Manager::loadGame(std::wstring log_dir)
 {
 	game_ptr->load(log_dir);
 	control_ptr->load(game_ptr->getLastTurn());
+}
+
+void Manager::unloadGame()
+{
+	control_ptr->unload();
 }

@@ -58,6 +58,19 @@ void Control::load(int turnCount)
     }
     bar_transformable.setScale(1, 0.5);
     bar_transformable.setPosition(turn_seek.getPosition() + (active_position - inactive_position) * 1.125f);
+    if (music) {
+        audio.play(Audio::Sounds::Music);
+    }
+}
+
+void Control::unload()
+{
+    audio.stop(Audio::Sounds::Music);
+    playing = false;
+    setPlaying();
+    speed = 1;
+    game.changeSpeed(1);
+    buttons[4].setTexture(&textures["speed_button_" + std::to_string(speed)]);
 }
 
 void Control::draw(RenderTarget* target){
@@ -146,15 +159,6 @@ void Control::manageKey(Event::KeyEvent key, bool released)
             break;
 
         case Keyboard::Key::Escape:
-            if (music) {
-                music = false;
-                audio.stop(Audio::Music);
-                buttons[4].setTexture(&textures["speed_button_" + std::to_string(speed)]);
-                soundButtons[0].setTexture(&textures["music_off"]);
-            }
-            playing = false;
-            setPlaying();
-            game.changeSpeed(1);
             manager.setState(Manager::State::menu);
             break;
 

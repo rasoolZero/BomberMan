@@ -15,7 +15,7 @@ class Audio
         void play(Sounds _sound);
         void stop(Sounds _sound);
         void setSound(bool _sound){this->sound=_sound;}
-
+        void setMasterVolume(float volume); // between 0 and 1
     protected:
 
     private:
