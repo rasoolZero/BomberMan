@@ -7,6 +7,7 @@
 #include "UnicodeConverter.h"
 #include <stdexcept>
 #include <filesystem>
+#include <cmath>
 using namespace sf;
 using json = nlohmann::json;
 float map(float value, float istart, float istop, float ostart, float ostop) {
@@ -24,8 +25,10 @@ Game::Game(RenderWindow & _window, Audio & _audio, thor::ResourceHolder<Texture,
     winnerText.setStyle(Text::Bold);
     winnerText.setCharacterSize(fontSize+12);
     winnerText.setFillColor(Color::White);
+    winnerText.setLineSpacing(10.f);
     winnerDisplay.setOutlineColor(Color::White);
     winnerDisplay.setOutlineThickness(3);
+    winnerDisplay.setFillColor(Color(0,100,0,100));
 
     blendMode.alphaDstFactor = blendMode.DstAlpha;
     blendMode.alphaSrcFactor = blendMode.DstAlpha;
@@ -183,6 +186,26 @@ void Game::load(std::wstring logAddress){
         animators[name].playAnimation(name,true);
     }
 
+    std::wstring textToDisplay;
+    sf::Color color;
+    if (winnerIndex == 1) {
+        color = player2Theme;
+        color.a = 200;
+    }
+    else {
+        color = player1Theme;
+        color.a = 200;
+    }
+    textToDisplay = names[winnerIndex].getString().toWideString();
+    textToDisplay += std::wstring(L" WINS! ");
+    winnerText.setString(textToDisplay);
+    winnerText.setOrigin(winnerText.getLocalBounds().width / 2, winnerText.getLocalBounds().height / 2);
+
+    winnerText.setPosition((window.getSize().x) / 2, (window.getSize().y) / 2.9);
+    winnerText.setColor(winnerIndex == 1 ? player2Theme : player1Theme);
+    winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width + 20, winnerText.getGlobalBounds().height * 3.5));
+    winnerDisplay.setPosition((window.getSize().x - winnerDisplay.getSize().x) / 2, (window.getSize().y - winnerDisplay.getSize().y) / 3);
+
     updatePlayer();
     updateAnimators(Time::Zero);
 }
@@ -190,8 +213,10 @@ void Game::load(std::wstring logAddress){
 void Game::update(Time DeltaTime){
     if(playing)
         timePassed+=DeltaTime.asSeconds();
-    if(turn==totalTurns)
-        timePassed=0.0;
+    if (turn == totalTurns) {
+        timePassed = 0.0;
+        end_progress += DeltaTime;
+    }
     while(timePassed/timeThreshold>=1){
         timePassed=timePassed-timeThreshold;
         turn++;
@@ -199,6 +224,10 @@ void Game::update(Time DeltaTime){
         if(turn==totalTurns+1){
             turn--;
         }
+    }
+
+    for (int i = 0; i < darkBackground.getVertexCount(); i++) {
+        darkBackground[i].color.a = end_progress >= seconds(1.f) ? 180 : 180 * cbrt(end_progress.asSeconds());
     }
     updateAnimators(DeltaTime);
     updatePlayer();
@@ -321,27 +350,10 @@ void Game::draw(RenderTarget* target){
 }
 
 void Game::displayWinner(RenderTarget* target){
-    std::wstring textToDisplay;
-    sf::Color color;
-    if(winnerIndex==1){
-        color = player2Theme;
-        color.a = 200;
-    }
-    else{
-        color = player1Theme;
-        color.a = 200;
-    }
-	textToDisplay = names[winnerIndex].getString().toWideString();
-    textToDisplay+=std::wstring(L" WINS! ");
-    winnerText.setString(textToDisplay);
-    winnerText.setPosition((target->getSize().x-winnerText.getGlobalBounds().width)/2,(target->getSize().y-winnerText.getGlobalBounds().height)/2);
-    winnerDisplay.setFillColor(color);
-    winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width+10,winnerText.getGlobalBounds().height*3));
-    winnerDisplay.setPosition((target->getSize().x-winnerDisplay.getSize().x)/2.0,(target->getSize().y-winnerDisplay.getSize().y)/2.0);
 	target->draw(darkBackground);
+	target->draw(player[winnerIndex]);
     target->draw(winnerDisplay);
     target->draw(winnerText);
-	target->draw(player[winnerIndex]);
 }
 
 void Game::changeSpeed(int _speed){
@@ -362,6 +374,9 @@ void Game::showFullName(bool player, bool show)
 }
 
 bool Game::setTurn(int _turn){
+    if (turn != totalTurns) {
+        end_progress = Time::Zero;
+    }
     if (_turn > totalTurns) {
         if (turn == totalTurns) {
             return false;
@@ -508,7 +523,7 @@ void Game::initPlayerAnimation(){
 }
 
 void Game::setupTurn(){
-    if(turn == totalTurns){
+    if(turn == totalTurns && playing){
         audio.play(Audio::Winner);
     }
     if(turn>0){

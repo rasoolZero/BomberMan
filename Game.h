@@ -78,6 +78,7 @@ class Game
         float timeThreshold;
         bool playing=false;
         int speed=1;
+        Time end_progress = Time::Zero;
 
         std::unordered_map<std::string,RectangleShape> shapes;
         std::unordered_map<std::string,thor::FrameAnimation> animations;
