@@ -202,7 +202,7 @@ void Game::load(std::wstring logAddress){
     winnerText.setOrigin(winnerText.getLocalBounds().width / 2, winnerText.getLocalBounds().height / 2);
 
     winnerText.setPosition((window.getSize().x) / 2, (window.getSize().y) / 2.9);
-    winnerText.setColor(winnerIndex == 1 ? player2Theme : player1Theme);
+    winnerText.setFillColor(winnerIndex == 1 ? player2Theme : player1Theme);
     winnerDisplay.setSize(Vector2f(winnerText.getGlobalBounds().width + 20, winnerText.getGlobalBounds().height * 3.5));
     winnerDisplay.setPosition((window.getSize().x - winnerDisplay.getSize().x) / 2, (window.getSize().y - winnerDisplay.getSize().y) / 3);
 

@@ -132,6 +132,8 @@ void Manager::manageInput(Event event)
 		}
 	}
 	else if (event.type == Event::MouseMoved) {
+		event.mouseMove.x = Mouse::getPosition(*window_ptr).x;
+		event.mouseMove.y = Mouse::getPosition(*window_ptr).y;
 		switch (active_screen)
 		{
 		case Manager::intro:
@@ -151,6 +153,8 @@ void Manager::manageInput(Event event)
 		if (event.type == Event::MouseButtonReleased) {
 			released = true;
 		}
+		event.mouseButton.x = Mouse::getPosition(*window_ptr).x;
+		event.mouseButton.y = Mouse::getPosition(*window_ptr).y;
 		switch (active_screen)
 		{
 		case State::intro:

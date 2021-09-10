@@ -90,11 +90,11 @@ void Control::update(Time DeltaTime){
         turn_seek.advance(static_cast<double>(DeltaTime.asSeconds()) / game.getTurnTime());
     }
     bool changed = false;
-    if (active_area.contains(Mouse::getPosition()) && progress < 1.0) {
+    if (active_area.contains(Mouse::getPosition(window)) && progress < 1.0) {
         progress += DeltaTime / activation_time;
         changed = true;
     }
-    else if (!active_area.contains(Mouse::getPosition()) && progress > 0.0) {
+    else if (!active_area.contains(Mouse::getPosition(window)) && progress > 0.0) {
         progress -= DeltaTime / activation_time;
         changed = true;
     }
@@ -193,7 +193,7 @@ void Control::manageKey(Event::KeyEvent key, bool released)
         case Keyboard::Key::F:
             game.showFullName(0, 0);
             game.showFullName(1, 0);
-            game.updateMouse(static_cast<Vector2f>(Mouse::getPosition()));
+            game.updateMouse(static_cast<Vector2f>(Mouse::getPosition(window)));
             break;
 
         default:

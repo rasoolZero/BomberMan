@@ -1,5 +1,5 @@
 #include <math.h>
-#include "tile_state.h"
+#include "Tile_State.h"
 
 using namespace std;
 
