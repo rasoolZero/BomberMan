@@ -7,13 +7,14 @@
 #include <filesystem>
 #include "macros.h"
 #include "UnicodeConverter.h"
-Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio)
+Menu::Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio, std::string default_path)
 	:window{window}
 	, bg{ background_color }
 	, logo_texture{ logo_texture }
 	, manager{ manager }
 	, audio{ audio }
 	, middle{ static_cast<Vector2f>(window.getSize()) / 2.f }
+	, default_dir{ default_path }
 {
 	logo.setTexture(*logo_texture);
 	logo.setOrigin(static_cast<Vector2f>(logo_texture->getSize()) / 2.f);
@@ -218,7 +219,7 @@ void Menu::chooseFile()
 {
 	char* temp_chr;
 	std::string temp_str;
-	temp_chr = tinyfd_openFileDialog("select a log file", "", 1, fileTypes, "JSON files", 0);
+	temp_chr = tinyfd_openFileDialog("select a log file", default_dir.c_str(), 1, fileTypes, "JSON files", 0);
 	if (temp_chr != NULL) {
 		temp_str = temp_chr;
 

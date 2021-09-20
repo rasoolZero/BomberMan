@@ -10,7 +10,7 @@ using namespace sf;
 class Menu
 {
 public:
-	Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio);
+	Menu(RenderWindow& window, Color background_color, Font& font, Texture* logo_texture, Manager& manager, Audio& audio, std::string default_path = "");
 	void update(Time DeltaTime);
 	void draw(RenderTarget* target = nullptr);
 	void appear(double progress);
@@ -44,6 +44,7 @@ private:
 
 	const char* fileTypes[1] = { "*.json" };
 	std::wstring log_dir;
+	std::string default_dir;
 
 	const Time message_display_time = seconds(2);
 	Time message_timer = Time::Zero;
